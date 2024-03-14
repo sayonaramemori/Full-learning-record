@@ -107,3 +107,9 @@ find [PATH] -type d | xargs chmod 755
 find [PATH] -type f -exec chmod 666 {} \;
 find [PATH] -type f | xargs chmod 666 
 ```
+
+### Amazing relaxing tools
+1. cowsay -f dragon 'hello'
+2. cmatrix
+3. bastet
+4. asciiquarium
