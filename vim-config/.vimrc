@@ -1,5 +1,6 @@
 set relativenumber
 "set cursorline
+set number
 set nohls
 
 set encoding=UTF-8
