@@ -18,6 +18,15 @@ echo '$name' //$name
 #1. lenght
 str1=sbpz
 echo ${#str1}
+
+# = equal test
+if [ $a = $b ]
+# != not eqal
+# -z is zero lenght
+if [ -z $a ]
+# -n is not empty
+# test whether be blank
+if [ $a ]
 ```
 
 ### array
@@ -29,15 +38,6 @@ echo ${myarr[@]}
 echo ${myarr[n]}
 3. get length
 len=${#myarr[@]}
-
-# = equal test
-if [ $a = $b ]
-# != not eqal
-# -z is zero lenght
-if [ -z $a ]
-# -n is not empty
-# test whether be blank
-if [ $a ]
 ```
 
 ### boolean
@@ -50,7 +50,6 @@ if [ $a -lt 9 -a $b -gt 6 ]
 then
 else 
 fi
-
 ```
 
 ### file test
