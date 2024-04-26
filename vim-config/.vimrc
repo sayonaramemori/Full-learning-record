@@ -1,7 +1,7 @@
 set relativenumber
 "set cursorline
 set number
-set nohls
+"set nohls
 
 set encoding=UTF-8
 set history=50
@@ -93,23 +93,14 @@ Plug 'connorholyday/vim-snazzy'
 Plug 'rafi/awesome-vim-colorschemes'
 call plug#end()
 
-"Plug 'ludovicchabant/vim-gutentags'
 colorschem snazzy
 ""colorschem abstract
-
-
-let g:cpp_class_scope_highlight = 1
-let g:cpp_member_variable_highlight = 1
-let g:cpp_class_decl_highlight = 1
-let g:cpp_posix_standard = 1
-let g:cpp_concepts_highlight = 1
 
 nnoremap <leader>n :NERDTreeFocus<CR>
 nnoremap <leader>c :NERDTreeClose<CR>
 nnoremap <C-n> :NERDTree<CR>
 nnoremap <C-t> :NERDTreeToggle<CR>
 nnoremap <C-f> :NERDTreeFind<CR>
-
 
 " Exit Vim if NERDTree is the only window remaining in the only tab.
 autocmd BufEnter * if tabpagenr('$') == 1 && winnr('$') == 1 && exists('b:NERDTree') && b:NERDTree.isTabTree() | quit | endif

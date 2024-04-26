@@ -6,14 +6,11 @@
 ### 2. Download the correct Release from the dist 
 > For my system, OS is Ubuntu 20.04.6 LTS (GNU/Linux 5.4.0-166-generic x86_64), and you can use `lscpu` to detect your computer information, as for my choice:  
 
-![choose_version](./img/choose.jpg)
-
 ### 3. Get config from windows  
 1. Open v2ray GUI client  
 2. Select the alive nodes  
 3. Export it as client configuration  
 
-![config](./img/config.jpg)
 
 ### 4. Put them to your remote computer  
 > If you work on your local computer, skip this step.   
@@ -38,7 +35,6 @@ cd v2ray
 ### 6. Move files to their place  
 > These are the files which we should move manually.  
 
-![files](./img/files.jpg)
 
 > You can copy the below script into a single shell script, and run it with bash  
 ```shell

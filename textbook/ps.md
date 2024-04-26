@@ -33,15 +33,4 @@
 ### Color   
 
 #### Color phase  
-<div style="color:red">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;red</div>
-<span style="color:rgb(255,0,255)">pink red&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
-<span style="color:rgb(255,255,0)">yellow</span>
-<div>
-    <span style="color:blue">blue&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
-    <span style="color:green">green</span>
-</div>
-<div style="color:rgb(0,255,255)">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;a&nbsp;o</div>
-
-
-#### java
 
