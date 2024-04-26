@@ -88,15 +88,14 @@ Plug 'preservim/nerdcommenter'
 Plug 'octol/vim-cpp-enhanced-highlight'
 Plug 'preservim/nerdtree'
 Plug 'vim-airline/vim-airline'
-Plug 'iamcco/markdown-preview.nvim'
+Plug 'iamcco/markdown-preview.nvim', { 'do': { -> mkdp#util#install() }, 'for': ['markdown', 'vim-plug']}
 Plug 'connorholyday/vim-snazzy'
 Plug 'rafi/awesome-vim-colorschemes'
 call plug#end()
 
 "Plug 'ludovicchabant/vim-gutentags'
-""colorschem snazzy
-colorschem abstract
-
+colorschem snazzy
+""colorschem abstract
 
 
 let g:cpp_class_scope_highlight = 1
