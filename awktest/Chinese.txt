@@ -1,0 +1,15 @@
+我们看一下如何在Linux下配置v2ray
+首先我们打开release distribution页面
+根据cpu的架构下载对应的version
+这里我下载的是linux 64位的
+在windows中打开v2ray GUI客户端
+选择可用的节点导出为客户端配置
+这里我将config保存到桌面
+打开终端将下载的文件和config传输到linux中
+然后使用unzip将其解压至v2ray文件夹中
+测试一下二进制文件是否能运行
+至此我们已经将准备工作完成
+将这段命令新建为一个脚本
+然后执行即可
+接下来我们启动v2ray
+测试一下是否启动成功

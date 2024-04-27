@@ -1,0 +1,15 @@
+Let's see how to setup v2ray on linux
+Firstly open the website for release distribution
+Download your version 
+As for my version linux-64 satisfys
+Then back to windows open v2ray GUI client
+Select your nodes in good state and export it as client config
+Here I export it to desktop
+I use sftp to transfer it to the home directory
+Unzip it into the v2ray directory
+Test whether the application works or not
+All the preparation works have been down until now
+Create a new shell script contains these commands
+Run it with bash
+Next we simply start it
+Do a test to ensure it has run correctly
