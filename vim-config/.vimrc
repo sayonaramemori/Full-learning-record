@@ -1,12 +1,12 @@
 set relativenumber
-"set cursorline
 set number
-"set nohls
+"set cursorline
+set nohls
 
 set encoding=UTF-8
 set history=50
 
-set expandtab
+""set expandtab
 set tabstop=4
 set smarttab
 set shiftwidth=4
@@ -49,6 +49,9 @@ vnoremap Y :w !xclip -i -sel c<CR>
 " Set <LEADER> as ;
 let mapleader=";"
 
+vnoremap <Ctrl-q> <Ctrl-v>
+
+
 "open vimrc anytime
 nnoremap <leader>rc :e ~/.vimrc<CR>
 inoremap <leader><leader> <Esc>
@@ -64,7 +67,7 @@ nnoremap <LEADER>h <C-w>h
 nnoremap <LEADER>l <C-w>l
 
 nnoremap <leader>w :wq<CR>
-nnoremap <leader>v :vs 
+nnoremap <leader>v <C-V>
 nnoremap a A
 
 nnoremap <leader>ta :TagbarToggle<CR>
@@ -88,19 +91,31 @@ Plug 'preservim/nerdcommenter'
 Plug 'octol/vim-cpp-enhanced-highlight'
 Plug 'preservim/nerdtree'
 Plug 'vim-airline/vim-airline'
-Plug 'iamcco/markdown-preview.nvim', { 'do': { -> mkdp#util#install() }, 'for': ['markdown', 'vim-plug']}
 Plug 'connorholyday/vim-snazzy'
 Plug 'rafi/awesome-vim-colorschemes'
+Plug 'iamcco/markdown-preview.nvim', { 'do': { -> mkdp#util#install() }, 'for': ['markdown', 'vim-plug']}
 call plug#end()
 
-colorschem snazzy
-""colorschem abstract
+"Plug 'ludovicchabant/vim-gutentags'
+""colorschem snazzy
+colorschem abstract
+
+
+
+let g:cpp_class_scope_highlight = 1
+let g:cpp_member_variable_highlight = 1
+let g:cpp_class_decl_highlight = 1
+let g:cpp_posix_standard = 1
+let g:cpp_concepts_highlight = 1
+
+nnoremap <leader>c I//<ESC>j^
 
 nnoremap <leader>n :NERDTreeFocus<CR>
-nnoremap <leader>c :NERDTreeClose<CR>
+nnoremap <leader>N :NERDTreeClose<CR>
 nnoremap <C-n> :NERDTree<CR>
 nnoremap <C-t> :NERDTreeToggle<CR>
 nnoremap <C-f> :NERDTreeFind<CR>
+
 
 " Exit Vim if NERDTree is the only window remaining in the only tab.
 autocmd BufEnter * if tabpagenr('$') == 1 && winnr('$') == 1 && exists('b:NERDTree') && b:NERDTree.isTabTree() | quit | endif

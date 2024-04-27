@@ -136,6 +136,22 @@ new_df = pd.merge(1,2,key,how='inner')
     # 1 - 1  use on
     # 1 - N  data will be copyed
     # N - M  like a matrix mul
-```
+```  
+
 ![join](./join.jpg)
+
+### Concat  
+> Batch converge for excels with the same structure
+```python
+pd.concat(objs,axis,join,ingore_index)
+#objs -- a list of df or series
+#axis -- default 0, denoting append a line
+#join -- default outer, inner
+
+pd.concat([df1,df2])
+
+#append a line
+pd.append(other,ignore_index)
+
+```
 
