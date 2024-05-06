@@ -67,6 +67,7 @@ nnoremap <LEADER>h <C-w>h
 nnoremap <LEADER>l <C-w>l
 
 nnoremap <leader>w :wq<CR>
+"For operating vim on windows
 nnoremap <leader>v <C-V>
 nnoremap a A
 
@@ -81,7 +82,7 @@ inoremap { {}<ESC>i
 inoremap [ []<ESC>i
 nnoremap - 0
 nnoremap = $
-nnoremap <backspace> d0
+nnoremap <backspace> db
 
 "nnoremap <space> zA
 "set fdm=indent
@@ -97,8 +98,8 @@ Plug 'iamcco/markdown-preview.nvim', { 'do': { -> mkdp#util#install() }, 'for': 
 call plug#end()
 
 "Plug 'ludovicchabant/vim-gutentags'
-""colorschem snazzy
-colorschem abstract
+colorschem snazzy
+"colorschem abstract
 
 
 
