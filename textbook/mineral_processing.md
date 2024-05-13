@@ -31,8 +31,13 @@
 > All minerals are classified into *polar* or *nonpolar* types according to their surface characteristics.  
 
 - Thus: 
-	1. The minerals are composed of covalent molecules held together by van der Waals forces, and the nonpolar surface do not readily attach to the water dipoles, and in consequence are naturally hydrophobic, with contact angles between $60\degree$and $90\degree$ 
-	2. 
+	1. The minerals are composed of covalent molecules held together by van der Waals forces, and the nonpolar surface do not readily attach to the water dipoles, and in consequence are naturally hydrophobic, with contact angles between $60\degree$and $90\degree$. Minerals of this type, such as graphite, sulfur, molybdenite, diamond, coal, and talc, have high natural float-abilitys.
+	2. Minerals with strong covalent or ionic surface bonding are known as polar types and react strongly with water molecules; these minerals are naturally hydropilic.
+
+- Hydropilicity is associated with high solid surface energy and hydrophobicity with low solid surface energy, where high and low are relative to the surface energy of water($\gamma_{w/a}~about~72mJm^{-2}$).  
+- In general, therefore, the degree of polarity, and thus surface energy and hydrophilicity, increases from sulfide minerals, through sulfates, to carbonates, halites, phosphates, etc., then to oxides-hydroxides, and, finally, silicates and quartz, which are strongly hydrophilic.  
+
+
 
 
 
