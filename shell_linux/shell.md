@@ -1,4 +1,4 @@
-### run a shell 
+### Run a shell script
 > 只有第三种在当前进程直接执行，而第一二个则会开启一个新的进程来执行。
 1. absolute path  
 2. bash file.sh

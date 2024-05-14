@@ -1,6 +1,6 @@
 ### A awesome tool for text process  
 1. Converge two files line by line.  
-    - For a file in windows, use dos2unix to preprocess  
+    - For a file from windows, use dos2unix to preprocess  
 2. Text filter and formatter
 
 ### Basic usage 
@@ -60,6 +60,7 @@ FNR==NR	                        {next}
                                     if(length($1)!=min_hie)printf("\t- [%s](#%s)\n",title,anchor)
                                         else printf("- [%s](#%s)\n",title,anchor)
                                 }
+
 # shell script to run this awk script
 if [ -z $2 ];then
 	name="CopyVersion_$1"
