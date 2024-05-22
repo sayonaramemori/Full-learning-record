@@ -6,17 +6,20 @@ use mysql_test::*;
 use std::env;
 use dotenv::dotenv;
 
+const QUERYALL:&str = "select * from student";
+
+
 fn main() {
     dotenv().ok();
     let url= env::var("DATABASE_URL").expect("ENV not found");
     let opt = Opts::from_url(&url).unwrap();
     let pool= Pool::new(opt).unwrap();
     let mut conn = pool.get_conn().unwrap();
-    testQuery(conn.as_mut());
     let stus:Vec<Student> = vec![
-        Student::new("Rust".to_string(),88,"hhhhhhh".to_string()),
-        Student::new("Python".to_string(), 99, "greatest".to_string()),
+        Student::new("javascripts"),
+        Student::new("ruby"),
     ];
-    // testInsert(conn.as_mut(), &stus);
+    //insert(conn.as_mut(), &stus[0]);
+    query(conn.as_mut(),QUERYALL);
     println!("Hello, world!");
 }
