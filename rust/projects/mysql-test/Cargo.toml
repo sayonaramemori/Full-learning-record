@@ -1,0 +1,13 @@
+[package]
+name = "mysql_test"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+chrono="0.4"
+mysql = { version = "25.0.0", features = ["chrono"] }
+dotenv = "=0.15.0"
+
+
+[[bin]]
+name="test"

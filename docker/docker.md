@@ -28,6 +28,7 @@ docker run -d --name someSql -p 3306:3306 -e TZ=Asia/shanghai -e MYSQL_ROOT_PASS
 
 
 ### ps  
+> Show container available  
 ```shell
 #To list the current containers 
 #-a all including exited containers
@@ -45,10 +46,6 @@ docker ps -a
 docker run -d --name nginx -p 80:80 -v html:/usr/share/nginx/html nginx:latest
 docker volume ls
 docker volume inspect [volume-name]
-
-
-#example  
-
 ```
 
 ### Docker File  
