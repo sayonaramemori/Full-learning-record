@@ -2,7 +2,14 @@ fn get(s:String){
     println!("{}",s);
 }
 
-#[derive(Clone)]
+#[derive(Clone,Debug,Default)]
+struct java(
+    String,
+    i32,
+    body,
+);
+
+#[derive(Clone,Debug,Default)]
 struct body {
     age:u8,
     name:String,
@@ -31,6 +38,9 @@ fn test(){
     }
     //v is invalid
     //println!("{}",v.len());
+    let v=(java::default(),java::default());
+    let nv=v;
+    println!("{:?}",nv.0);
 }
 
 fn main() {
