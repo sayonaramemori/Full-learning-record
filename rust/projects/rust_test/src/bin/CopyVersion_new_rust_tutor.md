@@ -1,4 +1,42 @@
-### Install Rust On Linux  
+- [1 Install Rust On Linux](#0)
+- [2 Basic Type](#10)
+- [3 String and char](#41)
+- [4 Ownship](#47)
+	- [4.1 Reference](#55)
+- [5 Life Span](#60)
+- [6 Expression and Statement](#62)
+	- [6.1 Loop](#78)
+	- [6.2 Call a method or function for Generic Type](#94)
+- [7 Built-in Type Implicit Conversion](#108)
+- [8 Error Handle](#113)
+	- [8.1 Propagate errors](#131)
+- [9 Package and Module](#148)
+	- [9.1 cargo](#150)
+	- [9.2 module components](#159)
+	- [9.3 component attribute](#193)
+	- [9.4 test](#199)
+	- [9.5 workspace](#215)
+- [10 Struct](#227)
+- [11 Enumeration](#261)
+- [12 Pattern](#293)
+	- [12.1 Pattern match](#295)
+	- [12.2 Multiply/if/@ match](#344)
+- [13 Trait and Generic type](#362)
+- [14 Iterator](#376)
+- [15 Operator Overload](#385)
+- [16 Useful trait](#394)
+- [17 Closure](#402)
+	- [17.1 Iterator adapter](#408)
+	- [17.2 Other Iterator providers](#454)
+	- [17.3 Consumer iterator](#474)
+		- [17.3.1 Java is good](#516)
+- [18 Collection](#518)
+- [19 String And Text](#521)
+- [20 IO](#523)
+- [21 Spawn](#525)
+- [22 Macro](#527)
+- [23 Unsafe Code](#529)
+### Install Rust On Linux<a id='0'></a>  
 > `curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh`  
     - `cargo --version`  
     - `rustc --version`  
@@ -8,7 +46,7 @@
 > Proxy is preferable.  
 > Using Docker to deploy v2ray  
 
-### Basic Type  
+### Basic Type<a id='10'></a>  
 1. Auto-deduce for variable definition is preset.  
 2. Using `0x,0o,0b` to denote hexadecimal,octal and binary number. 
 3. Using `as` to achieve type conversion.  
@@ -39,13 +77,13 @@
 |fn(&str, usize)->isize|Function pointer|String::from|  
 |\|para\|{body}|Closure|\|a, b\| a\*a+b\*b|
 
-### String and char  
+### String and char<a id='41'></a>  
 1. Every char in string occupies a bit if ASCII otherwise several bits(Unicode).  
 2. You can view String as Vec<u8> and &str as &[u8]. But only u8 can be converted to char.  
 
 
 
-### Ownship  
+### Ownship<a id='47'></a>  
 1. Variable owns its value, being destoryed when out of its scope.  
 2. Moving the ownship leads the original variable uninitialized.  
     - For variable in struct or vector, the rules also apply, leading the field or some datas of specific index uninitialized.  
@@ -53,14 +91,14 @@
 
 > Copy trait including integer, float, char, bool, and tuple and array in which the data implementes the copy trait.  
 
-#### Reference  
+#### Reference<a id='55'></a>  
 > Multiple readers and single writer.  
 
 1. Deep Reference is allowed in Rust.  
 
-### Life Span  
+### Life Span<a id='60'></a>  
 
-### Expression and Statement  
+### Expression and Statement<a id='62'></a>  
 > Comma is meaningful  
 ```rust 
 // An expression  
@@ -76,7 +114,7 @@ let status =
     }
 ```
 
-#### Loop  
+#### Loop<a id='78'></a>  
 > Inclue `while, loop and for`  
 ```rust 
 while condition{
@@ -92,7 +130,7 @@ for pattern in collection {
     block
 }
 ```
-#### Call a method or function for Generic Type
+#### Call a method or function for Generic Type<a id='94'></a>  
 ```rust
 //error, < is an operator
 Vec<i32>::with_capacity(100);
@@ -106,12 +144,12 @@ let ramp = (0..h).collect::<Vec<i32>>();
 return Vec::with_capacity(100); 
 ```
 
-### Built-in Type Implicit Conversion  
+### Built-in Type Implicit Conversion<a id='108'></a>  
 1. `&String` type is auto converted to `&str`  
 2. `&Vec<Type>` is auto converted to `&[Type]`  
 3. `&Box<Type>` is auto converted to `&Type`  
 
-### Error Handle  
+### Error Handle<a id='113'></a>  
 ```rust
 //return bool value
 result.is_ok();
@@ -129,7 +167,7 @@ result.expect(msg);
 result.as_ref().ok();
 result.as_mut();
 ```
-#### Propagate errors  
+#### Propagate errors<a id='131'></a>  
 ```rust
 use std::fs;
 use std::io;
@@ -146,9 +184,9 @@ fn move_all(src: &Path, dst: &Path) -> io::Result<()> {
 }
 ```
 
-### Package and Module
+### Package and Module<a id='148'></a>  
 
-#### cargo  
+#### cargo<a id='150'></a>  
 ```rust
 cargo clean //delete the target compiled  
 cargo test
@@ -157,7 +195,7 @@ cargo build --release  //debug_assert!() will be ignored
 cargo tree
 ```
 
-#### module components  
+#### module components<a id='159'></a>  
 - functions 
 - type(struct,enum,trait)
 - type alias
@@ -191,13 +229,13 @@ use self::sub_mod::*;
 use self::enum_type::*;
 ```
 
-#### component attribute 
+#### component attribute<a id='193'></a>  
 ```rust
 // This module will be compiled only for android
 #[cfg(target_os = "android")]
 mod mobile;
 ```
-#### test  
+#### test<a id='199'></a>  
 > Normal functions marked with `#[test]`, run `cargo test`  
 ```rust
 //This mod is included only when testing.  
@@ -213,7 +251,7 @@ mod tests{
     }
 }
 ```
-#### workspace  
+#### workspace<a id='215'></a>  
 ```rust
 cargo new project
 vim cargo.toml
@@ -225,7 +263,7 @@ members=["p1","p2"]
 ```
 
 
-### Struct  
+### Struct<a id='227'></a>  
 1. Struct is CamelCase named, and its fields are snake_case named.  
 2. Pub struct still has private field.  
 ```rust
@@ -259,7 +297,7 @@ fn chop(b:Broom) -> (Broom,Broom) {
 
 ```
 
-### Enumeration  
+### Enumeration<a id='261'></a>  
 > Must use pattern match to access the data.  
 ```rust
 enum Ordering{
@@ -291,9 +329,9 @@ enum Json {
 }
 ```
 
-### Pattern  
+### Pattern<a id='293'></a>  
 
-#### Pattern match  
+#### Pattern match<a id='295'></a>  
 ```rust
 match value {
     pattern => expr,
@@ -342,7 +380,7 @@ match line_result {
 }
 ```
 
-#### Multiply/if/@ match  
+#### Multiply/if/@ match<a id='344'></a>  
 ```rust
 let at_end = match chars.peek() {
     Some(&'\r') | Some(&'\n') | None => true,
@@ -360,7 +398,7 @@ match chars.next() {
 }
 ```
 
-### Trait and Generic type  
+### Trait and Generic type<a id='362'></a>  
 1. Trait is a set of functions, call it by the type implemented the trait or the trait itself.  
 
 ```rust
@@ -374,7 +412,7 @@ trait Creature: Visiable {
 ToString::to_string("hello");
 <str as ToString>::to_string("hello");
 ```
-### Iterator  
+### Iterator<a id='376'></a>  
 ```rust
 //associated type
 pub trait Iterator {
@@ -383,7 +421,7 @@ pub trait Iterator {
 }
 ```
 
-### Operator Overload  
+### Operator Overload<a id='385'></a>  
 ```rust
 pub trait Mul<RHS=Self>{
     type Output;
@@ -392,7 +430,7 @@ pub trait Mul<RHS=Self>{
 ```
 
 
-### Useful trait  
+### Useful trait<a id='394'></a>  
 1. Def and DerefMut  
 2. Default  
     - use `#[derive(Default)]` for struct
@@ -400,13 +438,13 @@ pub trait Mul<RHS=Self>{
 4. From and Into  
 
 
-### Closure  
+### Closure<a id='402'></a>  
 1. Fn default ref  
 2. FnMut default ref\_mut  
 3. add move to gain the ownship  
 
 
-#### Iterator adapter  
+#### Iterator adapter<a id='408'></a>  
 > Gain the ownship of iterator.
 
 > Not consuming a iterator, only return a new iterator: What should be done when calling `next()`. 
@@ -452,7 +490,7 @@ zip(T:Iterable)
 9. `by\_ref` and `cloned` 
 
 
-#### Other Iterator providers  
+#### Other Iterator providers<a id='454'></a>  
 
 |Type or Trait|Exp|Explain|  
 |:--|:--|:--|
@@ -472,7 +510,7 @@ zip(T:Iterable)
 ||s.split('/')|Can be splited by char, string or closure|  
 ||s.matcher(char::is\_numeric)|Generate the slice matched|  
 
-#### Consumer iterator
+#### Consumer iterator<a id='474'></a>  
 1. `for` will apply `IntoIterator::into_iter` and call `next`, the most used generic iter func.  
 ```rust
 //like iter
@@ -514,20 +552,20 @@ v.extend(&[1,2,3,4]);
 let (living,nonliving):(Vec<&str>,Vec<&str>)
     = things.iter().partition(|name| name.as_bytes()[0] & 1 !=0);
 ```
-##### Java is good
+##### Java is good<a id='516'></a>  
 
-### Collection
+### Collection<a id='518'></a>  
 1. `Vec`  
 
-### String And Text  
+### String And Text<a id='521'></a>  
 
-### IO  
+### IO<a id='523'></a>  
 
-### Spawn  
+### Spawn<a id='525'></a>  
 
-### Macro  
+### Macro<a id='527'></a>  
 
-### Unsafe Code  
+### Unsafe Code<a id='529'></a>  
 
 
 
