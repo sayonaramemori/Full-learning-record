@@ -1,18 +1,17 @@
 # git configuration
 
-## Configure your name and email  
+## Configure your git
+> Local config file is located in .git/config
 
-```
-git config --global user.name [YOUNAME]
-git config --global user.email [YOUREMAIL]
-//--global is to specify the file ~/.gitconfig
-//other settings include core.editor, merge.tool
-```
-
-## List the information of Configuration  
+> Global config file is located in /etc/gitconfig or other place  
 ```
 git config --list
-//Personalize your git
+
+git config --global user.name [YOUNAME]
+git config --global user.email [YOUREMAIL]
+git config --global core.editor vim
+git config --global merge.tool vimdiff  
+
 git config --global alias.[your-instruction-name] [instruction-name] 
 //example: git config --global alias.unstage 'reset HEAD' 
 ```
@@ -25,6 +24,8 @@ git help <verb>
 
 ## Fundamental Instructions
 ```
+git clone [URL] [DIR]
+
 git init   //Initialize the current directory as a repository  
 git status  //Most used in work
 git reflog  //
@@ -32,10 +33,23 @@ git log  // --pretty=PARA  multiple parameters is available, such as oneline, fu
 git add FILES  //*是一个多功能命令，可以用来跟着新文件，或者把已跟踪的文件放入暂存区，还能用于合并冲突时把有冲突的文件标记为已解决状态;运行了git add之后又做了修改的文件，需重新运行git add把最新版本暂存起来
 git commit FILES -a -m [comment] //skip add stage, commit directly  
 git reset --hard [hash-number]  //Reset the head pointer to the specify version
-
+```
+## Git ignore  
+```
+# An Example  
+# All files with suffix .a
+*.a 
+# But with an exception lib.a
+!lib.a
+# Ignore the file in / directory, not including subdir/TODO
+/TODO
+# Ignore the all the files located in build/ 
+build/
+# Ignore the doc/notes.txt, not including doc/server/arch.txt
+doc/*.txt
 ```
 
-## 删除命令
+## Modify  
 ```
 git rm FILES //untrack and remove the files  
 git rm --cached FILES //untrack the files
@@ -72,12 +86,13 @@ git restore FILES
 
 ## Remote Repository  
 ```
-git remote //Show remote repository name
-git remote -v //Show name and corresponding url  
-git remote add NAME [URL] //add a new remote repository 
-git remote show [remote-name] //Detailed information about the repository
+git remote                              //Show remote repository name
+git remote -v                           //Show name and corresponding url  
+git remote show [NAME]                  //Show the remote repository detailed
+git remote add NAME [URL]               //add a new remote repository 
+git remote show [remote-name]           //Detailed information about the repository
 git remote rename [old-name] [new-name] //rename the name 
-git remote rm [remote-name] //delete the local information of the remote repository
+git remote rm [remote-name]             //delete the local information of the remote repository
 ```
 
 ## Operation of the remote repository  
