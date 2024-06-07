@@ -49,6 +49,12 @@ build/
 doc/*.txt
 ```
 
+## Difference  
+```
+git diff //check the difference between modified files and staged files.
+git diff --cached //check the difference between the staged files and commited files lastly.
+```
+
 ## Modify  
 ```
 git rm FILES //untrack and remove the files  

@@ -3,8 +3,9 @@ use mysql::*;
 use mysql::prelude::*;
 use mysql_test::stu::student::Student;
 use mysql_test::*;
-use std::env;
+//For database url 
 use dotenv::dotenv;
+use std::env;
 
 const QUERYALL:&str = "select * from student";
 

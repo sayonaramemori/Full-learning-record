@@ -1,5 +1,5 @@
 use chrono::prelude::*;
-use chrono::{Duration};
+use chrono::Duration;
 use serde::{Deserialize,Serialize};
 
 #[derive(Deserialize,Serialize,Default,Clone)]

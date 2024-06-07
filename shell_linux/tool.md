@@ -42,6 +42,8 @@ nohup cmd
 jobs -l
 '''restart bg job
 bg [num]
+# bring back to fore ground
+fg
 ```
 
 ### File descriptor  
