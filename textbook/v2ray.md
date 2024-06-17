@@ -60,6 +60,9 @@ sudo systemctl daemon-reload
 # Your can use cmd 'export | grep http' to check whether it exists or not, or put it to profiles.
 export http_proxy="socks5://127.0.0.1:10808" && export https_proxy=$http_proxy
 
+# Or
+export http_proxy="http://127.0.0.1:10809" && export https_proxy=$http_proxy
+
 # Then start v2ray  
 sudo systemctl start v2ray.service  
 sudo systemctl status v2ray.service

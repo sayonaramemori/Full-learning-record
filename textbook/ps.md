@@ -3,6 +3,7 @@
 2. `Ctrl` + `<LC>` to generate a select area, clicking on the micro-pic on a layer  
 3. `Ctrl + Alt + Shift + E` to quickly preview the converge of the visible pictures.  
 4. Press `[]` to change the size of brush  
+5. `Alt + scroller` to change the scaler  
 
 |Mode|Explain|
 |:--|:--|
