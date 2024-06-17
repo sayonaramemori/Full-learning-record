@@ -48,9 +48,12 @@ echo \
       sudo rm /etc/apt/apt.conf.d/01proxy
 
       # Step 9: Clear Docker proxy configuration
-      echo "Clearing Docker proxy configuration..."
-      sudo rm /etc/systemd/system/docker.service.d/http-proxy.conf
-      sudo systemctl daemon-reload
-      sudo systemctl restart docker
+#      echo "Clearing Docker proxy configuration..."
+#      sudo rm /etc/systemd/system/docker.service.d/http-proxy.conf
+#      sudo systemctl daemon-reload
+#      sudo systemctl restart docker
 
       echo "Script completed successfully."
+
+	  sudo docker run --name Hello_Word hello-world
+	  sudo docker stop Hello_Word
