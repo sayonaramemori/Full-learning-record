@@ -121,16 +121,53 @@ git branch -d [branch-name] //Delete a branch
 
 ```
 
+### Set upstream  
+```shell
+# Initial push and setting the upstream branch
+git push -u origin feature-branch
+# After running this command, future pushes and pulls can be done simply with
+# Future push
+git push
+
+# Future pull
+git pull
+```
+
 ## Upload Big Files  
 > Using [lfs](https://github.com/git-lfs/git-lfs)
+
 
 ## Add corresponding ssh-key for specific respository
 ```
 git remote add [name] git@[alias]:sayonaramemori/study-roads.git
+
+ssh-keygen -t ed25519 -C "your_email@example.com" -f ~/.ssh/id_ed25519_repo1
+ssh-keygen -t ed25519 -C "your_email@example.com" -f ~/.ssh/id_ed25519_repo2
+
+eval "$(ssh-agent -s)"
+ssh-add ~/.ssh/id_ed25519_repo1
+ssh-add ~/.ssh/id_ed25519_repo2
+
 cd ~/.ssh
 vim config
 
-Host [alias]
-    Hostname github.com
-    IdentityFile="secret key absolute path"
+# Configuration for repository 1
+Host github-repo1
+    HostName github.com
+    User git
+    IdentityFile ~/.ssh/id_ed25519_repo1
+
+# Configuration for repository 2
+Host github-repo2
+    HostName github.com
+    User git
+    IdentityFile ~/.ssh/id_ed25519_repo2
+
+# For repository 1
+cd /path/to/repo1
+git remote set-url origin git@github-repo1:your-username/repo1.git
+
+# For repository 2
+cd /path/to/repo2
+git remote set-url origin git@github-repo2:your-username/repo2.git
 ```
