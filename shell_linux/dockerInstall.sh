@@ -14,7 +14,7 @@ echo "Adding Docker's official GPG key..."
 sudo apt-get update
 sudo apt-get install -y ca-certificates curl
 sudo install -m 0755 -d /etc/apt/keyrings
-sudo curl -fsSL https://download.docker.com/linux/ubuntu/gpg -o /etc/apt/keyrings/docker.asc
+sudo curl -fsSL https://download.docker.com/linux/ubuntu/gpg -o /etc/apt/keyrings/docker.asc --proxy "$HTTP_PROXY"
 sudo chmod a+r /etc/apt/keyrings/docker.asc
 
 # Step 3: Add the Docker repository to apt sources
