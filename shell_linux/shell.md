@@ -41,7 +41,6 @@ len=${#myarr[@]}
 ```
 
 ### boolean
-
 ```
 a=10
 b=20

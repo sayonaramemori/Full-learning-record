@@ -1,4 +1,4 @@
-### 扫描局域网ip
+### Scan ip
 ```shell
 //umask is 255.255.255.0 8*3 = 24
 nmap -sn 192.168.1.0/24
@@ -10,21 +10,20 @@ nmap -sP IP-Range
 nmap -v -sn 192.168.xx.0/20
 ```
 
-### 扫描端口
-> TCP 全连接扫描
+### Scan Port
+
 > `nmap -sT IP -p-`  
-> TCP 半连接扫描(recommended, less time cost)  
+
 > `nmap -sS IP -p-`  
 
-### for finding plc
+### Finding plc
 > `nmap -sn 192.168.31.0/24 | grep for | cut -d ' ' -f5,6`
 
-### 路由追踪
+### Trace Route  
 > `traceroute IP`
 
 ### Rename host
 > `hostnamectl set-hostname [name]`
-
 
 ### User add
 ```shell
@@ -114,4 +113,3 @@ find [PATH] -type f | xargs chmod 666
 1. cowsay -f dragon 'hello'
 2. cmatrix
 3. bastet
-4. asciiquarium
