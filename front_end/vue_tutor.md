@@ -1,128 +1,91 @@
-### TypeScript Basic
-> Addtional part -- Type system
-```TypeScript
-let age:number = 18;
-let arr: string[] = ['a'];
-let arr: Array<boolean> = [true,false];
-```
-### Union type
-```TypeScript
-//This array can contain two types
-let arr: (number | string)[] = [1,2,3,'4'];
-let num: number | null = 99;
+### Create a vue project  
+```shell
+npm create vue@latest
 ```
 
-### TypeDefine
-```ts
-type MyType = (number | string);
-let vari: MyType[] = [];
+### v-html  
+```html
+<h1 v-html="variable"></h1>
 ```
 
-### Function
-```ts
-function add(a:number,b:number):number{
-    return a+b;
-}
-//the parenthesis can not be omited
-const sub = (a:number,b:number):number => {return a-b;}
+### v-if & v-show  
+> v-if constructs or deconstructs the element.  
+> v-show simply switch the display style.  
 
-type Functype = (a:number,b:number) => number;
-const sub: Functype = (a,b) => {return a-b;}
-
-//if no return value, then return type is void
-
-//selectable parameters, the same as default parameters in cpp
-const print = (name?: string, gender?: string): void =>{
-    if(name && gender){
-        console.log(name,gender);
-    }
-}
+### v-on: | @  
+```html
+<button @click="func">
+<button v-on:click="func">
 ```
 
-### object type
-```ts
-let obj:{name:string,age:number} = {name:'hh',age:18}
-type objType = {
-    name: string,
-    age: 18,
-    saHi: (content:string) => void,
-    greet(name: string): void,
-    girlfriend?: string
-}
-//? express the selectable field
-
-let obj:objType={...}
-
-//access ? field;
-obj.grilfriend?.concat();
-obj.girlfriend && obj.grilfriend.concat();
+### v-bind  
+> Usage: v-bind:attr="expr"  
+```html
+<img v-bind:src="imgurl">
+//v-bind can be omitted
+<div :class="['blue','big']"></div>
+<div :class="{blue: true, big: false}"></div>
+<div :style="{width: '400px'}"></div>
 ```
 
-### interface
-```ts
-//omit semicolon is ok
-interface IPerson{
-    name: string
-    age: number
-    sayhi: () => void
-}
-//interface only works on OBJ, but type works on any
-
-//inheritance
-interface IStudent extends IPerson{
-    new-field: type
-}
+### v-for  
+```html
+<ul>
+    <li v-for="(item,index) in list" :key="item.id">{{ item }}</li>
+    <li v-for="item in list">{{ item }}</li>
+<ul>
+let list=[]
 ```
 
-### Tuple
-```ts
-let position: [number,number] = [114,115];
+### v-model  
+> For form elements, data stream binding.  
+```html
+<input type="text" v-model="variable">
 ```
 
-### Type auto deduce
-```ts
-//when init;
-let a = 1;
-
-//function return value;
-function add(a:number,b:number){
-    return a + b;
-}
+### Instruction suffix  
 ```
+@keyup.enter   //listen to enter up
+v-model.trim   //trim blank
+v-model.number //to number
 
-### literal type & enum type
-```ts
-type Gender = 'male' | 'female' | 'ghost';
-function changeGender(gender: Gender){...}
-
-enum direction{up, down, left, right}
 ```
-
-### Generic Type
-```
-function add<T extends interface_abc>(val: T){
-    return val;
-}
-const res = add<number>(1);
-```
-
-
 
 ### setup
 ```js
+//If name is not exported, then name is the file name
 <script lang="ts">
-    export default{
-
-    }
+    export default {name:"Name"}
 <script>
-//auto return
-<script setup lang="ts>
+<script setup lang="ts">
+    //auto expose
 </script>
+
+//omit name exposing, plugin is needed
+<script setup lang="ts" name="Person">
+npm install vite-plugin-vue-setup-extend -D
+vim vite.config.ts
+import vueSetup from 'vite-plugin-vue-setup-extend'
+plugins:[vueSetup()]
 ```
 
+### ref for basic type  
+```js
+import {ref} from 'vue'
+let a = ref(1)
+```
+
+### reactive for obj type  
+```js
+import {reactive} from 'vue'
+//.value is not need
+let car=reactive({brand:'bmw',price:100})
+//assign a new obj you should use Object.assign(car,new_car);
+```
 
 ### computed
 ```js
+//a is also a ref 
 let a = computed({
 get(){
     //some ref statements
@@ -156,6 +119,88 @@ watch(()=>person.car,(new,old){},{deep:true})
 watch([()=>person.car,()=>person.name],(new,old){},{deep:true});
 ```
 
+### defineProps  
+```js
+//data is also ok
+<Person :val='val1' :fun='func'/>
+defineProps(['val','fun'])
+//call the function
+fun('hhh')
+//use data
+val
+```
+
+### defineEmits
+> Custom event  
+```js
+<Person @val1='func1' />
+let emit = defineProps(['val1','val2'])
+//triger the event and pass parameters
+emit('val1',..args)
+```
+
+### mitt 
+> Mount easily  
+```
+npm install mitt
+const emitter = mitt()
+emitter.on('func',()=>{})
+onUnmounted(()=>{emitter.off('func')})
+```
+
+### ref, $refs and $parent 
+```js
+<Child ref='child'/>
+let child = ref()
+child.value.toy= 'java'
+
+//in Child
+let toy = ref('java')
+let book = ref('java')
+defineExpose({toy,book})
+```
+
+### provide and inject  
+```js
+//in father
+let cash = ref(100);
+provide('money',cash);
+
+//in offspring  
+let mon = inject('money',default_value);
+```
+
+### anonymous slot  
+```js
+<Category>
+    //put here
+</Category>
+
+//in Category
+<slot>
+  default content
+</slot>
+```
+
+### Slot with name  
+```js
+<Category>
+    <template v-slot:s1>
+        ...
+    </template>
+    <template v-slot:s2>
+        ...
+    </template>
+</Category>
+
+//in Category
+<slot name="s1">
+  default content
+</slot>
+<slot name="s2">
+  default content
+</slot>
+```
 ### tag ref
 ```js
 import {ref} from 'vue'
@@ -172,6 +217,9 @@ id.value
 import {onBeforeCreate,onCreated,onBeforeMount,onMounted,onBeforeUpdate,onUpdated}
 onBeforeMount(()=>{});
 ```
+
+### Teleport  
+
 
 
 

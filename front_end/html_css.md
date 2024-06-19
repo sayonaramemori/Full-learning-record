@@ -299,6 +299,10 @@ span {
     //horizontal centering for block elements
     margin: 0px auto;
 }
+.js {
+    //relative to father's width
+    margin: 0px 2.5%;
+}
 ```
 
 ### Hide elements  

@@ -311,7 +311,6 @@ const pig = {
 const {name, family: {mother,father}} = pig;
 ```
 
-
 ### Object Constructor
 ```javascript
 function Pig(name,age,gender){
@@ -340,13 +339,3 @@ array keys(target_obj);
 array values(target_obj);
 void assign(dest,source_obj);
 ```
-
-
-
-
-
-
-
-
-
-
