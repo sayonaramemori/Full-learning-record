@@ -11,22 +11,22 @@ use AutoReagent::handlers::{Login::*,Query::*};
 async fn main() -> std::io::Result<()> {
     //let ip:String = env::var("IP").unwrap();
     HttpServer::new(|| {
-        let secret_key = Key::generate();
+       let secret_key = Key::generate();
        let cors = Cors::default()
              .allow_any_origin()
-             .allow_any_header()
-             .allow_any_method()
+            // .allow_any_header()
+             //.allow_any_method()
              .supports_credentials()
-             //.allowed_methods(vec!["GET", "POST"])
-             //.allowed_headers(vec![actix_web::http::header::AUTHORIZATION, actix_web::http::header::ACCEPT])
-             //.allowed_header(actix_web::http::header::CONTENT_TYPE)
+             .allowed_methods(vec!["GET", "POST"])
+             .allowed_headers(vec![actix_web::http::header::AUTHORIZATION, actix_web::http::header::ACCEPT])
+             .allowed_header(actix_web::http::header::CONTENT_TYPE)
              .max_age(3600);
         App::new()
             .wrap(cors)
-            .wrap(SessionMiddleware::new(
+            .wrap(SessionMiddleware::builder(
                 CookieSessionStore::default(),
-                secret_key,
-            ))
+                secret_key.clone(),
+            ).build())
             .service(findlast)
             .service(greet)
             .service(login)

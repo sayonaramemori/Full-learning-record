@@ -1,4 +1,5 @@
 use actix_web::{get, web, Responder, HttpResponse};
+use actix_session::{Session};
 use chrono::prelude::*;
 use chrono::Duration;
 use rand::Rng;
@@ -10,7 +11,8 @@ pub async fn greet(name: web::Path<String>) -> impl Responder {
 }
 
 #[get("/findlast/{num}")]
-pub async fn findlast(num: web::Path<f64>) -> impl Responder {
+pub async fn findlast(num: web::Path<f64>,session:Session) -> impl Responder {
+    println!("{:?}",session.get::<String>("privilege_string").unwrap());
     let mut res = vec![];
     let num :u32= num.into_inner() as u32;
     let mut rng = rand::thread_rng();
