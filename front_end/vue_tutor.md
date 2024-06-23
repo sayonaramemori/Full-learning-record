@@ -123,18 +123,20 @@ watch([()=>person.car,()=>person.name],(new,old){},{deep:true});
 ```js
 //data is also ok
 <Person :val='val1' :fun='func'/>
-defineProps(['val','fun'])
+let x = defineProps(['val','fun'])
 //call the function
-fun('hhh')
+x['fun']('hhh')
 //use data
-val
+x['val']
+//but you can use in html block as follows
+{{ val }}
 ```
 
 ### defineEmits
 > Custom event  
 ```js
 <Person @val1='func1' />
-let emit = defineProps(['val1','val2'])
+let emit = defineEmits(['val1','val2'])
 //triger the event and pass parameters
 emit('val1',..args)
 ```
