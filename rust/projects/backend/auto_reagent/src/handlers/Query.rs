@@ -1,8 +1,8 @@
 use actix_web::{get, web, Responder, HttpResponse};
-use crate::models::*;
 use chrono::prelude::*;
 use chrono::Duration;
 use rand::Rng;
+use crate::models::TempRecord::TempRecord;
 
 #[get("/hello/{name}")]
 pub async fn greet(name: web::Path<String>) -> impl Responder {
@@ -10,12 +10,11 @@ pub async fn greet(name: web::Path<String>) -> impl Responder {
 }
 
 #[get("/findlast/{num}")]
-pub async fn findlast(num: web::Path<u32>) -> impl Responder {
+pub async fn findlast(num: web::Path<f64>) -> impl Responder {
     let mut res = vec![];
-    let num :u32= num.into_inner();
+    let num :u32= num.into_inner() as u32;
     let mut rng = rand::thread_rng();
-    let time = Local::now().naive_local();
-    let time :NaiveDateTime = time.with_nanosecond(0).unwrap();
+    let time = Local::now().naive_local().with_nanosecond(0).unwrap();
     let interval = Duration::seconds(1);
     let time_seq = gen_time(time,interval,num);
     let _ = time_seq.into_iter()
@@ -26,4 +25,8 @@ pub async fn findlast(num: web::Path<u32>) -> impl Responder {
     HttpResponse::Ok().json(res)
 }
 
-
+pub fn gen_time(start: NaiveDateTime, interval: Duration, count: u32) -> Vec<NaiveDateTime> {
+    (0..count)
+        .map(|i| start - interval * i as i32)
+        .collect()
+}

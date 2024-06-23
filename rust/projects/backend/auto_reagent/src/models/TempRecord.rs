@@ -1,5 +1,4 @@
 use chrono::prelude::*;
-use chrono::Duration;
 use serde::{Deserialize,Serialize};
 
 #[derive(Deserialize,Serialize,Default,Clone)]
@@ -19,9 +18,5 @@ impl TempRecord {
     }
 }
 
-pub fn gen_time(start: NaiveDateTime, interval: Duration, count: u32) -> Vec<NaiveDateTime> {
-    (0..count)
-        .map(|i| start - interval * i as i32)
-        .collect()
-}
+
 

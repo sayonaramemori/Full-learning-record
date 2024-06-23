@@ -1,9 +1,9 @@
-use actix_web::{web, App, HttpServer, HttpResponse};
+use actix_web::{App, HttpServer};
 use actix_cors::Cors;
 // use std::env;
 
 extern crate AutoReagent;
-use AutoReagent::handlers::*;
+use AutoReagent::handlers::{Login::*,Query::*};
 
 #[actix_web::main] // or #[tokio::main]
 async fn main() -> std::io::Result<()> {
@@ -19,6 +19,9 @@ async fn main() -> std::io::Result<()> {
             .wrap(cors)
             .service(findlast)
             .service(greet)
+            .service(login)
+            .service(logout)
+            .service(check_privilege)
     })
     .bind("0.0.0.0:8080")?
     .run()
