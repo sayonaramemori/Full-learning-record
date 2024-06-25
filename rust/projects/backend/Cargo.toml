@@ -1,2 +1,2 @@
 [workspace]
-members=["auto_reagent"]
+members=[ "MysqlConnector","auto_reagent", "Simulator"]

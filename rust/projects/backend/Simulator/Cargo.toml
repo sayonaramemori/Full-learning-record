@@ -1,0 +1,15 @@
+[package]
+name = "Simulator"
+version = "0.1.0"
+edition = "2021"
+default-run = "simulator"
+
+[dependencies]
+AutoReagent = {path="../auto_reagent"}
+chrono = { version = "0.4.31", features = ["serde"]}
+mysql = { version = "25.0.0", features = ["chrono"] }
+
+tokio = { version = "1.38.0" }
+
+[[bin]]
+name="simulator"
