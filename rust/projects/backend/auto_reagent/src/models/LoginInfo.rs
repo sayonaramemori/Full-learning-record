@@ -1,7 +1,7 @@
 use serde::{Deserialize, Serialize};
 use sqlx;
 
-#[derive(Deserialize,sqlx::FromRow,Debug)]
+#[derive(Deserialize,sqlx::FromRow,Debug,Serialize)]
 pub struct LoginInfo {
     pub username: String,
     pub password: String,
