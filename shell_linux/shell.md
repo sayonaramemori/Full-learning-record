@@ -29,17 +29,6 @@ if [ -z $a ]
 if [ $a ]
 ```
 
-### array
-```
-myarr=('js' 'java' 'cpp')
-1. get all
-echo ${myarr[@]}
-2. get by index
-echo ${myarr[n]}
-3. get length
-len=${#myarr[@]}
-```
-
 ### boolean
 ```
 a=10
@@ -62,7 +51,6 @@ if [ -f $file ]
 # a directory -d
 # exists -e
 ```
-
 
 ### for loop
 ```

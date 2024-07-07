@@ -2,11 +2,9 @@ user=`whoami`
 echo "Current operation for user: $user"
 read -p 'Please ensure the current user:' user
 query=`id $user | grep no`
-if [ -n $query ]
+if [ -z $query ]
 then
-    echo 'no such user, stop running'
-else
-    echo "Now for $user"
+	echo "Now for $user"
     if [ $user = 'root' ]
     then
         prefix="/$user"
@@ -22,5 +20,7 @@ else
         mkdir ${prefix}/.vim/autoload -p
         cp ./plug.vim ${prefix}/.vim/autoload/
     fi
+else
+    echo 'no such user, stop running'
 fi
 
