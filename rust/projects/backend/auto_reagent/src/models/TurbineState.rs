@@ -1,5 +1,6 @@
 use serde::{Deserialize, Serialize};
 use rand::Rng;
+use std::collections::HashMap;
 
 #[derive(Debug,sqlx::FromRow,Deserialize,Serialize,Default)]
 pub struct TurbineState{
@@ -29,6 +30,20 @@ impl TurbineState {
             flow_rate: rng.gen_range(0.0..50.0),
             flux: rng.gen_range(0.0..50.0),
             open: rng.gen_range(0.0..50.0),
+        }
+    }
+    pub fn to_turbine_state(hm:HashMap<String,String>)-> TurbineState {
+        return TurbineState {
+            outlet_pressure: hm.get("outlet_pressure").unwrap().parse().unwrap(),
+            pre_pressure: hm.get("pre_pressure").unwrap().parse().unwrap(),
+            frequency: hm.get("frequency").unwrap().parse().unwrap(),
+            current: hm.get("current").unwrap().parse().unwrap(),
+            safe_pressure: hm.get("safe_pressure").unwrap().parse().unwrap(),
+            power: match hm.get("power").unwrap(){a if &a[..0]=="1" => true,_ => false},
+            flow_rate: hm.get("flow_rate").unwrap().parse().unwrap(),
+            flux: hm.get("flux").unwrap().parse().unwrap(),
+            open: hm.get("open").unwrap().parse().unwrap(),
+            id: hm.get("id").unwrap().parse().unwrap(),
         }
     }
 }

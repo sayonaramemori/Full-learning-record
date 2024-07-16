@@ -199,7 +199,7 @@ div.java:not(.python) {
 }
 ```
 
-### Length dimension  
+### Length metrics 
 ```css
 #d2 {
     font-size: 20px;

@@ -59,6 +59,9 @@
 1. Deep Reference is allowed in Rust.  
 
 ### Life Span  
+```rust
+
+```
 
 ### Expression and Statement  
 > Comma is meaningful  
@@ -106,6 +109,8 @@ result.is_err();
 //result is depleted  
 result.ok();
 result.err();
+result.unwrap_or(fallback) //return Success if exists. Otherwise return fallback and discard the errors
+result.unwrap_or_else(fallback_fn)
 
 result.unwarp();
 result.expect(msg);
@@ -129,6 +134,28 @@ fn move_all(src: &Path, dst: &Path) -> io::Result<()> {
         fs::rename(entry.path(),dst_file)?;
     }
     Ok(())
+}
+```
+
+#### Define Error Type  
+```rust
+#[derive(Debug,Clone)]
+pub struct MyError {
+    pub msg: String,
+    pub line: usize,
+    pub column: usize,
+}
+
+use std::fmt;
+impl fmt::Display for MyError {
+    fn fmt(&self,f :&mut fmt::Formatter) -> Result<(),fmt::Error> {
+        write!(f,"{} ({}:{})",self.msg,self.line,self.column)
+    }
+}
+impl std::error::Error for MyErorr {
+    fn description(&self) -> &str {
+        &self.msg
+    }
 }
 ```
 
@@ -238,6 +265,7 @@ enum BroomIntent { FetchWater, DumpWater}
 
 fn chop(b:Broom) -> (Broom,Broom) {
     //broom1 get the ownship of the name field of b
+    //using .. struct to gain the rest of value when assign
     let mut broom1 = Broom{height: b.height/2, ..b};
     let mut broom2 = Broom{name:broom1.name.clone(),..broom1}
     (broom1,broom2)
