@@ -1,9 +1,7 @@
 use actix_web::HttpRequest;
 use std::collections::HashMap;
 use actix_web::{get, web, Responder, HttpResponse};
-use chrono::prelude::*;
-use chrono::Duration;
-use rand::Rng;
+use std::io::Write;
 use sqlx::{pool, MySql, MySqlPool};
 use crate::models::{TempRecord::TempRecord,TurbineState::TurbineState};
 use super::super::AppState::RedisState;
@@ -17,32 +15,19 @@ pub async fn findlast(req: HttpRequest,num: web::Path<f64>,redis_data:web::Data<
         let num_str = num.to_string();
         if let Ok(mut conn) = get_connection(&redis_data).await {
             if let Ok(val) = redis::cmd("LRANGE").arg("record").arg("-".to_string() + &num_str).arg("-1").query_async::<_,Vec<String>>(&mut conn).await {
-                let mut res = vec![];
-                let interval = Duration::seconds(1);
-                let time = Local::now().naive_local().with_nanosecond(0).unwrap();
-                let time_seq = gen_time(time,interval,num);
-                let val = val.into_iter().map(|v| v.parse::<f64>().unwrap() ).collect::<Vec<f64>>();
-                let _ = time_seq.into_iter()
-                    .rev()
+                let res :Vec<TempRecord>=  val.into_iter()
                     .zip(0..num)
-                    .zip(val)
-                    .map(|((t,i),v)| res.push(TempRecord::new(v,i,t)))
-                    .last();
+                    .map(|(v,i)|{ (v,i).into() })
+                    .collect();
                 return HttpResponse::Ok().json(res);
             }else {
-                println!("Failed");
+                let _ = writeln!(std::io::stderr(),"Query failed");
             }
         }
         HttpResponse::Ok().json("Query Error")
     }else{
         HttpResponse::Unauthorized().json(res.msg())
     }
-}
-
-pub fn gen_time(start: NaiveDateTime, interval: Duration, count: u32) -> Vec<NaiveDateTime> {
-    (0..count)
-        .map(|i| start - interval * i as i32)
-        .collect()
 }
 
 #[get("/state")]
