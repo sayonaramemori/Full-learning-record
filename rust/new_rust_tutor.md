@@ -747,6 +747,7 @@ BufReader::with_capacity(size,reader)
     3. `std::io::stdout()` and `std::io::stderr()`  
     4. Vec\<u8\>
 ```rust
+write!(std::io::stderr(),"err: for something")?;
 writer.write(&buf)
 writer.write_all(&buf) //return Result<()>
 

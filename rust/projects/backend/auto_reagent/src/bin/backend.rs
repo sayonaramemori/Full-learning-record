@@ -8,29 +8,29 @@ use AutoReagent::handlers::{Login::*,Query::*};
 use AutoReagent::models::redis_data::RedisState;
 use std::sync::{Arc,Mutex};
 use actix_web_actors::ws;
-// use actix::prelude::*;
+use actix::prelude::*;
 use serde::Deserialize;
 use actix::{Actor, StreamHandler};
 
-// #[derive(Message, Deserialize)]
-// #[rtype(result = "()")]
-// struct Instruction {
-//     action: String,
-//     value: i32,
-// }
+#[derive(Message, Deserialize)]
+#[rtype(result = "()")]
+struct Instruction {
+    action: String,
+    value: i32,
+}
 
-// async fn send_instruction(
-//     instruction: web::Json<Instruction>,
-//     data: web::Data<Arc<Mutex<Option<Addr<MyWs>>>>>,
-// ) -> HttpResponse {
-//     let guard = data.lock().unwrap();
-//     if let Some(addr) = &*guard {
-//         addr.do_send(instruction.into_inner());
-//         HttpResponse::Ok().body("Instruction sent")
-//     } else {
-//         HttpResponse::InternalServerError().body("No WebSocket connection")
-//     }
-// }
+async fn send_instruction(
+    instruction: web::Json<Instruction>,
+    data: web::Data<Arc<Mutex<Option<Addr<MyWs>>>>>,
+) -> HttpResponse {
+    let guard = data.lock().unwrap();
+    if let Some(addr) = &*guard {
+        addr.do_send(instruction.into_inner());
+        HttpResponse::Ok().body("Instruction sent")
+    } else {
+        HttpResponse::InternalServerError().body("No WebSocket connection")
+    }
+}
 struct MyWs;
 
 impl Actor for MyWs {
@@ -60,15 +60,15 @@ impl StreamHandler<Result<ws::Message, ws::ProtocolError>> for MyWs {
     }
 }
 
-// impl Handler<Instruction> for MyWs {
-//     type Result = ();
+impl Handler<Instruction> for MyWs {
+    type Result = ();
 
-//     fn handle(&mut self, msg: Instruction, ctx: &mut Self::Context) {
-//         // 处理自定义消息
-//         let response = format!("Action: {}, Value: {}", msg.action, msg.value);
-//         ctx.text(response);
-//     }
-// }
+    fn handle(&mut self, msg: Instruction, ctx: &mut Self::Context) {
+        // 处理自定义消息
+        let response = format!("Action: {}, Value: {}", msg.action, msg.value);
+        ctx.text(response);
+    }
+}
 
 #[get("/ws")]
 async fn index(req: HttpRequest, stream: web::Payload) -> Result<HttpResponse,Error> {
@@ -118,6 +118,7 @@ async fn main() -> std::io::Result<()> {
             .service(stop)
             .service(pump_status)
             .service(set_point)
+            .service(index)
     })
     .bind("localhost:8080")?
     .run()
