@@ -1,8 +1,9 @@
 extern crate client_test;
-use client_test::*;
+use chrono::Timelike;
+use client_test::Example::auto_reagent::*;
 
 fn main() {
-    let session = create_session("opc.tcp://127.0.0.1:49320");
-    do_test(session);
+    test();
+    // yml_test();
 }
 

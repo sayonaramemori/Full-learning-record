@@ -1,19 +1,17 @@
-use actix_web::test::call_and_read_body;
 use actix_web::{web, HttpRequest};
-use chrono::{Duration, NaiveDateTime, TimeDelta};
-use jwt::claims;
-use redis::{aio::MultiplexedConnection, AsyncCommands,FromRedisValue};
+use redis::aio::MultiplexedConnection;
 use serde::{Deserialize, Serialize};
 use sqlx::{MySql, MySqlPool};
-use crate::models::{LoginInfo::LoginInfo};
 use hmac::{Hmac, Mac};
 use jwt::VerifyWithKey;
 use jwt::SignWithKey;
 use sha2::Sha256;
-use super::super::AppState::RedisState;
-use super::Login;
 use chrono::prelude::*;
-pub struct StatusMsg(bool,String);
+
+use crate::models::redis_data::RedisState;
+use crate::models::LoginInfo::LoginInfo;
+use crate::debug_println;
+
 #[derive(Deserialize,Serialize,PartialEq)]
 pub struct Claims{
     pub info: LoginInfo,
@@ -22,6 +20,8 @@ pub struct Claims{
 
 pub const SECRETKEY :&[u8;8]= b"sayonara";
 
+
+pub struct StatusMsg(bool,String);
 impl StatusMsg {
     pub fn is_good(&self) -> bool{ return self.0; }
     pub fn msg(&self) -> String { return self.1.clone(); }
@@ -37,31 +37,30 @@ pub fn generate_token(info:LoginInfo,expire_time:i64) -> String {
 
 //query user from redis first, if not exist, then query db
 pub async fn exist_user(info: &LoginInfo,redis_data: &web::Data<RedisState>,pool: &web::Data<MySqlPool>) -> StatusMsg{
-    if let Ok(mut conn) = get_connection(&redis_data).await {
-        if let Ok(passwd) = redis::cmd("GET").arg(&info.username).query_async::<_,String>(&mut conn).await {
+    match redis_data.get(&info.username).await {
+        Ok(passwd) => {
             if passwd == info.password { 
-                // println!("Query Redis");
+                // debug_println!("Query user in Redis");
                 return StatusMsg(true,String::from("Ok"));
             }else{
                 return StatusMsg(false,String::from("Error password"));
             }
-        }else{
+        },
+        Err(_) => {
             let res = sqlx::query_as::<MySql,LoginInfo>("select username, password from admin where username=? and password=?")
                 .bind(&info.username)
                 .bind(&info.password)
                 .fetch_one(pool.get_ref())
                 .await;
             if let Ok(user_info) = res {
-                let _ = redis::cmd("SETEX").arg(user_info.username).arg(3600).arg(user_info.password).query_async::<_,()>(&mut conn).await;
-                // println!("Query DB");
+                // debug_println!("Query user in DB");
+                let _ = redis_data.setex(&user_info.username, user_info.password, 3600).await;
                 return StatusMsg(true,String::from("Ok"));
             }else{
                 return StatusMsg(false,String::from("Error User Info"))
             }
-        }
-    }else {
-        return StatusMsg(false,String::from("Connect to Redis Error"));
-    }
+        },
+    };
 }
 
 pub async fn verify_token(token:&str,redis_data: &web::Data<RedisState>,pool: &web::Data<MySqlPool>) -> StatusMsg{

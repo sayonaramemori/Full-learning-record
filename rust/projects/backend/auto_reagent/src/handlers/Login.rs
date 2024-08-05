@@ -2,7 +2,7 @@ use actix_web::{get, post, web, HttpRequest, HttpResponse};
 use chrono::{Duration, Utc};
 use sqlx::{MySql, MySqlPool};
 use crate::models::LoginInfo::LoginInfo;
-use super::super::AppState::RedisState;
+use crate::models::redis_data::RedisState;
 use super::Verify::{get_connection,verify,exist_user,generate_token};
 
 
@@ -11,8 +11,8 @@ async fn login(info: web::Json<LoginInfo>, redis_data: web::Data<RedisState>, po
     let res = exist_user(&info, &redis_data, &pool).await;
     let user_info = LoginInfo{username:info.username.clone(),password:info.password.clone()};
     if res.is_good() {
-        let VeryfyInterval = Duration::hours(24);
-        return HttpResponse::Ok().json(generate_token(user_info,Utc::now().checked_add_signed(VeryfyInterval).unwrap().timestamp()));
+        let verify_interval = Duration::hours(24);
+        return HttpResponse::Ok().json(generate_token(user_info,Utc::now().checked_add_signed(verify_interval).unwrap().timestamp()));
     }else{
         return HttpResponse::Unauthorized().json(res.msg());
     }

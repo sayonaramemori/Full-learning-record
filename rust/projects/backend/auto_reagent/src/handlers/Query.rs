@@ -1,30 +1,37 @@
-use actix_web::HttpRequest;
 use std::collections::HashMap;
-use actix_web::{get, web, Responder, HttpResponse};
+use actix_web::{post,get, web, Responder, HttpResponse,HttpRequest};
 use std::io::Write;
+use chrono::{prelude::*, Duration};
 use sqlx::{pool, MySql, MySqlPool};
-use crate::models::{TempRecord::TempRecord,TurbineState::TurbineState};
-use super::super::AppState::RedisState;
-use super::Verify::{verify,get_connection};
+use crate::models::{TempRecord::TempRecord,TurbineState::TurbineState,TempRecord::{DateTimeRange,DateTimeRng,HistoryData}};
+use crate::models::redis_data::RedisState;
+use super::Verify::verify;
+use crate::mapper::sql::get_data_in_range;
+
+#[get("/findlastVice/{num}")]
+pub async fn findlast_vice(req: HttpRequest,num: web::Path<f64>,redis_data:web::Data<RedisState>,pool:web::Data<MySqlPool>) -> impl Responder {
+    return findlast_record(req, num, redis_data, pool, "fluxVice").await;
+}
 
 #[get("/findlast/{num}")]
 pub async fn findlast(req: HttpRequest,num: web::Path<f64>,redis_data:web::Data<RedisState>,pool:web::Data<MySqlPool>) -> impl Responder {
+    return findlast_record(req, num, redis_data, pool, "flux").await;
+}
+
+async fn findlast_record(req: HttpRequest,num: web::Path<f64>,redis_data:web::Data<RedisState>,pool:web::Data<MySqlPool>,target:&'static str) -> impl Responder {
     let res = verify(&req, &redis_data,&pool).await;
     if res.is_good() {
-        let num :u32= num.into_inner() as u32;
-        let num_str = num.to_string();
-        if let Ok(mut conn) = get_connection(&redis_data).await {
-            if let Ok(val) = redis::cmd("LRANGE").arg("record").arg("-".to_string() + &num_str).arg("-1").query_async::<_,Vec<String>>(&mut conn).await {
-                let res :Vec<TempRecord>=  val.into_iter()
+        let num = num.into_inner() as i64;
+        match redis_data.lrange(target, num as usize).await {
+            Ok(res) => {
+                let res :Vec<TempRecord<String>> = res.into_iter()
                     .zip(0..num)
                     .map(|(v,i)|{ (v,i).into() })
                     .collect();
                 return HttpResponse::Ok().json(res);
-            }else {
-                let _ = writeln!(std::io::stderr(),"Query failed");
-            }
-        }
-        HttpResponse::Ok().json("Query Error")
+            },
+            Err(e) => return HttpResponse::InternalServerError().json(e.to_string()+" leading operation fail"),
+        };
     }else{
         HttpResponse::Unauthorized().json(res.msg())
     }
@@ -34,24 +41,42 @@ pub async fn findlast(req: HttpRequest,num: web::Path<f64>,redis_data:web::Data<
 async fn turbine_state(req: HttpRequest, redis_data: web::Data<RedisState>,pool: web::Data<MySqlPool>) -> HttpResponse {
     let res = verify(&req, &redis_data,&pool).await;
     if res.is_good() {
-        if let Ok(mut conn) = get_connection(&redis_data).await {
-            let cmd = redis::cmd("HGETALL");
-            let res = redis::pipe()
-                .add_command(cmd.clone()).arg("turbineState:001")
-                .add_command(cmd).arg("turbineState:002")
-                .query_async::<_,Vec<HashMap<String,String>>>(&mut conn).await;
-            if res.is_ok() {
-                let res = res.unwrap();
-                if res[0].is_empty()||res[1].is_empty(){ 
-                    let rows = sqlx::query_as::<MySql,TurbineState>("select * from turbineState").fetch_all(pool.get_ref()).await.unwrap();
-                    return HttpResponse::Ok().json(rows);
+        match redis_data.hgetall::<HashMap<String,String>>(vec!["turbineState:001","turbineState:002"]).await {
+            Ok(res) => {
+                let mut response:Vec<TurbineState> = vec![];
+                for i in res {
+                    if !i.is_empty() {
+                        response.push(TurbineState::to_turbine_state(i));
+                    }
                 }
-                let res = res.into_iter().map(|t| TurbineState::to_turbine_state(t)).collect::<Vec<TurbineState>>();
-                return HttpResponse::Ok().json(res);
-            }
-            else {return HttpResponse::Ok().json("Type Error"); }
+                return HttpResponse::Ok().json(response);
+            },
+            Err(e) => return HttpResponse::InternalServerError().json(e.to_string()+" leading operation fail"),
         }
-        HttpResponse::Ok().json("Connection to Redis failed")
+    }
+    HttpResponse::Unauthorized().json(res.msg())
+}
+
+#[post("/history")]
+async fn history(req: HttpRequest, redis_data: web::Data<RedisState>,pool: web::Data<MySqlPool>,data:web::Json<DateTimeRange>) -> HttpResponse {
+    let res = verify(&req, &redis_data,&pool).await;
+    if res.is_good() {
+        if let (Ok(start),Ok(end)) = (data.start.parse::<DateTime<Utc>>(),data.end.parse::<DateTime<Utc>>()) {
+            let offset = FixedOffset::east_opt(8*3600).unwrap();
+            let start = start.with_timezone(&offset).naive_local();
+            let end = end.with_timezone(&offset).naive_local();
+            let time_pair = DateTimeRng(start,end);
+            let res = get_data_in_range(&pool, time_pair).await;
+            let res: Vec<TempRecord<NaiveDateTime>>= res.into_iter().map(|v|{TempRecord{time:v.time.naive_local(),val:v.val,id:v.id}}).collect();
+            let mut temp = 0.0;
+            res.iter().map(|i| {temp = temp + i.val;}).last();
+            let average = temp/(res.len() as f64);
+            let total_time = (res.len() as f64)/3600.0;
+            let res = HistoryData {average,total_time,records:res};
+            HttpResponse::Ok().json(res)
+        }else{
+            HttpResponse::InternalServerError().json("Connection to Redis failed")
+        }
     }else {
         HttpResponse::Unauthorized().json(res.msg())
     }

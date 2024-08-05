@@ -23,7 +23,7 @@ fn main() {
     let s1 = statement.to_string() + "1";
     let s2 = statement.to_string() + "2";
     loop {
-        let temp1 = TurbineState::new();
+        let temp1 = TurbineState::new(true);
         let para1 = params! {
                 "outlet_pressure" => temp1.outlet_pressure,
                 "pre_pressure" => temp1.pre_pressure,
@@ -35,7 +35,7 @@ fn main() {
                 "flux" => temp1.flux,
                 "open" => temp1.open,
             };
-        let temp2 = TurbineState::new();
+        let temp2 = TurbineState::new(true);
         let para2 = params! {
                 "outlet_pressure" => temp2.outlet_pressure,
                 "pre_pressure" => temp2.pre_pressure,
@@ -49,6 +49,6 @@ fn main() {
             };
         conn.exec_drop(&s1,para1).unwrap();
         conn.exec_drop(&s2,para2).unwrap();
-        thread::sleep(StdDuration::from_secs(1));
+        thread::sleep(std::time::Duration::from_secs(1));
     }
 }

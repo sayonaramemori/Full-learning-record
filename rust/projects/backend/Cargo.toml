@@ -1,2 +1,2 @@
 [workspace]
-members=[ "MysqlConnector","auto_reagent", "Simulator","./opcua_client"]
+members=[ "MysqlConnector","auto_reagent", "Simulator","./opcua_client", "websocket"]

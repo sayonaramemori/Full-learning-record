@@ -4,6 +4,7 @@ use std::collections::HashMap;
 
 #[derive(Debug,sqlx::FromRow,Deserialize,Serialize,Default)]
 pub struct TurbineState{
+    pub status: bool,
     pub id: i32,
     pub outlet_pressure: f64,
     pub pre_pressure: f64,
@@ -17,9 +18,10 @@ pub struct TurbineState{
 }
 
 impl TurbineState {
-    pub fn new() -> TurbineState{
+    pub fn new_rng(status:bool) -> TurbineState{
         let mut rng = rand::thread_rng();
         TurbineState{
+            status,
             id: 0,
             outlet_pressure: rng.gen_range(0.0..50.0),
             pre_pressure: rng.gen_range(0.0..50.0),
@@ -32,8 +34,24 @@ impl TurbineState {
             open: rng.gen_range(0.0..50.0),
         }
     }
+    pub fn new(status:bool) -> TurbineState{
+        TurbineState{
+            status,
+            id: 0,
+            outlet_pressure: 0.0,
+            pre_pressure: 0.0,
+            frequency: 0.0,
+            current: 0.0,
+            safe_pressure: 0.0,
+            power: true,
+            flow_rate: 0.0,
+            flux: 0.0,
+            open: 0.0,
+        }
+    }
     pub fn to_turbine_state(hm:HashMap<String,String>)-> TurbineState {
         return TurbineState {
+            status: true,
             outlet_pressure: hm.get("outlet_pressure").unwrap().parse().unwrap(),
             pre_pressure: hm.get("pre_pressure").unwrap().parse().unwrap(),
             frequency: hm.get("frequency").unwrap().parse().unwrap(),
