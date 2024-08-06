@@ -37,8 +37,6 @@ impl Actor for MyWs {
     type Context = ws::WebsocketContext<Self>;
 }
 
-
-
 impl StreamHandler<Result<ws::Message, ws::ProtocolError>> for MyWs {
     fn handle(&mut self, msg: Result<ws::Message, ws::ProtocolError>, ctx : &mut Self::Context) {
         println!("Start handle stream");
@@ -62,7 +60,6 @@ impl StreamHandler<Result<ws::Message, ws::ProtocolError>> for MyWs {
 
 impl Handler<Instruction> for MyWs {
     type Result = ();
-
     fn handle(&mut self, msg: Instruction, ctx: &mut Self::Context) {
         // 处理自定义消息
         let response = format!("Action: {}, Value: {}", msg.action, msg.value);
