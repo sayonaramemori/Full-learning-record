@@ -19,16 +19,17 @@ struct Instruction {
     value: i32,
 }
 
+#[get("/si")]
 async fn send_instruction(
     instruction: web::Json<Instruction>,
-    data: web::Data<Arc<Mutex<Option<Addr<MyWs>>>>>,
+    data: web::Data<Arc<RwLock<Vec<Addr<MyWs>>>>>,
 ) -> HttpResponse {
-    let guard = data.lock().unwrap();
-    if let Some(addr) = &*guard {
-        addr.do_send(instruction.into_inner());
-        HttpResponse::Ok().body("Instruction sent")
-    } else {
+    let mut guard = data.write().unwrap();
+    if guard.is_empty() {
         HttpResponse::InternalServerError().body("No WebSocket connection")
+    } else {
+        guard[0].do_send(instruction.into_inner());
+        HttpResponse::Ok().body("Instruction sent")
     }
 }
 struct MyWs;
@@ -61,7 +62,6 @@ impl StreamHandler<Result<ws::Message, ws::ProtocolError>> for MyWs {
 impl Handler<Instruction> for MyWs {
     type Result = ();
     fn handle(&mut self, msg: Instruction, ctx: &mut Self::Context) {
-        // 处理自定义消息
         let response = format!("Action: {}, Value: {}", msg.action, msg.value);
         ctx.text(response);
     }
