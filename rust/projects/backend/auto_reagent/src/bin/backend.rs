@@ -1,4 +1,4 @@
-use actix_web::{Error,get,web, App, HttpServer,HttpResponse,HttpRequest};
+use actix_web::{get, guard, web, App, Error, HttpRequest, HttpResponse, HttpServer};
 use actix_cors::Cors;
 use sqlx::mysql::MySqlPoolOptions;
 
@@ -22,14 +22,18 @@ struct Instruction {
 #[get("/si")]
 async fn send_instruction(
     instruction: web::Json<Instruction>,
-    data: web::Data<Arc<RwLock<Vec<Addr<MyWs>>>>>,
+    data: web::Data<Arc<RwLock<Option<Addr<MyWs>>>>>,
 ) -> HttpResponse {
-    let mut guard = data.write().unwrap();
-    if guard.is_empty() {
+    let guard = data.write();
+    let guard = guard.as_ref().unwrap().as_ref();
+    match guard {
+       Some(addr) => {
+            addr.do_send(instruction.into_inner());
+            HttpResponse::Ok().body("Instruction sent")
+       },
+       None => {
         HttpResponse::InternalServerError().body("No WebSocket connection")
-    } else {
-        guard[0].do_send(instruction.into_inner());
-        HttpResponse::Ok().body("Instruction sent")
+       }
     }
 }
 struct MyWs;
@@ -50,7 +54,7 @@ impl StreamHandler<Result<ws::Message, ws::ProtocolError>> for MyWs {
             Ok(ws::Message::Binary(binary)) => ctx.binary(binary),
             Ok(ws::Message::Ping(ping)) => ctx.ping(&ping),
             Ok(ws::Message::Pong(pong)) => ctx.pong(&pong),
-            // Ok(ws::Message::Close(reason)) => self.close(reason),
+            Ok(ws::Message::Close(_)) => { },
             // Err(_) => {}
             _ => {
                 println!("Ji le");
@@ -68,7 +72,7 @@ impl Handler<Instruction> for MyWs {
 }
 
 #[get("/ws")]
-async fn index(req: HttpRequest, stream: web::Payload, addr: web::Data<Arc<RwLock<Vec<Addr<MyWs>>>>>) -> Result<HttpResponse,Error> {
+async fn index(req: HttpRequest, stream: web::Payload, addr: web::Data<Arc<RwLock<Option<Addr<MyWs>>>>>) -> Result<HttpResponse,Error> {
     let res = ws::WsResponseBuilder::new(MyWs, &req, stream).start_with_addr();
     let addr = addr.into_inner();
     let mut guard =  addr.write().unwrap();
@@ -78,7 +82,7 @@ async fn index(req: HttpRequest, stream: web::Payload, addr: web::Data<Arc<RwLoc
     else {
         let (addr,response) = res.unwrap();
         println!("{:?}",addr);
-        guard.push(addr);
+        *guard = Some(addr);
         return Ok(response);
     }
 }
@@ -91,7 +95,7 @@ async fn main() -> std::io::Result<()> {
 
     // let redis_client = redis::Client::open("redis://:Iloveyouxuwu121234@kazusa.vip").unwrap();
     let app_state = RedisState::new("Iloveyouxuwu121234", "redis://:Iloveyouxuwu121234@kazusa.vip");
-    let addr: Arc<RwLock<Vec<Addr<MyWs>>>> = Arc::new(RwLock::new(vec![]));
+    let addr: Arc<RwLock<Option<Addr<MyWs>>>> = Arc::new(RwLock::new(None));
     HttpServer::new(move || {
        let cors = Cors::default()
              .allow_any_origin()
@@ -121,6 +125,7 @@ async fn main() -> std::io::Result<()> {
             .service(pump_status)
             .service(set_point)
             .service(index)
+            .service(send_instruction)
     })
     .bind("localhost:8080")?
     .run()
