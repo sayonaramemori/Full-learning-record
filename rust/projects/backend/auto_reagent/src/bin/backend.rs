@@ -26,6 +26,7 @@ async fn send_instruction(
 ) -> HttpResponse {
     let mut guard = data.write().unwrap();
     guard.retain(|x| x.connected());
+    println!("Alive size: {}",guard.len());
     if guard.is_empty() {
         HttpResponse::InternalServerError().body("No WebSocket connection")
     }else{
@@ -44,7 +45,6 @@ impl Actor for MyWs {
 
 impl StreamHandler<Result<ws::Message, ws::ProtocolError>> for MyWs {
     fn handle(&mut self, msg: Result<ws::Message, ws::ProtocolError>, ctx : &mut Self::Context) {
-        println!("Start handle stream");
         match msg {
             Ok(ws::Message::Text(text)) => {
                 println!("Received: {}", text);
@@ -66,8 +66,8 @@ impl Handler<Instruction> for MyWs {
     type Result = ();
     fn handle(&mut self, msg: Instruction, ctx: &mut Self::Context) {
         let response = format!("Action: {}, Value: {}", msg.action, msg.value);
-        // ctx.text(response);
         println!("{response}");
+        ctx.text(response);
     }
 }
 
