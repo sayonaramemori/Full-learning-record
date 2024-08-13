@@ -10,3 +10,5 @@ futures = "0.3.30"
 tokio-tungstenite = "0.23.1"
 serde = { version = "1.0.188", features = ["derive"]}
 serde_json = "1.0.121"
+tokio-util = "=0.7.11"
+client_test = {path="../opcua_client"}

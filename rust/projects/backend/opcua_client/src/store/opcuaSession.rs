@@ -1,4 +1,5 @@
 use std::sync::Arc;
+use tokio::task;
 use opcua::{client::prelude::{Client, Session,*}, sync::*};
 use chrono::prelude::*;
 use chrono::DateTime;
@@ -21,13 +22,15 @@ pub struct OpcuaSession {
 }
 
 impl OpcuaSession {
-    pub fn new(endpoint_url:&str) -> OpcuaSession {
+    pub async fn new(endpoint_url:&str) -> OpcuaSession {
         let res = OpcuaSession{
             session: Arc::new(std::sync::RwLock::new(None)),
             url: endpoint_url.to_string(),
         };
-        res.gain_new_session();
-        return res;
+        tokio::task::spawn_blocking(move ||{
+            res.gain_new_session();
+            return res;
+        }).await.unwrap()
     }
 
     fn get_client()-> Client {
@@ -98,6 +101,7 @@ impl OpcuaSession {
             },
         }
     }
+
     pub fn write_single_retry(&self, node_id: &NodeId, value: Variant, times:u32)->bool{
         for _ in 0..times {
             if self.write_single(node_id, value.clone()) {
@@ -106,6 +110,7 @@ impl OpcuaSession {
         }
         false
     }
+
     pub fn write_single(&self, node_id: &NodeId, value: Variant) -> bool {
         let guard = self.session.read().unwrap();
         let session = guard.as_ref().unwrap().read();
@@ -133,6 +138,17 @@ impl OpcuaSession {
         drop(guard);
         self.gain_new_session();
         return false;
+    }
+
+    pub async fn async_write_single_retry(session: Arc<OpcuaSession>,node_id: NodeId, value: Variant, times:u32) -> bool {
+        task::spawn_blocking(move||{
+            session.write_single_retry(&node_id, value, times)
+        }).await.unwrap()
+    }
+
+    pub async fn async_read_single(session: Arc<OpcuaSession>, node_id: NodeId) -> Result<Option<DataTime>,StatusCode>{
+        let res = task::spawn_blocking(move || {session.read_single(&node_id)}).await.unwrap();
+        return res;
     }
 }
 

@@ -18,11 +18,12 @@ pub struct NodeConfig{
 }
 
 impl NodeConfig {
-    pub fn new() -> NodeConfig{
-        let mut file = File::open("C:\\Users\\13427\\Desktop\\code\\linux-tools\\rust\\projects\\backend\\opcua_client\\src\\opcua_config\\config.yml").unwrap();
-        let mut contents = String::new();
-        file.read_to_string(&mut contents).unwrap();
-        serde_yml::from_str::<NodeConfig>(&contents).unwrap()
+    pub async fn new() -> NodeConfig{
+        let res = tokio::task::spawn_blocking(move||{
+            let content = std::fs::read_to_string("C:\\Users\\13427\\Desktop\\code\\linux-tools\\rust\\projects\\backend\\opcua_client\\src\\opcua_config\\config.yml").unwrap();
+            serde_yml::from_str::<NodeConfig>(&content).unwrap()
+        }).await.unwrap();
+        return res;
     }
     pub fn get(&self,tag:&str) -> &str{
         if let Some(ref val) = self.produce {

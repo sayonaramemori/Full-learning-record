@@ -68,31 +68,35 @@ impl Handler<Instruction> for MyWs {
 }
 
 #[get("/ws")]
-async fn index(req: HttpRequest, stream: web::Payload) -> Result<HttpResponse,Error> {
-    println!("call index");
-    let res = ws::start(MyWs, &req, stream);
+async fn index(req: HttpRequest, stream: web::Payload, addr: web::Data<Arc<RwLock<Vec<Addr<MyWs>>>>>) -> Result<HttpResponse,Error> {
+    let res = ws::WsResponseBuilder::new(MyWs, &req, stream).start_with_addr();
+    let addr = addr.into_inner();
+    let mut guard =  addr.write().unwrap();
     if res.is_err(){
-        println!("Err when init");
+        return Err(res.err().unwrap());
     }
     else {
-        println!("OKKKKKKKKkk");
+        let (addr,response) = res.unwrap();
+        println!("{:?}",addr);
+        guard.push(addr);
+        return Ok(response);
     }
-    return res;
 }
 
+use std::sync::RwLock;
 #[actix_web::main] // or #[tokio::main]
 async fn main() -> std::io::Result<()> {
     let url = "mysql://root:121234@kazusa.vip:3000/plc?ssl-mode=DISABLED";
     let pool = MySqlPoolOptions::new().connect(url).await.unwrap();
 
-    let redis_client = redis::Client::open("redis://:Iloveyouxuwu121234@kazusa.vip").unwrap();
-    let app_state = RedisState::new("Iloveyouxuwu121234", redis_client);
-    // let addr:Arc<Mutex<Option<Addr<MyWs>>>> = Arc::new(Mutex::new(None));
+    // let redis_client = redis::Client::open("redis://:Iloveyouxuwu121234@kazusa.vip").unwrap();
+    let app_state = RedisState::new("Iloveyouxuwu121234", "redis://:Iloveyouxuwu121234@kazusa.vip");
+    let addr: Arc<RwLock<Vec<Addr<MyWs>>>> = Arc::new(RwLock::new(vec![]));
     HttpServer::new(move || {
        let cors = Cors::default()
-            //  .allow_any_origin()
-            //  .allow_any_header()
-            //  .allow_any_method()
+             .allow_any_origin()
+             .allow_any_header()
+             .allow_any_method()
             .allowed_origin("http://localhost:5173")
              .supports_credentials()
              .allowed_methods(vec!["GET", "POST"])
@@ -102,6 +106,7 @@ async fn main() -> std::io::Result<()> {
         App::new()
             .app_data(web::Data::new(pool.clone()))
             .app_data(web::Data::new(app_state.clone()))
+            .app_data(web::Data::new(addr.clone()))
             .wrap(cors)
             // .default_service(web::to(|| HttpResponse::Ok()))
             .service(findlast)

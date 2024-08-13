@@ -1,10 +1,14 @@
 use serde::Deserialize;
+use tokio_util::sync::CancellationToken;
 use tokio_tungstenite::connect_async;
 use tokio_tungstenite::tungstenite::protocol::Message;
 use futures::stream::StreamExt;
 use futures::SinkExt;
 use std::time::Duration;
 use tokio::time::sleep;
+use std::sync::mpsc::channel;
+
+
 
 #[derive(Deserialize,Debug)]
 struct Instruction {
@@ -43,6 +47,8 @@ async fn connect_to_server() -> Result<(), Box<dyn std::error::Error>> {
 
     let (mut write, mut read) = ws_stream.split();
 
+    let cancellation_token = CancellationToken::new();
+    let cancel_token_clone = cancellation_token.clone();
     // 启动一个任务处理从 WebSocket 接收的消息
     let read_task = tokio::spawn(async move {
         while let Some(message) = read.next().await {
@@ -58,12 +64,14 @@ async fn connect_to_server() -> Result<(), Box<dyn std::error::Error>> {
                 _ => println!("Error for message"),
             }
         }
+        cancel_token_clone.cancel();
     });
 
     // 处理发送的消息（此处可以添加发送逻辑）
     let send_task = tokio::spawn(async move {
         // 示例：发送一个初始化消息
         if let Err(e) = write.send(Message::Text("Client connected".into())).await {
+            println!("Connect failed");
         }
     });
 

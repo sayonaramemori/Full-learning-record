@@ -1,5 +1,5 @@
 use std::sync::Arc;
-use std::thread;
+use tokio::time::sleep;
 use mysql::prelude::Queryable;
 use mysql::*;
 use opcua::client::prelude::*;
@@ -20,7 +20,7 @@ pub fn subscribe_test(){
     // &&
     subscribe_to_values(session.clone(),config_temp,reference.clone()).is_ok()
     {
-        to_mysql("mysql://root:121234@kazusa.vip:3000/plc".to_string(),"record".to_string(),reference.clone());
+        to_mysql("mysql://root:121234@kazusa.vip:3000/plc","record".to_string(),reference.clone());
         let _ = Session::run(session);
     } else {
         println!("Error creating subscription");
@@ -48,33 +48,31 @@ where T: Fn(&MonitoredItem,Arc<RedisData>) + Send + Sync + 'static
 }
 
 
-fn to_mysql(mysql_url:String,redis_key:String,redis_data:Arc<RedisData>) {
-    thread::spawn(move ||{
-        let mysql_data = MysqlData::new(&mysql_url);
-        loop {
-            let res = mysql_data.get_conn();
-            if let Ok(mut conn) = res {
-                if let Ok(res) = redis_data.as_ref().lpop(&redis_key, 2000){
-                    let _ = conn.query_drop(
-                    r"CREATE TABLE if not exists temp (
-                        id bigint auto_increment,
-                        val double not null,
-                        time timestamp not null,
-                        primary key(id)
-                    )");
-                    let res :Vec<Temperature>= res.into_iter().map(|s| Temperature::from(s)).collect();
-                    // println!("res is {:?}",res);
-                    let _ = conn.exec_batch(
-                    r"INSERT INTO temp(val,time)
-                        VALUES (:val, :time)",
-                    res.iter().map(|p| params! {
-                        "val" => p.val,
-                        "time" => p.time,
-                        })
-                    );
-                }
+async fn to_mysql(mysql_url:&'static str,redis_key:String,redis_data:Arc<RedisData>) {
+    let mysql_data = MysqlData::new(&mysql_url).await;
+    loop {
+        let res = mysql_data.get_conn();
+        if let Ok(mut conn) = res {
+            if let Ok(res) = redis_data.as_ref().lpop(&redis_key, 2000){
+                let _ = conn.query_drop(
+                r"CREATE TABLE if not exists temp (
+                    id bigint auto_increment,
+                    val double not null,
+                    time timestamp not null,
+                    primary key(id)
+                )");
+                let res :Vec<Temperature>= res.into_iter().map(|s| Temperature::from(s)).collect();
+                // println!("res is {:?}",res);
+                let _ = conn.exec_batch(
+                r"INSERT INTO temp(val,time)
+                    VALUES (:val, :time)",
+                res.iter().map(|p| params! {
+                    "val" => p.val,
+                    "time" => p.time,
+                    })
+                );
             }
-            thread::sleep(std::time::Duration::from_secs(1800));
         }
-    });
+        sleep(std::time::Duration::from_secs(1800)).await;
+    }
 }
