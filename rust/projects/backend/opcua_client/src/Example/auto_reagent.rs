@@ -17,23 +17,26 @@ use crate::Models::Temperature::Temperature;
 use crate::opcua_config::NodeConfig;
 use crate::debug_println;
 
-pub async fn transfer_data_to_plc<T>(target:&str,val:String) 
+pub async fn transfer_data_to_plc<T>(ds:Arc<DataStore>,target:String,val:String) 
 where T: 'static + Send + Sync + FromStr + Clone + Display + Copy,
 {
-    let ds = create_data_store(true,false,true,true).await;
+    // let ds = create_data_store(true,false,true,true).await;
+    println!("transfer called");
     let config = ds.get::<NodeConfig>().unwrap();
     let redis_data = ds.get::<RedisData>().unwrap();
     let status_key = target.to_string() + "Status";
+    let id= config.node(&target);
+    let session_better = ds.get::<OpcuaSession>().unwrap();
     lazy_static! { static ref mapper:DataStore = DataStore::new_variant_mapper(); }
-        let id= config.node(target);
-        let session_better = ds.get::<OpcuaSession>().unwrap();
-        if let Ok(val)= val.parse::<T>(){
-            let variant_func:Arc<_>  = mapper.get_func::<T>().unwrap();
-            if OpcuaSession::async_write_single_retry(session_better, id, variant_func(val), 3).await
-            {
-                redis_data.setex_retry(&status_key, val,10,5).await;
-            }
+    println!("end init");
+    if let Ok(val)= val.parse::<T>(){
+        println!("parse ok val is {}",val);
+        let variant_func:Arc<_>  = mapper.get_func::<T>().unwrap();
+        if OpcuaSession::async_write_single_retry(session_better, id, variant_func(val), 3).await
+        {
+            redis_data.setex_retry(&status_key, val,10,5).await;
         }
+    }
 }
 
 pub async fn collect_data(target:&'static str,sender: Sender<DataTime>){
@@ -55,7 +58,7 @@ pub async fn collect_data(target:&'static str,sender: Sender<DataTime>){
     }
 }
 
-async fn create_data_store(redis:bool,mysql:bool,opcua_config:bool,opcua_session:bool,)->Arc<DataStore> {
+pub async fn create_data_store(redis:bool,mysql:bool,opcua_config:bool,opcua_session:bool,)->Arc<DataStore> {
     let ds = Arc::new(DataStore::new());
     if redis {
         let redis_data = RedisData::new("Iloveyouxuwu121234","redis://:Iloveyouxuwu121234@kazusa.vip", );

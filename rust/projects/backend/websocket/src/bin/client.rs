@@ -4,9 +4,9 @@ use tokio_tungstenite::connect_async;
 use tokio_tungstenite::tungstenite::protocol::Message;
 use futures::stream::StreamExt;
 use futures::SinkExt;
-use std::time::Duration;
+use std::{sync::Arc, time::Duration};
 use tokio::time::sleep;
-use client_test::Example::auto_reagent::{test,transfer_data_to_plc};
+use client_test::{store::app::DataStore, Example::auto_reagent::{create_data_store, test, transfer_data_to_plc}};
 use std::sync::mpsc::channel;
 
 
@@ -53,13 +53,14 @@ async fn connect_to_server() -> Result<(), Box<dyn std::error::Error>> {
     // 启动一个任务处理从 WebSocket 接收的消息
     let plc_record = tokio::spawn(test());
     let read_task = tokio::spawn(async move {
+        let ds = create_data_store(true, false, true, true).await;
         while let Some(message) = read.next().await {
             match message {
                 Ok(Message::Text(text)) => {
                     let instruction = serde_json::from_str(&text);
                     match instruction {
-                        Ok(res) => handle_instruction(res).await,
-                        _ => println!("{text}"),
+                        Ok(res) => handle_instruction(ds.clone(),res).await,
+                        _ => println!("sb b {text}"),
                     }
                     
                 }
@@ -80,8 +81,9 @@ async fn connect_to_server() -> Result<(), Box<dyn std::error::Error>> {
     Ok(())
 }
 
-async fn handle_instruction(instruction: Instruction) {
+async fn handle_instruction(ds:Arc<DataStore>,instruction: Instruction) {
     //My important 
     println!("Instruction is {:?}",instruction);
-    transfer_data_to_plc::<f64>(&instruction.target, instruction.value).await;
+    transfer_data_to_plc::<f64>(ds,instruction.target, instruction.value).await;
+    println!("Handler over");
 }

@@ -1,7 +1,7 @@
 use actix_web::{get, guard, web, App, Error, HttpRequest, HttpResponse, HttpServer};
 use actix_cors::Cors;
 use sqlx::mysql::MySqlPoolOptions;
-
+use serde_json;
 extern crate AutoReagent;
 use AutoReagent::handlers::MachineButton::*;
 use AutoReagent::handlers::{Login::*,Query::*};
@@ -9,10 +9,10 @@ use AutoReagent::models::redis_data::RedisState;
 use std::sync::{Arc,Mutex};
 use actix_web_actors::ws;
 use actix::prelude::*;
-use serde::Deserialize;
+use serde::{Deserialize,Serialize};
 use actix::{Actor, StreamHandler};
 
-#[derive(Message, Deserialize,Clone)]
+#[derive(Message, Deserialize,Clone,Serialize)]
 #[rtype(result = "()")]
 struct Instruction {
     target: String,
@@ -70,7 +70,8 @@ impl Handler<Instruction> for MyWs {
     fn handle(&mut self, msg: Instruction, ctx: &mut Self::Context) {
         let response = format!("target: {}, Value: {}", msg.target, msg.value);
         println!("{response}");
-        ctx.text(response);
+        let res = serde_json::to_string(&msg).unwrap();
+        ctx.text(res);
     }
 }
 
