@@ -48,8 +48,7 @@ impl StreamHandler<Result<ws::Message, ws::ProtocolError>> for MyWs {
         match msg {
             Ok(ws::Message::Text(text)) => {
                 println!("Received: {}", text);
-                ctx.text(format!("Echo: {}", text));
-                ctx.text(text)
+                // ctx.text(format!("Echo: {}", text));
             },
             Ok(ws::Message::Binary(binary)) => ctx.binary(binary),
             Ok(ws::Message::Ping(ping)) => ctx.ping(&ping),
@@ -67,7 +66,8 @@ impl Handler<Instruction> for MyWs {
     type Result = ();
     fn handle(&mut self, msg: Instruction, ctx: &mut Self::Context) {
         let response = format!("Action: {}, Value: {}", msg.action, msg.value);
-        ctx.text(response);
+        // ctx.text(response);
+        println!("{response}");
     }
 }
 
