@@ -15,8 +15,8 @@ use actix::{Actor, StreamHandler};
 #[derive(Message, Deserialize,Clone)]
 #[rtype(result = "()")]
 struct Instruction {
-    action: String,
-    value: i32,
+    target: String,
+    value: String,
 }
 
 #[get("/si")]
@@ -43,10 +43,12 @@ impl Actor for MyWs {
     type Context = ws::WebsocketContext<Self>;
 }
 
+//handle receive
 impl StreamHandler<Result<ws::Message, ws::ProtocolError>> for MyWs {
     fn handle(&mut self, msg: Result<ws::Message, ws::ProtocolError>, ctx : &mut Self::Context) {
         match msg {
             Ok(ws::Message::Text(text)) => {
+                //do nothing for in coming msg
                 println!("Received: {}", text);
                 // ctx.text(format!("Echo: {}", text));
             },
@@ -62,10 +64,11 @@ impl StreamHandler<Result<ws::Message, ws::ProtocolError>> for MyWs {
     }
 }
 
+//handle send
 impl Handler<Instruction> for MyWs {
     type Result = ();
     fn handle(&mut self, msg: Instruction, ctx: &mut Self::Context) {
-        let response = format!("Action: {}, Value: {}", msg.action, msg.value);
+        let response = format!("target: {}, Value: {}", msg.target, msg.value);
         println!("{response}");
         ctx.text(response);
     }

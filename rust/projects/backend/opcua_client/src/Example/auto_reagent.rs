@@ -17,7 +17,7 @@ use crate::Models::Temperature::Temperature;
 use crate::opcua_config::NodeConfig;
 use crate::debug_println;
 
-pub async fn transfer_data_to_plc<T>(target:&'static str) 
+pub async fn transfer_data_to_plc<T>(target:&str,val:String) 
 where T: 'static + Send + Sync + FromStr + Clone + Display + Copy,
 {
     let ds = create_data_store(true,false,true,true).await;
@@ -25,22 +25,15 @@ where T: 'static + Send + Sync + FromStr + Clone + Display + Copy,
     let redis_data = ds.get::<RedisData>().unwrap();
     let status_key = target.to_string() + "Status";
     lazy_static! { static ref mapper:DataStore = DataStore::new_variant_mapper(); }
-    loop {
-        sleep(std::time::Duration::from_secs(1)).await;
         let id= config.node(target);
         let session_better = ds.get::<OpcuaSession>().unwrap();
-        if let Ok(res) = redis_data.rpop(target, 1).await {
-            if !res.is_empty() {
-                if let Ok(val)= res[0].parse::<T>(){
-                    let variant_func:Arc<_>  = mapper.get_func::<T>().unwrap();
-                    if OpcuaSession::async_write_single_retry(session_better, id, variant_func(val), 3).await
-                    {
-                        redis_data.setex_retry(&status_key, val,10,5).await;
-                    }
-                }
+        if let Ok(val)= val.parse::<T>(){
+            let variant_func:Arc<_>  = mapper.get_func::<T>().unwrap();
+            if OpcuaSession::async_write_single_retry(session_better, id, variant_func(val), 3).await
+            {
+                redis_data.setex_retry(&status_key, val,10,5).await;
             }
         }
-    }
 }
 
 pub async fn collect_data(target:&'static str,sender: Sender<DataTime>){
@@ -87,10 +80,10 @@ pub async fn test(){
     let (flux_sender, _rx) = broadcast::channel::<DataTime>(3600);
     let (flux_vice_sender, _rx) = broadcast::channel::<DataTime>(3600);
     tokio::select! {
-        _ = transfer_data_to_plc::<bool>("switchVice") => { std::process::exit(1); },
-        _ = transfer_data_to_plc::<bool>("switch") => { std::process::exit(1); },
-        _ = transfer_data_to_plc::<f64>("setpoint") => { std::process::exit(1); },
-        _ = transfer_data_to_plc::<f64>("setpointVice") => { std::process::exit(1); },
+        // _ = transfer_data_to_plc::<bool>("switchVice") => { std::process::exit(1); },
+        // _ = transfer_data_to_plc::<bool>("switch") => { std::process::exit(1); },
+        // _ = transfer_data_to_plc::<f64>("setpoint") => { std::process::exit(1); },
+        // _ = transfer_data_to_plc::<f64>("setpointVice") => { std::process::exit(1); },
 
         _ = trim_record(3600,600,"flux") => { std::process::exit(1); },
         _ = flux_to_mysql(flux_sender.subscribe(),"flux",) => { std::process::exit(1); },

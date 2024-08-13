@@ -6,14 +6,15 @@ use futures::stream::StreamExt;
 use futures::SinkExt;
 use std::time::Duration;
 use tokio::time::sleep;
+use client_test::Example::auto_reagent::{test,transfer_data_to_plc};
 use std::sync::mpsc::channel;
 
 
 
 #[derive(Deserialize,Debug)]
 struct Instruction {
-    action: String,
-    value: i32,
+    target: String,
+    value: String,
 }
 
 #[tokio::main]
@@ -50,6 +51,7 @@ async fn connect_to_server() -> Result<(), Box<dyn std::error::Error>> {
     let cancellation_token = CancellationToken::new();
     let cancel_token_clone = cancellation_token.clone();
     // 启动一个任务处理从 WebSocket 接收的消息
+    let plc_record = tokio::spawn(test());
     let read_task = tokio::spawn(async move {
         while let Some(message) = read.next().await {
             match message {
@@ -67,21 +69,19 @@ async fn connect_to_server() -> Result<(), Box<dyn std::error::Error>> {
         cancel_token_clone.cancel();
     });
 
-    // 处理发送的消息（此处可以添加发送逻辑）
     let send_task = tokio::spawn(async move {
-        // 示例：发送一个初始化消息
-        while let Ok(_) = write.send(Message::Text("Client keep".into())).await {
-            println!("keep connect");
+        while let Ok(_) = write.send(Message::Text("Ping".into())).await {
             sleep(std::time::Duration::from_secs(5)).await;
         }
     });
 
-    tokio::try_join!(read_task, send_task)?;
+    tokio::try_join!(read_task, send_task, plc_record)?;
 
     Ok(())
 }
 
 async fn handle_instruction(instruction: Instruction) {
-    // 创建 OPC UA 客户端
+    //My important 
     println!("Instruction is {:?}",instruction);
+    transfer_data_to_plc::<f64>(&instruction.target, instruction.value).await;
 }
