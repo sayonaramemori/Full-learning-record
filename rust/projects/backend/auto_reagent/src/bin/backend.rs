@@ -12,7 +12,7 @@ use actix::prelude::*;
 use serde::Deserialize;
 use actix::{Actor, StreamHandler};
 
-#[derive(Message, Deserialize)]
+#[derive(Message, Deserialize,Clone)]
 #[rtype(result = "()")]
 struct Instruction {
     action: String,
@@ -22,18 +22,18 @@ struct Instruction {
 #[get("/si")]
 async fn send_instruction(
     instruction: web::Json<Instruction>,
-    data: web::Data<Arc<RwLock<Option<Addr<MyWs>>>>>,
+    data: web::Data<Arc<RwLock<Vec<Addr<MyWs>>>>>,
 ) -> HttpResponse {
-    let guard = data.write();
-    let guard = guard.as_ref().unwrap().as_ref();
-    match guard {
-       Some(addr) => {
-            addr.do_send(instruction.into_inner());
-            HttpResponse::Ok().body("Instruction sent")
-       },
-       None => {
+    let mut guard = data.write().unwrap();
+    if guard.is_empty() {
         HttpResponse::InternalServerError().body("No WebSocket connection")
-       }
+    }else{
+        guard.retain(|x| x.connected());
+        let ins = instruction.into_inner();
+        for addr in guard.iter(){
+            addr.do_send(ins.clone());
+        }
+        HttpResponse::Ok().body("Instruction sent")
     }
 }
 struct MyWs;
@@ -72,7 +72,7 @@ impl Handler<Instruction> for MyWs {
 }
 
 #[get("/ws")]
-async fn index(req: HttpRequest, stream: web::Payload, addr: web::Data<Arc<RwLock<Option<Addr<MyWs>>>>>) -> Result<HttpResponse,Error> {
+async fn index(req: HttpRequest, stream: web::Payload, addr: web::Data<Arc<RwLock<Vec<Addr<MyWs>>>>>) -> Result<HttpResponse,Error> {
     let res = ws::WsResponseBuilder::new(MyWs, &req, stream).start_with_addr();
     let addr = addr.into_inner();
     let mut guard =  addr.write().unwrap();
@@ -82,7 +82,7 @@ async fn index(req: HttpRequest, stream: web::Payload, addr: web::Data<Arc<RwLoc
     else {
         let (addr,response) = res.unwrap();
         println!("{:?}",addr);
-        *guard = Some(addr);
+        guard.push(addr);
         return Ok(response);
     }
 }
@@ -95,7 +95,7 @@ async fn main() -> std::io::Result<()> {
 
     // let redis_client = redis::Client::open("redis://:Iloveyouxuwu121234@kazusa.vip").unwrap();
     let app_state = RedisState::new("Iloveyouxuwu121234", "redis://:Iloveyouxuwu121234@kazusa.vip");
-    let addr: Arc<RwLock<Option<Addr<MyWs>>>> = Arc::new(RwLock::new(None));
+    let addr: Arc<RwLock<Vec<Addr<MyWs>>>> = Arc::new(RwLock::new(vec![]));
     HttpServer::new(move || {
        let cors = Cors::default()
              .allow_any_origin()
@@ -127,7 +127,7 @@ async fn main() -> std::io::Result<()> {
             .service(index)
             .service(send_instruction)
     })
-    .bind("localhost:8080")?
+    .bind("0.0.0.0:8080")?
     .run()
     .await
 }
