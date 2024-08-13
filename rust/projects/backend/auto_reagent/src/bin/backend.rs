@@ -25,10 +25,10 @@ async fn send_instruction(
     data: web::Data<Arc<RwLock<Vec<Addr<MyWs>>>>>,
 ) -> HttpResponse {
     let mut guard = data.write().unwrap();
+    guard.retain(|x| x.connected());
     if guard.is_empty() {
         HttpResponse::InternalServerError().body("No WebSocket connection")
     }else{
-        guard.retain(|x| x.connected());
         let ins = instruction.into_inner();
         for addr in guard.iter(){
             addr.do_send(ins.clone());
