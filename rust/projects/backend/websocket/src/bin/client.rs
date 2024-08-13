@@ -70,8 +70,9 @@ async fn connect_to_server() -> Result<(), Box<dyn std::error::Error>> {
     // 处理发送的消息（此处可以添加发送逻辑）
     let send_task = tokio::spawn(async move {
         // 示例：发送一个初始化消息
-        while let Err(e) = write.send(Message::Text("Client connected".into())).await {
-            println!("Connect failed");
+        while let _ = write.send(Message::Text("Client keep".into())).await {
+            println!("keep connect");
+            sleep(std::time::Duration::from_secs(5));
         }
     });
 
