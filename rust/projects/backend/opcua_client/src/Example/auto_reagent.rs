@@ -1,11 +1,8 @@
-use crate::store::app::DataStore;
-use crate::store::opcuaSession;
+use crate::store::middleware::DataStore;
 use lazy_static::lazy_static;
 use tokio::time::sleep;
 use tokio::signal;
 use tokio::task::{self,spawn_blocking};
-use std::fmt::Display;
-use std::str::FromStr;
 use tokio::sync::broadcast::{self,Sender,Receiver};
 
 use std::sync::Arc;
@@ -14,28 +11,19 @@ use mysql::*;
 use crate::store::{MysqlData::MysqlData,opcuaSession::*};
 use AutoReagent::models::redis_data::RedisState as RedisData;
 use crate::Models::Temperature::Temperature;
-use crate::opcua_config::NodeConfig;
+use crate::opcua_config::node_config::NodeConfig;
 use crate::debug_println;
 
-pub async fn transfer_data_to_plc<T>(ds:Arc<DataStore>,target:String,val:String) 
-where T: 'static + Send + Sync + FromStr + Clone + Display + Copy,
+pub async fn transfer_data_to_plc(ds:Arc<DataStore>,target:String,val:String) 
 {
-    // let ds = create_data_store(true,false,true,true).await;
-    println!("transfer called");
     let config = ds.get::<NodeConfig>().unwrap();
     let redis_data = ds.get::<RedisData>().unwrap();
     let status_key = target.to_string() + "Status";
     let id= config.node(&target);
     let session_better = ds.get::<OpcuaSession>().unwrap();
-    lazy_static! { static ref mapper:DataStore = DataStore::new_variant_mapper(); }
-    println!("end init");
-    if let Ok(val)= val.parse::<T>(){
-        println!("parse ok val is {}",val);
-        let variant_func:Arc<_>  = mapper.get_func::<T>().unwrap();
-        if OpcuaSession::async_write_single_retry(session_better, id, variant_func(val), 3).await
-        {
-            redis_data.setex_retry(&status_key, val,10,5).await;
-        }
+    if OpcuaSession::async_write_single_retry(session_better, id, config.get_variant(&target,val.clone()).unwrap(), 3).await
+    {
+        redis_data.setex_retry(&status_key, val,10,5).await;
     }
 }
 

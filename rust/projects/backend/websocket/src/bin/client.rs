@@ -1,13 +1,14 @@
-use serde::Deserialize;
+use serde::{Deserialize, Serialize};
 use tokio_util::sync::CancellationToken;
 use tokio_tungstenite::connect_async;
 use tokio_tungstenite::tungstenite::protocol::Message;
 use futures::stream::StreamExt;
 use futures::SinkExt;
-use std::{sync::Arc, time::Duration};
+use std::{str::FromStr, sync::Arc, time::Duration};
 use tokio::time::sleep;
-use client_test::{store::app::DataStore, Example::auto_reagent::{create_data_store, test, transfer_data_to_plc}};
+use client_test::{store::middleware::DataStore, Example::auto_reagent::{create_data_store, test, transfer_data_to_plc}};
 use std::sync::mpsc::channel;
+use std::format::FromStr;
 
 
 
@@ -84,6 +85,6 @@ async fn connect_to_server() -> Result<(), Box<dyn std::error::Error>> {
 async fn handle_instruction(ds:Arc<DataStore>,instruction: Instruction) {
     //My important 
     println!("Instruction is {:?}",instruction);
-    transfer_data_to_plc::<f64>(ds,instruction.target, instruction.value).await;
+    transfer_data_to_plc(ds,instruction.target, instruction.value).await;
     println!("Handler over");
 }

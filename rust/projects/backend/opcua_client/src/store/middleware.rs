@@ -20,9 +20,9 @@ impl DataStore {
         res.insert_func(|val:bool|{return Variant::Boolean(val);});
         res.insert_func(|val:f32|{return Variant::Float(val);});
         res.insert_func(|val:f64|{return Variant::Double(val);});
+        res.insert_func(|val:i16|{return Variant::Int16(val);});
         res.insert_func(|val:i32|{return Variant::Int32(val);});
         res.insert_func(|val:i64|{return Variant::Int64(val);});
-        res.insert_func(|val:i16|{return Variant::Int16(val);});
         res.insert_func(|val:u16|{return Variant::UInt16(val);});
         res.insert_func(|val:u32|{return Variant::UInt32(val);});
         res.insert_func(|val:u64|{return Variant::UInt64(val);});
