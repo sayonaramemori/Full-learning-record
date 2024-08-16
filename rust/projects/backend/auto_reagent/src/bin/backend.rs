@@ -50,7 +50,11 @@ async fn main() -> std::io::Result<()> {
             .service(pump_status)
             .service(set_point)
             .service(websocket_index)
+<<<<<<< HEAD
             // .service(send_instruction)
+=======
+            .service(send_instruction)
+>>>>>>> ea08cdaccdf1ff0344eeaa9771e6e37dc06f0b50
     })
     .bind("0.0.0.0:8080")?
     // .bind("localhost:8080")?
