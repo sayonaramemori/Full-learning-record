@@ -22,6 +22,9 @@ pub struct OpcuaSession {
 }
 
 impl OpcuaSession {
+    pub async fn new_arc() -> Arc<OpcuaSession> {
+        Arc::new(OpcuaSession::new("opc.tcp://127.0.0.1:49320").await)
+    }
     pub async fn new(endpoint_url:&str) -> OpcuaSession {
         let res = OpcuaSession{
             session: Arc::new(std::sync::RwLock::new(None)),

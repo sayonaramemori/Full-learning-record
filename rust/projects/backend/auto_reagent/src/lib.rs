@@ -1,6 +1,7 @@
 pub mod handlers;
 pub mod models;
 pub mod mapper;
+pub mod websocket;
 
 #[macro_export]
 macro_rules! debug_println {
