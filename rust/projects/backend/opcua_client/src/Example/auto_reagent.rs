@@ -19,11 +19,14 @@ pub async fn transfer_data_to_plc(ds:Arc<DataStore>,target:String,val:String)
     let config = ds.get::<NodeConfig>().unwrap();
     let redis_data = ds.get::<RedisData>().unwrap();
     let status_key = target.to_string() + "Status";
+    // let session_better = ds.get::<OpcuaSession>().unwrap();
+    let session_better = OpcuaSession::new_arc().await;
     let id= config.node(&target);
-    let session_better = ds.get::<OpcuaSession>().unwrap();
-    if OpcuaSession::async_write_single_retry(session_better, id, config.get_variant(&target,val.clone()).unwrap(), 3).await
-    {
-        redis_data.setex_retry(&status_key, val,10,5).await;
+    if let Some(id) = id {
+        if OpcuaSession::async_write_single_retry(session_better, id, config.get_variant(&target,val.clone()).unwrap(), 3).await
+        {
+            redis_data.setex_retry(&status_key, val,10,5).await;
+        }
     }
 }
 
@@ -32,7 +35,7 @@ pub async fn collect_data(target:&'static str,sender: Sender<DataTime>){
     let config = ds.get::<NodeConfig>().unwrap();
     loop {
         let session_better = ds.get::<OpcuaSession>().unwrap();
-        let flux = config.node(target);
+        let flux = config.node(target).unwrap();
         let res = OpcuaSession::async_read_single(session_better, flux).await;
         match res{
             Ok(res) => {
@@ -71,22 +74,35 @@ pub async fn test(){
     let (flux_sender, _rx) = broadcast::channel::<DataTime>(3600);
     let (flux_vice_sender, _rx) = broadcast::channel::<DataTime>(3600);
     tokio::select! {
-        // _ = transfer_data_to_plc::<bool>("switchVice") => { std::process::exit(1); },
-        // _ = transfer_data_to_plc::<bool>("switch") => { std::process::exit(1); },
-        // _ = transfer_data_to_plc::<f64>("setpoint") => { std::process::exit(1); },
-        // _ = transfer_data_to_plc::<f64>("setpointVice") => { std::process::exit(1); },
+        _ = trim_record(3600,600,"flux") => {
+             std::process::exit(1); 
+            },
+        _ = flux_to_mysql(flux_sender.subscribe(),"flux",) => { 
+            std::process::exit(1);
+         },
+        _ = flux_to_redis(flux_sender.subscribe(),"flux",) => { 
+            std::process::exit(1);
+         },
+        _ = collect_data("flux",flux_sender) => { 
+            std::process::exit(1);
+         },
 
-        _ = trim_record(3600,600,"flux") => { std::process::exit(1); },
-        _ = flux_to_mysql(flux_sender.subscribe(),"flux",) => { std::process::exit(1); },
-        _ = flux_to_redis(flux_sender.subscribe(),"flux",) => { std::process::exit(1); },
-        _ = collect_data("flux",flux_sender) => { std::process::exit(1); },
+        _ = trim_record(3600,600,"fluxVice") => { 
+            std::process::exit(1);
+         },
+        _ = flux_to_mysql(flux_vice_sender.subscribe(),"fluxVice",) => { 
+            std::process::exit(1);
+         },
+        _ = flux_to_redis(flux_vice_sender.subscribe(),"fluxVice",) => { 
+            std::process::exit(1);
+         },
+        _ = collect_data("fluxVice",flux_vice_sender) => { 
+            std::process::exit(1);
+         },
 
-        _ = trim_record(3600,600,"fluxVice") => { std::process::exit(1); },
-        _ = flux_to_mysql(flux_vice_sender.subscribe(),"fluxVice",) => { std::process::exit(1); },
-        _ = flux_to_redis(flux_vice_sender.subscribe(),"fluxVice",) => { std::process::exit(1); },
-        _ = collect_data("fluxVice",flux_vice_sender) => { std::process::exit(1); },
-
-        _ = signal::ctrl_c() => { std::process::exit(0); },
+        _ = signal::ctrl_c() => { 
+            std::process::exit(0);
+         },
     };
 }
 

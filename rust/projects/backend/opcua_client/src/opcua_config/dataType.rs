@@ -1,7 +1,7 @@
 use serde::{Deserialize,Serialize};
 #[derive(Deserialize,Serialize,Debug,Clone)]
 pub enum DataType{
-    Bool,
+    Boolean,
     Int16,
     Int32,
     Int64,

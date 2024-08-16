@@ -1,4 +1,5 @@
-use std::str::FromStr;
+use std::{collections::HashMap, str::FromStr};
+use futures::stream::Empty;
 use opcua::types::NodeId;
 use serde::Deserialize;
 use super::dataType::DataType;
@@ -15,15 +16,29 @@ pub struct Mapping {
 pub struct NodeConfig{
     produce: Option<Vec<Mapping>>,
     test: Option<Vec<Mapping>>,
+    node_built: Option<HashMap<String,NodeId>>
 }
 
 impl NodeConfig {
     pub async fn new() -> NodeConfig{
-        let res = tokio::task::spawn_blocking(move||{
+        let mut res = tokio::task::spawn_blocking(move||{
             let content = std::fs::read_to_string("C:\\Users\\13427\\Desktop\\code\\linux-tools\\rust\\projects\\backend\\opcua_client\\src\\opcua_config\\config.yml").unwrap();
             serde_yml::from_str::<NodeConfig>(&content).unwrap()
         }).await.unwrap();
+        res.init_node_store();
         return res;
+    }
+    fn init_node_store(&mut self){
+        self.node_built = Some(HashMap::new());
+        if let Some(ref produce) = self.produce {
+            let empty :Vec<Mapping>= vec![];
+            let mut iters = produce.into_iter().chain(empty.iter());
+            if let Some(ref test) = self.test { iters = produce.into_iter().chain(test.into_iter()); }
+            iters.map(|val|{
+                let id = NodeId::from_str(&val.node).unwrap();
+                self.node_built.as_mut().unwrap().insert(val.tag.clone(),id);
+            }).last();
+        }
     }
     pub fn get_type(&self,tag:&str) -> Option<DataType> {
          if let Some(ref val) = self.produce {
@@ -42,7 +57,7 @@ impl NodeConfig {
         }
         None
     }
-    pub fn get_node(&self,tag:&str) -> &str{
+    pub fn get_node_str(&self,tag:&str) -> &str{
         if let Some(ref val) = self.produce {
             for i in val {
                 if i.tag == tag {
@@ -59,14 +74,17 @@ impl NodeConfig {
         }
         ""
     }
-    //if no matched node in config.yml, error will be raised directly
-    pub fn node(&self,tag:&str) -> NodeId {
-        NodeId::from_str(self.get_node(tag)).unwrap()
+    pub fn node(&self,tag:&str) -> Option<NodeId> {
+        let res = self.node_built.as_ref().unwrap().get(tag);
+        match res {
+            Some(node) => return Some(node.clone()),
+            _ => None,
+        }
     }
     pub fn get_variant(&self,tag:&str,val:String) -> Option<Variant>{
         let dt = Self::get_type(self, tag).unwrap();
         match dt {
-            DataType::Bool => {
+            DataType::Boolean => {
                 if let Ok(val)= val.parse::<bool>(){return Some(Variant::Boolean(val))}
             },
             DataType::Double => {

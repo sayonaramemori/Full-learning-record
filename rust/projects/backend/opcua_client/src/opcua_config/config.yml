@@ -1,3 +1,4 @@
+# dtype is needed for writing node
 produce:
   - tag: "flux"
     node: "ns=2;s=模拟器示例.函数.Ramp1"
