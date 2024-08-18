@@ -1,6 +1,8 @@
 use std::{clone, fmt::Display, sync::Arc};
 use mysql::binlog::value;
 use redis::{aio::MultiplexedConnection, AsyncCommands, FromRedisValue, RedisError, RedisResult};
+
+use crate::debug_println;
 #[derive(Clone)]
 pub struct RedisState {
     pub redis_client: Arc<redis::Client>,
@@ -52,7 +54,10 @@ impl RedisState {
         let mut conn = self.get_auth_connection().await?;
         match redis::cmd("SETEX").arg(key).arg(sec.to_string()).arg(val.to_string()).query_async::<_,()>(&mut conn).await {
             Ok(_) => Ok(()),
-            Err(e) => Err(e),
+            Err(e) => {
+                debug_println!("Setex failed for {e}");
+                Err(e)
+            },
         }
     }
     pub async fn setex_retry<T>(&self,key:&str,val:T,sec:u32,count:usize)

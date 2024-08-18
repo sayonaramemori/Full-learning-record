@@ -89,7 +89,8 @@ async fn to_redis_str(mut recv: Receiver<DataTime>,target:&'static str) {
     let ds = create_data_store(true, false, false, false).await;
     let redis_data = ds.get::<RedisData>().unwrap();
     while let Ok(res) = recv.recv().await {
-        redis_data.setex_retry(target, res.to_string(),9,3).await;
+        //only data needed
+        redis_data.setex_retry(target, res.data,9,3).await;
     }
 }
 
