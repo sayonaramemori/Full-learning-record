@@ -8,7 +8,7 @@ use super::Verify::{get_connection,verify,exist_user,generate_token};
 
 #[post("/login")]
 async fn login(info: web::Json<LoginInfo>, redis_data: web::Data<RedisState>, pool:web::Data<MySqlPool>) -> HttpResponse {
-    let res = exist_user(&info, &redis_data, &pool).await;
+    let res = exist_user(&info, &redis_data, &pool,None).await;
     let user_info = LoginInfo{username:info.username.clone(),password:info.password.clone()};
     if res.is_good() {
         let verify_interval = Duration::hours(24);

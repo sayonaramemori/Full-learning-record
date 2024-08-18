@@ -830,6 +830,7 @@ dependencies = [
  "redis 0.25.4",
  "serde",
  "serde_yml",
+ "sqlx",
  "tokio",
  "tungstenite",
 ]

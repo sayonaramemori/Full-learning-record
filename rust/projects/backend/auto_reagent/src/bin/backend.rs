@@ -26,7 +26,7 @@ async fn main() -> std::io::Result<()> {
              .allow_any_origin()
              .allow_any_header()
              .allow_any_method()
-            .allowed_origin("http://localhost:5173")
+             .allowed_origin("http://localhost:5173")
              .supports_credentials()
              .allowed_methods(vec!["GET", "POST"])
              .allowed_headers(vec![actix_web::http::header::AUTHORIZATION, actix_web::http::header::ACCEPT])

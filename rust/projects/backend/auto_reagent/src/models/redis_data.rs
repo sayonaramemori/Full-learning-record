@@ -45,9 +45,12 @@ impl RedisState {
             Err(e) => Err(e),
         }
     }
-    pub async fn setex(&self,key:&str,val:String,sec:u32) ->RedisResult<()> {
+
+    pub async fn setex<T>(&self,key:&str,val:T,sec:u32) ->RedisResult<()> 
+    where T: ToString
+    {
         let mut conn = self.get_auth_connection().await?;
-        match redis::cmd("SETEX").arg(key).arg(sec.to_string()).arg(val).query_async::<_,()>(&mut conn).await {
+        match redis::cmd("SETEX").arg(key).arg(sec.to_string()).arg(val.to_string()).query_async::<_,()>(&mut conn).await {
             Ok(_) => Ok(()),
             Err(e) => Err(e),
         }

@@ -81,3 +81,5 @@ async fn history(req: HttpRequest, redis_data: web::Data<RedisState>,pool: web::
         HttpResponse::Unauthorized().json(res.msg())
     }
 }
+
+
