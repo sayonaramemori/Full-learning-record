@@ -35,3 +35,14 @@
 
 #### Color phase  
 
+### Example  
+#### Caption For PR  
+1. Create text layer, including zh and en.  
+2. Click '图像' and then click vaiable -> define variable.  
+3. Select the zh text layer created, and give a name zh for text substitute.
+4. Select the en text layer created, and give a name en for text substitute.
+5. Click '图像' and then click vaiable -> data set, then import the text file.
+6. Click 'file' and then export, '数据组导出'.  
+7. Drag the output to PR project.
+
+

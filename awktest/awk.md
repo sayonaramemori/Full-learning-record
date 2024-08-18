@@ -10,7 +10,7 @@
 awk '{print $0}' file
 
 
-# You can specify the FS you want with -v 
+# You can specify the FS you want with -v (variable)
 # $num is the sequence of the field cut by FS
 awk -v FS=":" '{print $1}' file
 ```
