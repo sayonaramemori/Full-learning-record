@@ -57,8 +57,17 @@ async fn turbine_state(req: HttpRequest, redis_data: web::Data<RedisState>,pool:
     HttpResponse::Unauthorized().json(res.msg())
 }
 
-#[post("/history")]
-async fn history(req: HttpRequest, redis_data: web::Data<RedisState>,pool: web::Data<MySqlPool>,data:web::Json<DateTimeRange>) -> HttpResponse {
+#[post("/historyMain")]
+async fn main_history(req: HttpRequest, redis_data: web::Data<RedisState>,pool: web::Data<MySqlPool>,data:web::Json<DateTimeRange>) -> HttpResponse {
+    return history(req,redis_data,pool,data,"flux").await;
+}
+
+#[post("/historyVice")]
+async fn vice_history(req: HttpRequest, redis_data: web::Data<RedisState>,pool: web::Data<MySqlPool>,data:web::Json<DateTimeRange>) -> HttpResponse {
+    return history(req,redis_data,pool,data,"fluxVice").await;
+}
+// #[post("/history")]
+async fn history(req: HttpRequest, redis_data: web::Data<RedisState>,pool: web::Data<MySqlPool>,data:web::Json<DateTimeRange>,table:&'static str) -> HttpResponse {
     let res = verify(&req, &redis_data,&pool).await;
     if res.is_good() {
         if let (Ok(start),Ok(end)) = (data.start.parse::<DateTime<Utc>>(),data.end.parse::<DateTime<Utc>>()) {
@@ -66,7 +75,7 @@ async fn history(req: HttpRequest, redis_data: web::Data<RedisState>,pool: web::
             let start = start.with_timezone(&offset).naive_local();
             let end = end.with_timezone(&offset).naive_local();
             let time_pair = DateTimeRng(start,end);
-            let res = get_data_in_range(&pool, time_pair).await;
+            let res = get_data_in_range(&pool, time_pair,table).await;
             let res: Vec<TempRecord<NaiveDateTime>>= res.into_iter().map(|v|{TempRecord{time:v.time.naive_local(),val:v.val,id:v.id}}).collect();
             let mut temp = 0.0;
             res.iter().map(|i| {temp = temp + i.val;}).last();
