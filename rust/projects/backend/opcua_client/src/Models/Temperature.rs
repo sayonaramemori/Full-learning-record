@@ -1,7 +1,7 @@
 use std::convert::From;
 use chrono::prelude::NaiveDateTime;
-use crate::store::opcuaSession::DataTime;
 
+use crate::opcua_config::opcua_session_wrapper::DataTime;
 
 #[derive(Default,Debug)]
 pub struct Temperature {

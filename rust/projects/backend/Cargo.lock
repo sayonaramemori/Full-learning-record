@@ -28,15 +28,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "MysqlConnector"
-version = "0.1.0"
-dependencies = [
- "chrono",
- "mysql",
- "sqlx",
-]
-
-[[package]]
 name = "Simulator"
 version = "0.1.0"
 dependencies = [
@@ -821,6 +812,7 @@ name = "client_test"
 version = "0.1.0"
 dependencies = [
  "AutoReagent",
+ "anyhow",
  "chrono",
  "futures",
  "lazy_static",

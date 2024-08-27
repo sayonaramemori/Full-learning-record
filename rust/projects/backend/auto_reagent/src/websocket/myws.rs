@@ -106,13 +106,12 @@ async fn websocket_index(req: HttpRequest, stream: web::Payload, addr: web::Data
     let res = ws::WsResponseBuilder::new(MyWs, &req, stream).start_with_addr();
     let addr = addr.into_inner();
     let mut guard =  addr.write().unwrap();
-    if res.is_err(){
-        return Err(res.err().unwrap());
-    }
-    else {
-        let (addr,response) = res.unwrap();
-        // println!("{:?}",addr);
-        guard.push(addr);
-        return Ok(response);
+    match res {
+        Ok(res) => {
+            let (addr,response) = res;
+            guard.push(addr);
+            return Ok(response);
+        },
+        Err(e) => {return Err(e)},
     }
 }

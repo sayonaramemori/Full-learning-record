@@ -5,8 +5,6 @@ pub fn with_timezone(time:DateTime<Utc>)->DateTime<FixedOffset> {
     return time.with_timezone(&get_timezone());
 }
 
-
-//------------------low level---------------------
 fn get_timezone()->FixedOffset{
     lazy_static! {
         static ref zone: FixedOffset = FixedOffset::east_opt(8*3600).unwrap();

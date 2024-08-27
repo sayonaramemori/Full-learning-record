@@ -3,7 +3,6 @@ use mysql::*;
 extern crate AutoReagent;
 use AutoReagent::models::TurbineState::TurbineState;
 use std::thread;
-use std::time::Duration as StdDuration;
 
 fn main() {
     let url = "mysql://root:121234@kazusa.vip:3000/plc";

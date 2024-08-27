@@ -10,6 +10,10 @@ pub struct RedisState {
 }
 
 impl RedisState {
+    pub fn new_arc() -> Arc<RedisState> {
+        let redis_data = Self::new("Iloveyouxuwu121234","redis://:Iloveyouxuwu121234@ayanamyrei.com", );
+        Arc::new(redis_data)
+    }
     pub fn new(pass:&str,url:&str) -> RedisState{
         let redis_client = redis::Client::open(url).unwrap();
         return RedisState{redis_client: Arc::new(redis_client),redis_passwd:pass.to_string()}

@@ -1,0 +1,220 @@
+use std::sync::Arc;
+use tokio::task;
+use opcua::{client::prelude::{Client, Session,*}, sync::*};
+use chrono::prelude::*;
+use chrono::DateTime;
+use std::fmt::Display;
+use crate::debug_println;
+use crate::utility::time::*;
+use crate::opcua_config::node_config::get_node_config;
+
+#[derive(Clone,Debug)]
+pub struct DataTime{pub data:String,pub time: DateTime<FixedOffset>}
+
+impl Display for DataTime {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f,"{}|{:?}",self.data,self.time)
+    }
+}
+
+pub struct OpcuaSession {
+    session: Arc<std::sync::RwLock<Option<Arc<RwLock<Session>>>>>,
+    url: String,
+}
+
+impl OpcuaSession {
+    fn get_client()-> Client {
+        ClientBuilder::new()
+            .application_name("My First Client")
+            .application_uri("urn:MyFirstClient")
+            .create_sample_keypair(true)
+            .trust_server_certs(true)
+            .session_retry_limit(9)
+            // .session_timeout(999999999)
+            .client().unwrap()
+    }
+
+    fn gain_new_session(&self){
+        let mut session = self.session.write().unwrap();
+        *session = Some(Self::get_client()
+            .connect_to_endpoint(self.url.as_ref(), IdentityToken::Anonymous)
+            .expect("connect failed"));
+    }
+
+    fn read_batch(&self, node_id: Vec<NodeId>) -> Result<Vec<DataTime>,StatusCode>{
+        let guard = self.session.read().unwrap();
+        let session = guard.as_ref().unwrap().read();
+        let temp :Vec<ReadValueId>= node_id.into_iter().map(|v|{ReadValueId::from(v)}).collect();
+        match session.read(&temp, TimestampsToReturn::Both, 0.0){
+            Ok(value) => {
+                let mut res:Vec<DataTime> = vec![];
+                for i in value{
+                    let time = i.server_timestamp.unwrap().as_chrono();
+                    let time =with_timezone(time);
+                    match i.value {
+                        Some(val) => res.push(DataTime{data:val.to_string(),time}),
+                        _ => return Err(StatusCode::BadNotReadable),
+                    }
+                }
+                Ok(res)
+            },
+            Err(err) => {
+                debug_println!("Read batch failed for {:?}",err);
+                drop(session);
+                drop(guard);
+                self.gain_new_session();
+                return Err(err);
+            },
+        }
+    }
+
+    fn read_single<T>(&self, node_id: &NodeId) -> Result<T,StatusCode>
+    where T: Clone + From<DataTime>
+    {
+        let guard = self.session.read().unwrap();
+        let session = guard.as_ref().unwrap().read();
+        let temp :Vec<ReadValueId>= vec![node_id.into()];
+        match session.read(&temp, TimestampsToReturn::Both, 0.0){
+            Ok(res) => {
+                for i in res {
+                    let time = i.server_timestamp.unwrap().as_chrono();
+                    let time = with_timezone(time);
+                    if let Some(val) = i.value {
+                        return Ok(T::from(DataTime{data:val.to_string(),time}));
+                    }
+                }
+                return Err(StatusCode::BadNotReadable);
+            },
+            Err(err) => {
+                drop(session);
+                drop(guard);
+                self.gain_new_session();
+                Err(err)
+            },
+        }
+    }
+
+    fn write_single_retry(&self, node_id: &NodeId, value: Variant, times:u32) -> Result<(), StatusCode>{
+        let mut res = self.write_single(node_id, value.clone());
+        for _ in 0..times {
+            if res.is_ok() { break; }else{
+                res = self.write_single(node_id, value.clone());
+            }
+        }
+        return res;
+    }
+
+    fn write_single(&self, node_id: &NodeId, value: Variant) -> Result<(),StatusCode>{
+        let guard = self.session.read().unwrap();
+        let session = guard.as_ref().unwrap().read();
+        let value = DataValue {
+            value: Some(value),
+            status: Some(StatusCode::Good),
+            ..Default::default()
+        };
+        let write_value = WriteValue {
+            node_id: node_id.clone(),
+            attribute_id: AttributeId::Value as u32,
+            index_range: UAString::null(),
+            value,
+        };
+        let write_values = vec![write_value];
+        let res = session.write(&write_values);
+        match res {
+            Ok(res) => {
+                if res[0].is_good(){
+                    debug_println!("Write operation success");
+                    return Ok(());
+                }else {
+                    return Err(res[0]);
+                }
+            },
+            Err(e) => {
+                debug_println!("Write operation failed");
+                drop(session);
+                drop(guard);
+                self.gain_new_session();
+                return Err(e);
+            }
+        }
+    }
+
+    async fn async_write_single_retry(session: Arc<OpcuaSession>,node_id: NodeId, value: Variant, times:u32) -> Result<(),StatusCode>{
+        task::spawn_blocking(move||{
+            session.write_single_retry(&node_id, value, times)
+        }).await.unwrap()
+    }
+
+}
+
+//Interface exposed
+impl OpcuaSession {
+    pub async fn new_arc() -> Arc<OpcuaSession> {
+        Arc::new(OpcuaSession::new("opc.tcp://127.0.0.1:49320").await)
+    }
+
+    pub async fn new(endpoint_url:&str) -> OpcuaSession {
+        let res = OpcuaSession{
+            session: Arc::new(std::sync::RwLock::new(None)),
+            url: endpoint_url.to_string(),
+        };
+        tokio::task::spawn_blocking(move ||{
+            res.gain_new_session();
+            return res;
+        }).await.unwrap()
+    }
+
+    //Only when target and val provided matches, then write operation will performe actually.
+    pub async fn async_write(session: Arc<OpcuaSession>, target: &str, val: String)->Result<(), StatusCode>{
+        let config = get_node_config().await;
+        let node_id = config.node(target);
+        let variant = config.get_variant(target,val);
+        if let (Some(id),Some(val)) = (node_id,variant) {
+            Self::async_write_single_retry(session,id,val,5).await
+        }else{ Err(StatusCode::BadNodeIdUnknown) }
+    }
+    
+    //read one node with one try
+    pub async fn async_read<T>(session: Arc<OpcuaSession>, target: &str) -> Result<T,StatusCode>
+    where T: 'static + Clone + From<DataTime> + Send + Sync
+    {
+        let config = get_node_config().await;
+        if let Some(id) = config.node(target){
+            task::spawn_blocking(move || {session.read_single(&id)}).await.unwrap()
+        }else{
+            Err(StatusCode::BadNodeIdUnknown)
+        }
+    }
+
+    //read multiple nodes with one try
+    pub async fn async_read_batch(session: Arc<OpcuaSession>, target: &[String]) -> Result<Vec<DataTime>,StatusCode>
+    {
+        let config = get_node_config().await;
+        let node_ids = target.into_iter().map(|v|{config.node(v)}).collect::<Vec<Option<NodeId>>>();
+        if node_ids.contains(&None) {
+            Err(StatusCode::BadNodeIdInvalid)
+        }else{
+            let node_ids = node_ids.into_iter().map(|v| v.unwrap()).collect::<Vec<NodeId>>();
+            match task::spawn_blocking(move || {session.read_batch(node_ids)}).await {
+                Ok(res) => {
+                    match res {
+                        Ok(res) => {
+                            return Ok(res);
+                        },
+                        Err(e) => {Err(e)},
+                    }
+                },
+                Err(_e) => {Err(StatusCode::BadOutOfMemory)},
+            }
+        }
+    }
+}
+
+
+
+
+
+
+
+
+
