@@ -1,0 +1,14 @@
+zh	en
+首先我们打开OPC UA Configuration	First we open the OPC UA Configuration.
+这里为了方便测试，选择无安全策略的本地服务器	Here, for the sake of testing, we choose a local server with no security policy.
+然后打开kepserver	Then open kepserver
+打开属性编辑器允许匿名登录	Open the properties editor to allow anonymous logins
+最后重新初始化运行时	Finally, reinitialize the runtime
+然后打开浏览器	Then open the browser
+搜索opcua并添加依赖包	Search for opcua and add the dependencies
+打开说明文档	Open the documentation
+复制这一段演示代码	Copy the demo code
+这里只保留创建session部分的代码	Only the code that creates the session is kept here
+修改为对应的端口	Change it to the corresponding port
+然后测试能否连接成功	Then test if the connection is successful
+可以看到连接成功	You can see that the connection is successful
