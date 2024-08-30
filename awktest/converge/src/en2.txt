@@ -1,0 +1,27 @@
+Let's open UA Expert
+Connect to the server we just configured
+Right-click on the Server and click Add.
+Enter the configured server address
+Browse the test node of kepserver
+Let's show you how to create a NodeId in Rust.
+The first method takes a namespace and an identifier
+The second method takes a NodeId string.
+Then look at the definition of the read function
+This function takes an atomically counted reference
+to a real session protected by a read/write lock.
+The second argument is the NodeId
+First we put a read lock on the mutex.
+to get the real session inside it
+Then we convert the NodeId to a ReadValueId.
+and then we call the read API from the real session.
+Note that the first parameter is an array reference
+Use matching to handle both success and failure results
+Here we print the value read and the corresponding time.
+You can see that the read was successful.
+Next, let's see how to read multiple values at the same time.
+We come to the definition of the read function
+The difference is that the second parameter is a vector of NodeIds.
+Here, the conversion of the Id type is done using an iterator.
+Everything else remains the same
+Finally, let's test it.
+You can see that the two values are read successfully at the same time

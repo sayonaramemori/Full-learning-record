@@ -1,14 +1,15 @@
 zh	en
-首先我们打开OPC UA Configuration	First we open the OPC UA Configuration.
-这里为了方便测试，选择无安全策略的本地服务器	Here, for the sake of testing, we choose a local server with no security policy.
-然后打开kepserver	Then open kepserver
-打开属性编辑器允许匿名登录	Open the properties editor to allow anonymous logins
-最后重新初始化运行时	Finally, reinitialize the runtime
-然后打开浏览器	Then open the browser
-搜索opcua并添加依赖包	Search for opcua and add the dependencies
-打开说明文档	Open the documentation
-复制这一段演示代码	Copy the demo code
-这里只保留创建session部分的代码	Only the code that creates the session is kept here
-修改为对应的端口	Change it to the corresponding port
-然后测试能否连接成功	Then test if the connection is successful
-可以看到连接成功	You can see that the connection is successful
+我们来看如何向一个节点写值	Let's see how to write a value to a node
+首先来到写值函数的定义	First, we come to the definition of the write function
+该函数接收一个 Session, NodeId 和 Variant	This function takes a Session, NodeId, and Variant.
+可以点开 Variant, 可以看到是一个类型枚举	You can click on Variant to see that it is a type enumeration.
+然后基于 Variant 创建一个 DataValue	Then it creates a DataValue based on the Variant.
+然后基于 DataValue 和 NodeId 创建一个 WriteValue	Then it creates a WriteValue based on the DataValue and NodeId.
+对 Session 上读锁	Put a read lock on the Session
+最后调用写值 API, 注意参数为 WriteValue 的数组引用	Finally, we call the WriteValue API, noting that the parameter is an array reference to the WriteValue.
+整个写操作失败时我们打印失败的原因	When the entire write operation fails, we print the reason for the failure.
+成功时返回 StatusCode 的向量, 指示对应 WriteValue 是否成功写入	On success, a vector of StatusCodes is returned, indicating whether the corresponding WriteValue was successfully written.
+由于我们只传入了一个 WriteValue, 故结果向量中只有一个元素	Since we only passed in one WriteValue, there is only one element in the result vector.
+我们遍历这个结果向量, 如果 Status 为 good 就打印写入成功	We iterate through the result vector, and if Status is good, we print that the write was successful.
+回到测试代码, 这里我们对多个不同类型的节点每一秒写入一个值	Back to the test code, here we are writing one value per second to multiple nodes of different types.
+运行测试代码, 可以看到写入成功	Run the test code, and you can see that the write succeeded.

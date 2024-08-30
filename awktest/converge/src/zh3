@@ -1,0 +1,14 @@
+我们来看如何向一个节点写值
+首先来到写值函数的定义
+该函数接收一个 Session, NodeId 和 Variant
+可以点开 Variant, 可以看到是一个类型枚举
+然后基于 Variant 创建一个 DataValue
+然后基于 DataValue 和 NodeId 创建一个 WriteValue
+对 Session 上读锁
+最后调用写值 API, 注意参数为 WriteValue 的数组引用
+整个写操作失败时我们打印失败的原因
+成功时返回 StatusCode 的向量, 指示对应 WriteValue 是否成功写入
+由于我们只传入了一个 WriteValue, 故结果向量中只有一个元素
+我们遍历这个结果向量, 如果 Status 为 good 就打印写入成功
+回到测试代码, 这里我们对多个不同类型的节点每一秒写入一个值
+运行测试代码, 可以看到写入成功
