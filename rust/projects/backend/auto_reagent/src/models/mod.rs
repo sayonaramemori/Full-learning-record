@@ -2,6 +2,7 @@ pub mod TempRecord;
 pub mod LoginInfo;
 pub mod TurbineState;
 pub mod redis_data;
+pub mod record;
 
 pub enum Operation {
     Start,

@@ -25,8 +25,9 @@ async fn main() -> std::io::Result<()> {
              .allowed_origin("http://47.92.144.135")
              .supports_credentials()
              .allowed_methods(vec!["GET", "POST"])
-             .allowed_headers(vec![actix_web::http::header::AUTHORIZATION, actix_web::http::header::ACCEPT])
+             .allowed_headers(vec![actix_web::http::header::AUTHORIZATION, actix_web::http::header::ACCEPT,])
              .allowed_header(actix_web::http::header::CONTENT_TYPE)
+             .allowed_header("token")
              .max_age(3600);
         App::new()
             .app_data(web::Data::new(pool.clone()))

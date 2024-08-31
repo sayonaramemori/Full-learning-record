@@ -80,7 +80,7 @@ pub async fn verify_token(token:&str,redis_data: &web::Data<RedisState>,pool: &w
 // return (bool,msg) in which msg is error msg 
 // when bool is false and msg is username when bool is true for the first time to query
 pub async fn verify(req: &HttpRequest, redis_data: &web::Data<RedisState>,pool: &web::Data<MySqlPool>) -> StatusMsg { 
-    let token = match req.headers().get("Authorization") {
+    let token = match req.headers().get("token") {
         Some(header_value) => header_value.to_str().unwrap_or(""),
         None => "",
     };

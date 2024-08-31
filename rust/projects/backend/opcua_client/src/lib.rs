@@ -1,7 +1,6 @@
 #![feature(stmt_expr_attributes)]
 
-// pub mod store;
-pub mod models;
+pub mod entity;
 pub mod example;
 pub mod opcua_config;
 pub mod utility;

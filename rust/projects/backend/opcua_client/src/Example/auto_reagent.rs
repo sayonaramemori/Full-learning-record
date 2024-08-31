@@ -5,32 +5,17 @@ use tokio::sync::broadcast::Receiver;
 use mysql::*;
 use AutoReagent::models::redis_data::RedisState as RedisData;
 
-use crate::models::Temperature::Temperature;
+use crate::entity::temperature::Temperature;
 use crate::debug_println;
-use crate::opcua_config::{opcua_session_wrapper::{DataTime,OpcuaSession},data_collector::DataCollector};
-
-//Expose to be called by websocket client
-pub async fn transfer_data_to_plc(target:String,val:String) -> Result<(), Box<dyn std::error::Error>>
-{
-    let redis_data = RedisData::new_arc();
-    let session = OpcuaSession::new_arc().await;
-    let status_key = target.to_string() + "Status";
-    match OpcuaSession::async_write(session, &target, val.clone()).await
-    {
-        Ok(_) => {
-            redis_data.setex_retry(&status_key, val,10,5).await;
-            Ok(())
-        },
-        Err(e) => {Err(Box::new(e))},
-    }
-}
+use crate::opcua_config::data_adaptor::{collector::DataCollector,unit::DataTime::DataTime};
 
 //To redis for query from front end
 async fn to_redis_list(mut recv: Receiver<DataTime>,target:&'static str) -> Result<(), Box<dyn std::error::Error>>
 {
     let redis_data = RedisData::new_arc();
     while let Ok(res) = recv.recv().await {
-        redis_data.rpush_retry(target, vec![res.to_string()],3).await;
+        let res = serde_json::to_string(&res).unwrap();
+        redis_data.rpush_retry(target, vec![res],3).await;
     }
     Ok(())
 }
@@ -40,7 +25,7 @@ async fn to_redis_str(mut recv: Receiver<DataTime>,target:&'static str)-> Result
     let redis_data = RedisData::new_arc();
     while let Ok(res) = recv.recv().await {
         //only data needed
-        redis_data.setex_retry(target, res.data,9,3).await;
+        redis_data.setex_retry(target, res.v ,9,3).await;
     }
     Ok(())
 }
@@ -120,21 +105,21 @@ pub async fn do_record() -> Result<(), Box<dyn std::error::Error>> {
     
     tokio::try_join!(
         to_redis_str(sp_colletor.subscribe(), "setpointStatus"),
-        DataCollector::start(sp_colletor),
+        DataCollector::execute_loop(sp_colletor),
         to_redis_str(sp_vice_colletor.subscribe(), "setpointViceStatus"),
-        DataCollector::start(sp_vice_colletor),
+        DataCollector::execute_loop(sp_vice_colletor),
         to_redis_str(switch_colletor.subscribe(), "switchStatus"),
-        DataCollector::start(switch_colletor),
+        DataCollector::execute_loop(switch_colletor),
         to_redis_str(switch_vice_colletor.subscribe(), "switchViceStatus"),
-        DataCollector::start(switch_vice_colletor),
+        DataCollector::execute_loop(switch_vice_colletor),
         flux_to_mysql(flux_colletor.subscribe(), "flux"),
         to_redis_list(flux_colletor.subscribe(), "flux"),
         trim_record(3600, 600, "flux"),
-        DataCollector::start(flux_colletor),
+        DataCollector::execute_loop(flux_colletor),
         flux_to_mysql(flux_vice_colletor.subscribe(), "fluxVice"),
         to_redis_list(flux_vice_colletor.subscribe(), "fluxVice"),
         trim_record(3600, 600, "fluxVice"),
-        DataCollector::start(flux_vice_colletor),
+        DataCollector::execute_loop(flux_vice_colletor),
     )?;
 
     Ok(())

@@ -1,21 +1,13 @@
 use std::sync::Arc;
 use tokio::task;
 use opcua::{client::prelude::{Client, Session,*}, sync::*};
-use chrono::prelude::*;
-use chrono::DateTime;
-use std::fmt::Display;
 use crate::debug_println;
 use crate::utility::time::*;
-use crate::opcua_config::node_config::get_node_config;
+use crate::opcua_config::node_config::NodeConfig::get_node_config;
+use super::data_adaptor::unit::DataTime::DataTime;
+use super::data_adaptor::interface::collect::StoreValueTime;
 
-#[derive(Clone,Debug)]
-pub struct DataTime{pub data:String,pub time: DateTime<FixedOffset>}
 
-impl Display for DataTime {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f,"{}|{:?}",self.data,self.time)
-    }
-}
 
 pub struct OpcuaSession {
     session: Arc<std::sync::RwLock<Option<Arc<RwLock<Session>>>>>,
@@ -52,7 +44,7 @@ impl OpcuaSession {
                     let time = i.server_timestamp.unwrap().as_chrono();
                     let time =with_timezone(time);
                     match i.value {
-                        Some(val) => res.push(DataTime{data:val.to_string(),time}),
+                        Some(data) => res.push(DataTime{v:data.to_string(),t:time}),
                         _ => return Err(StatusCode::BadNotReadable),
                     }
                 }
@@ -69,7 +61,7 @@ impl OpcuaSession {
     }
 
     fn read_single<T>(&self, node_id: &NodeId) -> Result<T,StatusCode>
-    where T: Clone + From<DataTime>
+    where T: StoreValueTime
     {
         let guard = self.session.read().unwrap();
         let session = guard.as_ref().unwrap().read();
@@ -78,9 +70,10 @@ impl OpcuaSession {
             Ok(res) => {
                 for i in res {
                     let time = i.server_timestamp.unwrap().as_chrono();
-                    let time = with_timezone(time);
                     if let Some(val) = i.value {
-                        return Ok(T::from(DataTime{data:val.to_string(),time}));
+                        let mut res = T::new();
+                        res.set_time(time).set_value(val.to_string());
+                        return Ok(res);
                     }
                 }
                 return Err(StatusCode::BadNotReadable);
@@ -107,11 +100,7 @@ impl OpcuaSession {
     fn write_single(&self, node_id: &NodeId, value: Variant) -> Result<(),StatusCode>{
         let guard = self.session.read().unwrap();
         let session = guard.as_ref().unwrap().read();
-        let value = DataValue {
-            value: Some(value),
-            status: Some(StatusCode::Good),
-            ..Default::default()
-        };
+        let value = DataValue::from(value);
         let write_value = WriteValue {
             node_id: node_id.clone(),
             attribute_id: AttributeId::Value as u32,
@@ -119,8 +108,7 @@ impl OpcuaSession {
             value,
         };
         let write_values = vec![write_value];
-        let res = session.write(&write_values);
-        match res {
+        match session.write(&write_values){
             Ok(res) => {
                 if res[0].is_good(){
                     debug_println!("Write operation success");
@@ -173,10 +161,22 @@ impl OpcuaSession {
             Self::async_write_single_retry(session,id,val,5).await
         }else{ Err(StatusCode::BadNodeIdUnknown) }
     }
-    
+
+    pub async fn async_write_once(target: &str, val: String)->Result<(), StatusCode>{
+        let session = OpcuaSession::new_arc().await;
+        Self::async_write(session, target, val).await
+    }
+
+    pub async fn async_read_once<T>(target: &str) -> Result<T,StatusCode>
+    where T: 'static + Clone + StoreValueTime + Send + Sync
+    {
+        let session = OpcuaSession::new_arc().await;
+        Self::async_read(session, target).await
+    }
+
     //read one node with one try
     pub async fn async_read<T>(session: Arc<OpcuaSession>, target: &str) -> Result<T,StatusCode>
-    where T: 'static + Clone + From<DataTime> + Send + Sync
+    where T: 'static + Clone + StoreValueTime + Send + Sync
     {
         let config = get_node_config().await;
         if let Some(id) = config.node(target){
@@ -208,6 +208,7 @@ impl OpcuaSession {
             }
         }
     }
+
 }
 
 

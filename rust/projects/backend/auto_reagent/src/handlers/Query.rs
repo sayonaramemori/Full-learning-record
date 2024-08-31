@@ -3,10 +3,11 @@ use actix_web::{post,get, web, Responder, HttpResponse,HttpRequest};
 use std::io::Write;
 use chrono::{prelude::*, Duration};
 use sqlx::{pool, MySql, MySqlPool};
-use crate::models::{TempRecord::TempRecord,TurbineState::TurbineState,TempRecord::{DateTimeRange,DateTimeRng,HistoryData}};
+use crate::models::{record::Record, TempRecord::{DateTimeRange, DateTimeRng, HistoryData, TempRecord}, TurbineState::TurbineState};
 use crate::models::redis_data::RedisState;
 use super::Verify::verify;
 use crate::mapper::sql::get_data_in_range;
+use std::str::FromStr;
 
 #[get("/findlastVice/{num}")]
 pub async fn findlast_vice(req: HttpRequest,num: web::Path<f64>,redis_data:web::Data<RedisState>,pool:web::Data<MySqlPool>) -> impl Responder {
@@ -25,8 +26,10 @@ async fn findlast_record(req: HttpRequest,num: web::Path<f64>,redis_data:web::Da
         match redis_data.lrange(target, num as usize).await {
             Ok(res) => {
                 let res :Vec<TempRecord<String>> = res.into_iter()
+                    .map(|v|{Record::from_str(&v)})
+                    .filter(|v|{v.is_ok()})
                     .zip(0..num)
-                    .map(|(v,i)|{ (v,i).into() })
+                    .map(|(v,i)|{ (v.unwrap(),i).into() })
                     .collect();
                 return HttpResponse::Ok().json(res);
             },

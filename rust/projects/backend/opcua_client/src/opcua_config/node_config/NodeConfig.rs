@@ -7,6 +7,7 @@ use tokio::sync::OnceCell as TokioOnceCell;
 use std::sync::Arc;
 
 static CONFIG: TokioOnceCell<Arc<NodeConfig>> = TokioOnceCell::const_new();
+
 pub async fn get_node_config() -> Arc<NodeConfig> {
     CONFIG.get_or_init(|| async {
         Arc::new(NodeConfig::new().await)
@@ -32,7 +33,7 @@ impl NodeConfig {
     pub async fn new() -> NodeConfig{
         //This unwrap only happens at init stage, so it is safe
         let mut res = tokio::task::spawn_blocking(move||{
-            let content = std::fs::read_to_string("C:\\Users\\13427\\Desktop\\code\\linux-tools\\rust\\projects\\backend\\opcua_client\\src\\opcua_config\\config.yml").unwrap();
+            let content = std::fs::read_to_string("C:\\Users\\13427\\Desktop\\code\\linux-tools\\rust\\projects\\backend\\opcua_client\\src\\opcua_config\\node_config\\config.yml").unwrap();
             serde_yml::from_str::<NodeConfig>(&content).unwrap()
         }).await.unwrap();
         res.init_node_store();
@@ -54,7 +55,7 @@ impl NodeConfig {
         }
     }
     
-    fn get_type(&self,tag:&str) -> Option<DataType> {
+    pub fn get_type(&self,tag:&str) -> Option<DataType> {
          if let Some(ref val) = self.produce {
             for i in val {
                 if i.tag == tag {
@@ -136,6 +137,5 @@ impl NodeConfig {
         None
     }
 }
-
 
 

@@ -1,7 +1,8 @@
 use chrono::prelude::*;
 use serde::{Deserialize,Serialize};
 use std::convert::From;
-use std::ops::Add;
+use super::record::Record;
+
 
 
 #[derive(Deserialize,Serialize,Debug)]
@@ -29,41 +30,15 @@ impl<T> TempRecord<T>{
         }
     }
 }
-impl From<(f64,i64,String)> for TempRecord<String> {
-    fn from(value: (f64,i64,String)) -> TempRecord<String> {
-         TempRecord {
-            val: value.0,
-            id:value.1, 
-            time:value.2, 
-        }
-    }
-}
 
-impl From<(String,i64,String)> for TempRecord<String> {
-    fn from(value: (String,i64,String)) -> TempRecord<String> {
-         TempRecord {
-            val: value.0.parse::<f64>().unwrap_or(0.0),
-            id:value.1, 
-            time:value.2, 
-        }
-    }
-}
-
-impl From<(String,i64)> for TempRecord<String> {
-    fn from(value: (String,i64)) -> TempRecord<String> {
-        let mut iterator = value.0.split('|');
-        let val = match iterator.next() {
-            Some(s) => s.parse::<f64>().unwrap_or(0.0),
-            _ => 0.0,
-        };
-        let time = match iterator.next() {
-            Some(s) => s.to_string(),
-            _ => String::from(""),
-        };
+impl From<(Record,i64)> for TempRecord<String> {
+    fn from(value: (Record,i64)) -> TempRecord<String> {
+        let (record,id) = value;
         TempRecord {
-            val,
-            time,
-            id:value.1, 
+            val: record.v.parse::<f64>().unwrap_or(0.0),
+            id,
+            //only debug string works for frontend
+            time: format!("{:?}",record.t),
         }
     }
 }

@@ -7,7 +7,6 @@ use tokio_tungstenite::connect_async;
 use tokio_tungstenite::tungstenite::protocol::Message;
 use std::{str::FromStr, sync::Arc, time::Duration};
 use tokio::time::sleep;
-use client_test::{debug_println, example::auto_reagent::transfer_data_to_plc};
 use std::sync::mpsc::channel;
 
 use tokio_tungstenite::MaybeTlsStream;
@@ -16,12 +15,14 @@ use tokio::net::TcpStream;
 use futures::stream::{StreamExt,SplitStream,SplitSink};
 use futures::SinkExt;
 
+use AutoReagent::models::redis_data::RedisState as RedisData;
+use client_test::opcua_config::data_adaptor::transferee::DataTransferee;
+use client_test::opcua_config::data_adaptor::unit::Instruction::Instruction;
+use client_test::opcua_config::data_adaptor::interface::transfer::InstructionInfo;
+use client_test::debug_println;
 
-#[derive(Deserialize,Debug)]
-struct Instruction {
-    target: String,
-    value: String,
-}
+
+
 
 #[tokio::main]
 async fn main() {
@@ -42,11 +43,7 @@ async fn connect_to_server() -> Result<(), Box<dyn std::error::Error>> {
     let url = "ws://47.92.144.135:8080/ws"; 
     let (ws_stream, _) = connect_async(url).await?;
     let (mut write, mut read) = ws_stream.split();
-    // tokio::select!{
-    //     _ = handle_read(read) => { println!("sb");},
-    //     _ = keep_alive(write) => {},
-    // };
-        let read_handle = tokio::spawn(handle_read(read));
+    let read_handle = tokio::spawn(handle_read(read));
     let write_handle = tokio::spawn(keep_alive(write));
 
     if let Err(e) = tokio::try_join!(read_handle, write_handle) {
@@ -60,9 +57,11 @@ async fn handle_read(mut read:SplitStream<WebSocketStream<MaybeTlsStream<TcpStre
         while let Some(message) = read.next().await {
             match message {
                 Ok(Message::Text(text)) => {
-                    let instruction = serde_json::from_str(&text);
+                    let instruction = serde_json::from_str::<Instruction>(&text);
                     match instruction {
-                        Ok(res) => handle_instruction(res).await,
+                        Ok(res) => {
+                            handle_instruction(res).await
+                        },
                         Err(_) => debug_println!("Not a instruction"),
                     }
                 },
@@ -82,13 +81,12 @@ async fn keep_alive(mut write:SplitSink<WebSocketStream<MaybeTlsStream<TcpStream
     debug_println!("send task over");
 }
 
+
 async fn handle_instruction(instruction: Instruction) {
     debug_println!("Receive {:?}",instruction);
-    // transfer_data_to_plc(instruction.target, instruction.value).await;
-    if let Err(e) = tokio::spawn(async move {
-        transfer_data_to_plc(instruction.target, instruction.value).await;
-    }).await {
-        eprintln!("Error in transfer_data_to_plc: {:?}", e);
+    if DataTransferee::execute(&instruction).await {
+        let redis_data = RedisData::new_arc();
+        let status_key = format!("{}Status",instruction.target);
+        redis_data.setex_retry(&status_key, instruction.value,10,5).await;
     }
-    debug_println!("Write operation over");
 }
