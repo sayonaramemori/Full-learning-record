@@ -1,5 +1,3 @@
-#![feature(stmt_expr_attributes)]
-
 use serde::{Deserialize, Serialize};
 use tokio_util::sync::CancellationToken;
 use tokio_tungstenite::connect_async;

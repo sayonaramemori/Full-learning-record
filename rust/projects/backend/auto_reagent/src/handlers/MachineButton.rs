@@ -11,7 +11,7 @@ use std::sync::{RwLock,Arc};
 
 pub async fn start_or_stop(data: web::Data<Arc<RwLock<Vec<Addr<MyWs>>>>>,num:web::Path<u32>,req:HttpRequest,redis_data:web::Data<RedisState>,pool:web::Data<MySqlPool>,op:Operation) -> HttpResponse {
     let res = verify(&req, &redis_data, &pool).await;
-    if res.is_good() {
+    if res.is_some() {
         let number = num.into_inner();
         let target = match number {
             0 => "switch",
@@ -23,7 +23,7 @@ pub async fn start_or_stop(data: web::Data<Arc<RwLock<Vec<Addr<MyWs>>>>>,num:web
             Operation::Stop => return stop(target.to_string(),data).await,
         }
     }
-    HttpResponse::Unauthorized().json(res.msg())
+    HttpResponse::Unauthorized().json("Bad Token")
 }
 
 #[get("/start/{num}")]
@@ -39,7 +39,7 @@ pub async fn stop_operation(data: web::Data<Arc<RwLock<Vec<Addr<MyWs>>>>>,num:we
 #[get("/pumpStatus/{num}")]
 pub async fn pump_status(num:web::Path<u32>,req:HttpRequest,redis_data:web::Data<RedisState>,pool:web::Data<MySqlPool>) -> HttpResponse {
     let res = verify(&req, &redis_data, &pool).await;
-    if res.is_good() {
+    if res.is_some() {
         let number = num.into_inner();
         let obj = match number {
             0 => "switchStatus",
@@ -53,13 +53,13 @@ pub async fn pump_status(num:web::Path<u32>,req:HttpRequest,redis_data:web::Data
             Err(e) => return HttpResponse::InternalServerError().json(e.to_string() + " leading Operation failed"),
         }
     }
-    HttpResponse::Unauthorized().json(res.msg())
+    HttpResponse::Unauthorized().json("Bad Token")
 }
 
 #[get("/setpoint/{num}/{sp}")]
 pub async fn set_point(data: web::Data<Arc<RwLock<Vec<Addr<MyWs>>>>>,nums:web::Path<(u32,f64)>,req:HttpRequest,redis_data:web::Data<RedisState>,pool:web::Data<MySqlPool>) -> HttpResponse{
     let res = verify(&req, &redis_data, &pool).await;
-    if res.is_good() {
+    if res.is_some() {
         let (num,sp) = nums.into_inner();
         let obj = match num {
             0 => "setpoint",
@@ -69,5 +69,5 @@ pub async fn set_point(data: web::Data<Arc<RwLock<Vec<Addr<MyWs>>>>>,nums:web::P
         if sp<0.0 || sp>200.0 {return HttpResponse::BadRequest().json("Bad params");}
         return setpoint(obj.to_string(),sp.to_string(),data).await;
     }
-    HttpResponse::Unauthorized().json(res.msg())
+    HttpResponse::Unauthorized().json("Bad Token")
 }

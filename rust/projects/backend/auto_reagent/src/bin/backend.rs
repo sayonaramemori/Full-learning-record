@@ -18,9 +18,9 @@ async fn main() -> std::io::Result<()> {
     let addr: Arc<RwLock<Vec<Addr<MyWs>>>> = Arc::new(RwLock::new(vec![]));
     HttpServer::new(move || {
        let cors = Cors::default()
-             .allow_any_origin()
-             .allow_any_header()
-             .allow_any_method()
+            //  .allow_any_origin()
+            //  .allow_any_header()
+            //  .allow_any_method()
              .allowed_origin("http://localhost:5173")
              .allowed_origin("http://47.92.144.135")
              .supports_credentials()
@@ -28,6 +28,7 @@ async fn main() -> std::io::Result<()> {
              .allowed_headers(vec![actix_web::http::header::AUTHORIZATION, actix_web::http::header::ACCEPT,])
              .allowed_header(actix_web::http::header::CONTENT_TYPE)
              .allowed_header("token")
+             .expose_headers(vec!["token"])
              .max_age(3600);
         App::new()
             .app_data(web::Data::new(pool.clone()))

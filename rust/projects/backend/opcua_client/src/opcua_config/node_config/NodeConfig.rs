@@ -26,77 +26,53 @@ pub struct Mapping {
 pub struct NodeConfig{
     produce: Option<Vec<Mapping>>,
     test: Option<Vec<Mapping>>,
-    node_built: Option<HashMap<String,NodeId>>
+    node_built: Option<HashMap<String,(NodeId,Option<DataType>)>>
 }
 
 impl NodeConfig {
     pub async fn new() -> NodeConfig{
         //This unwrap only happens at init stage, so it is safe
-        let mut res = tokio::task::spawn_blocking(move||{
+        let res = tokio::task::spawn_blocking(move||{
             let content = std::fs::read_to_string("C:\\Users\\13427\\Desktop\\code\\linux-tools\\rust\\projects\\backend\\opcua_client\\src\\opcua_config\\node_config\\config.yml").unwrap();
             serde_yml::from_str::<NodeConfig>(&content).unwrap()
         }).await.unwrap();
-        res.init_node_store();
-        return res;
+        Self::init_node_store(res)
     }
 
-    //Init node_built
-    fn init_node_store(&mut self){
-        self.node_built = Some(HashMap::new());
-        if let Some(ref produce) = self.produce {
+    //Init node_built, then release the memory of Mapping vector
+    fn init_node_store(mut config: NodeConfig) -> NodeConfig{
+        config.node_built = Some(HashMap::new());
+        if let Some(ref produce) = config.produce {
             let empty :Vec<Mapping>= vec![];
-            let mut iters = produce.into_iter().chain(empty.iter());
-            if let Some(ref test) = self.test { iters = produce.into_iter().chain(test.into_iter()); }
+            let iters = if config.test.is_none() {
+                produce.into_iter().chain(empty.iter())
+            }else{
+                produce.into_iter().chain(config.test.as_ref().unwrap().iter()) 
+            };
             iters.map(|val|{
                 //This unwrap check the config syntax
                 let id = NodeId::from_str(&val.node).unwrap();
-                self.node_built.as_mut().unwrap().insert(val.tag.clone(),id);
+                config.node_built.as_mut().unwrap().insert(val.tag.clone(),(id,val.dtype.clone()));
             }).last();
         }
+        config.produce = None;
+        config.test = None;
+        config
     }
     
     pub fn get_type(&self,tag:&str) -> Option<DataType> {
-         if let Some(ref val) = self.produce {
-            for i in val {
-                if i.tag == tag {
-                    return i.dtype.clone();
-                }
-            }
+        let res = self.node_built.as_ref().unwrap().get(tag);
+        match res{
+            Some(res)  => { res.1.clone() },
+            _ => None,
         }
-        if let Some(ref val) = self.test {
-            for i in val {
-                if i.tag == tag {
-                    return i.dtype.clone();
-                }
-            }
-        }
-        None
     }
-
-    //description for a node 
-    fn get_node_str(&self,tag:&str) -> &str{
-        if let Some(ref val) = self.produce {
-            for i in val {
-                if i.tag == tag {
-                    return &i.node;
-                }
-            }
-        }
-        if let Some(ref val) = self.test {
-            for i in val {
-                if i.tag == tag {
-                    return &i.node;
-                }
-            }
-        }
-        ""
-    }
-
+                    
     //this unwrap is safe due to it has been initialized
-    pub fn node(&self,tag:&str) -> Option<NodeId> {
+    pub fn get_node(&self,tag:&str) -> Option<NodeId> {
         let res = self.node_built.as_ref().unwrap().get(tag);
         match res {
-            Some(node) => return Some(node.clone()),
+            Some(res) => return Some(res.0.clone()),
             _ => None,
         }
     }
