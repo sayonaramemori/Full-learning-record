@@ -10,16 +10,16 @@ use crate::mapper::sql::get_data_in_range;
 use std::str::FromStr;
 
 #[get("/findlastVice/{num}")]
-pub async fn findlast_vice(req: HttpRequest,num: web::Path<f64>,redis_data:web::Data<RedisState>,pool:web::Data<MySqlPool>) -> impl Responder {
+pub async fn findlast_vice(req: HttpRequest,num: web::Path<f64>,redis_data:web::Data<RedisState>,pool:web::Data<HashMap<String,MySqlPool>>) -> impl Responder {
     return findlast_record(req, num, redis_data, pool, "fluxVice").await;
 }
 
 #[get("/findlast/{num}")]
-pub async fn findlast(req: HttpRequest,num: web::Path<f64>,redis_data:web::Data<RedisState>,pool:web::Data<MySqlPool>) -> impl Responder {
+pub async fn findlast(req: HttpRequest,num: web::Path<f64>,redis_data:web::Data<RedisState>,pool:web::Data<HashMap<String,MySqlPool>>) -> impl Responder {
     return findlast_record(req, num, redis_data, pool, "flux").await;
 }
 
-async fn findlast_record(req: HttpRequest,num: web::Path<f64>,redis_data:web::Data<RedisState>,pool:web::Data<MySqlPool>,target:&'static str) -> impl Responder {
+async fn findlast_record(req: HttpRequest,num: web::Path<f64>,redis_data:web::Data<RedisState>,pool:web::Data<HashMap<String,MySqlPool>>,target:&'static str) -> impl Responder {
     let res = verify(&req, &redis_data,&pool).await;
     if res.is_some() {
         let num = num.into_inner() as i64;
@@ -40,7 +40,7 @@ async fn findlast_record(req: HttpRequest,num: web::Path<f64>,redis_data:web::Da
 }
 
 #[get("/state")]
-async fn turbine_state(req: HttpRequest, redis_data: web::Data<RedisState>,pool: web::Data<MySqlPool>) -> HttpResponse {
+async fn turbine_state(req: HttpRequest, redis_data: web::Data<RedisState>,pool: web::Data<HashMap<String,MySqlPool>>) -> HttpResponse {
     let res = verify(&req, &redis_data,&pool).await;
     if res.is_some() {
         match redis_data.hgetall::<HashMap<String,String>>(vec!["turbineState:001","turbineState:002"]).await {
@@ -60,16 +60,24 @@ async fn turbine_state(req: HttpRequest, redis_data: web::Data<RedisState>,pool:
 }
 
 #[post("/historyMain")]
-async fn main_history(req: HttpRequest, redis_data: web::Data<RedisState>,pool: web::Data<MySqlPool>,data:web::Json<DateTimeRange>) -> HttpResponse {
+async fn main_history(req: HttpRequest, redis_data: web::Data<RedisState>,pool: web::Data<HashMap<String,MySqlPool>>,data:web::Json<DateTimeRange>) -> HttpResponse {
     return history(req,redis_data,pool,data,"flux").await;
 }
 
 #[post("/historyVice")]
-async fn vice_history(req: HttpRequest, redis_data: web::Data<RedisState>,pool: web::Data<MySqlPool>,data:web::Json<DateTimeRange>) -> HttpResponse {
+async fn vice_history(req: HttpRequest, redis_data: web::Data<RedisState>,pool: web::Data<HashMap<String,MySqlPool>>,data:web::Json<DateTimeRange>) -> HttpResponse {
     return history(req,redis_data,pool,data,"fluxVice").await;
 }
-// #[post("/history")]
-async fn history(req: HttpRequest, redis_data: web::Data<RedisState>,pool: web::Data<MySqlPool>,data:web::Json<DateTimeRange>,table:&'static str) -> HttpResponse {
+
+use chrono::Datelike;
+fn get_table_name_prefix() -> String {
+    let now = chrono::Local::now();
+    let formatted_date = now.format("%Y%m%d").to_string();
+    let weekday = now.weekday().num_days_from_monday() + 1;
+    format!("{}_{}", formatted_date, weekday)
+}
+
+async fn history(req: HttpRequest, redis_data: web::Data<RedisState>,pool: web::Data<HashMap<String,MySqlPool>>,data:web::Json<DateTimeRange>,table:&'static str) -> HttpResponse {
     let res = verify(&req, &redis_data,&pool).await;
     if res.is_some() {
         if let (Ok(start),Ok(end)) = (data.start.parse::<DateTime<Utc>>(),data.end.parse::<DateTime<Utc>>()) {
@@ -77,7 +85,8 @@ async fn history(req: HttpRequest, redis_data: web::Data<RedisState>,pool: web::
             let start = start.with_timezone(&offset).naive_local();
             let end = end.with_timezone(&offset).naive_local();
             let time_pair = DateTimeRng(start,end);
-            let res = get_data_in_range(&pool, time_pair,table).await;
+            let res = get_data_in_range(&pool, time_pair,table,&get_table_name_prefix()).await;
+            println!("Len is {}",res.len());
             let step = res.len()/250;
             let mut res_kept_iter = res.into_iter();
             let mut res:Vec<TempRecord<NaiveDateTime>> = vec![];

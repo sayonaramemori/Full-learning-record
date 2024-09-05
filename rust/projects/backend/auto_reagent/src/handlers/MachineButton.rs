@@ -7,9 +7,10 @@ use crate::models::Operation;
 use crate::websocket::myws::*;
 
 use actix::prelude::*;
+use std::collections::HashMap;
 use std::sync::{RwLock,Arc};
 
-pub async fn start_or_stop(data: web::Data<Arc<RwLock<Vec<Addr<MyWs>>>>>,num:web::Path<u32>,req:HttpRequest,redis_data:web::Data<RedisState>,pool:web::Data<MySqlPool>,op:Operation) -> HttpResponse {
+pub async fn start_or_stop(data: web::Data<Arc<RwLock<Vec<Addr<MyWs>>>>>,num:web::Path<u32>,req:HttpRequest,redis_data:web::Data<RedisState>,pool:web::Data<HashMap<String,MySqlPool>>,op:Operation) -> HttpResponse {
     let res = verify(&req, &redis_data, &pool).await;
     if res.is_some() {
         let number = num.into_inner();
@@ -27,17 +28,17 @@ pub async fn start_or_stop(data: web::Data<Arc<RwLock<Vec<Addr<MyWs>>>>>,num:web
 }
 
 #[get("/start/{num}")]
-pub async fn start_operation(data: web::Data<Arc<RwLock<Vec<Addr<MyWs>>>>>,num:web::Path<u32>,req:HttpRequest,redis_data:web::Data<RedisState>,pool:web::Data<MySqlPool>,) -> HttpResponse {
+pub async fn start_operation(data: web::Data<Arc<RwLock<Vec<Addr<MyWs>>>>>,num:web::Path<u32>,req:HttpRequest,redis_data:web::Data<RedisState>,pool:web::Data<HashMap<String,MySqlPool>>,) -> HttpResponse {
     start_or_stop(data, num, req, redis_data, pool, Operation::Start).await
 }
 
 #[get("/stop/{num}")]
-pub async fn stop_operation(data: web::Data<Arc<RwLock<Vec<Addr<MyWs>>>>>,num:web::Path<u32>,req:HttpRequest,redis_data:web::Data<RedisState>,pool:web::Data<MySqlPool>) -> HttpResponse {
+pub async fn stop_operation(data: web::Data<Arc<RwLock<Vec<Addr<MyWs>>>>>,num:web::Path<u32>,req:HttpRequest,redis_data:web::Data<RedisState>,pool:web::Data<HashMap<String,MySqlPool>>) -> HttpResponse {
     start_or_stop(data, num, req, redis_data, pool, Operation::Stop).await
 }
 
 #[get("/pumpStatus/{num}")]
-pub async fn pump_status(num:web::Path<u32>,req:HttpRequest,redis_data:web::Data<RedisState>,pool:web::Data<MySqlPool>) -> HttpResponse {
+pub async fn pump_status(num:web::Path<u32>,req:HttpRequest,redis_data:web::Data<RedisState>,pool:web::Data<HashMap<String,MySqlPool>>) -> HttpResponse {
     let res = verify(&req, &redis_data, &pool).await;
     if res.is_some() {
         let number = num.into_inner();
@@ -57,7 +58,7 @@ pub async fn pump_status(num:web::Path<u32>,req:HttpRequest,redis_data:web::Data
 }
 
 #[get("/setpoint/{num}/{sp}")]
-pub async fn set_point(data: web::Data<Arc<RwLock<Vec<Addr<MyWs>>>>>,nums:web::Path<(u32,f64)>,req:HttpRequest,redis_data:web::Data<RedisState>,pool:web::Data<MySqlPool>) -> HttpResponse{
+pub async fn set_point(data: web::Data<Arc<RwLock<Vec<Addr<MyWs>>>>>,nums:web::Path<(u32,f64)>,req:HttpRequest,redis_data:web::Data<RedisState>,pool:web::Data<HashMap<String,MySqlPool>>) -> HttpResponse{
     let res = verify(&req, &redis_data, &pool).await;
     if res.is_some() {
         let (num,sp) = nums.into_inner();

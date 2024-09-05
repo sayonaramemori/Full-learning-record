@@ -1,3 +1,5 @@
+use std::collections::HashMap;
+
 use actix_web::{get, post, web, HttpRequest, HttpResponse};
 use chrono::{Duration, Utc};
 use sqlx::{MySql, MySqlPool};
@@ -7,7 +9,7 @@ use super::Verify::{get_connection,verify,exist_user,generate_token};
 
 
 #[post("/login")]
-async fn login(info: web::Json<LoginInfo>, _redis_data: web::Data<RedisState>, pool:web::Data<MySqlPool>) -> HttpResponse {
+async fn login(info: web::Json<LoginInfo>, _redis_data: web::Data<RedisState>, pool:web::Data<HashMap<String,MySqlPool>>) -> HttpResponse {
     let res = exist_user(&info, &pool).await;
     if res.is_some() {
         let verify_interval = Duration::hours(24);
@@ -22,7 +24,7 @@ async fn login(info: web::Json<LoginInfo>, _redis_data: web::Data<RedisState>, p
 }
 
 #[get("/logout")]
-async fn logout(req: HttpRequest, redis_data: web::Data<RedisState>,pool: web::Data<MySqlPool>) -> HttpResponse {
+async fn logout(req: HttpRequest, redis_data: web::Data<RedisState>,pool: web::Data<HashMap<String,MySqlPool>>) -> HttpResponse {
     let res = verify(&req, &redis_data,&pool).await;
     if let Some(res) = res{
         if let Ok(mut conn) = get_connection(&redis_data).await {
@@ -34,7 +36,7 @@ async fn logout(req: HttpRequest, redis_data: web::Data<RedisState>,pool: web::D
 }
 
 #[get("/verify")]
-async fn check_privilege(req: HttpRequest, redis_data: web::Data<RedisState>,pool: web::Data<MySqlPool>) -> HttpResponse {
+async fn check_privilege(req: HttpRequest, redis_data: web::Data<RedisState>,pool: web::Data<HashMap<String,MySqlPool>>) -> HttpResponse {
     let res = verify(&req, &redis_data,&pool).await;
     if let Some(res) = res {
         HttpResponse::Ok().json(res.info.username)

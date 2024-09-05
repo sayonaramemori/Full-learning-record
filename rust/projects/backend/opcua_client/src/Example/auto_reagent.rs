@@ -44,16 +44,32 @@ async fn insert_data(pool: &Pool<MySql>, data: &Vec<Temperature>, sql: &String) 
     Ok(())
 }
 
+use chrono::Datelike;
+fn get_table_name_prefix() -> String {
+    // Get the current local date and time
+    let now = chrono::Local::now();
+    // Get the date part in 'YYYYMMDD' format
+    let formatted_date = now.format("%Y%m%d").to_string();
+    // Get the weekday number (0 for Monday, 6 for Sunday)
+    let weekday = now.weekday().num_days_from_monday() + 1;
+    // Combine the formatted date with the weekday number
+    let result = format!("{}_{}", formatted_date, weekday);
+    // Print the result
+    debug_println!("{result}");
+    result
+}
+
 //store to database
-async fn flux_to_mysql(mut recv: Receiver<DataTime>,table:&'static str) -> Result<(), Box<dyn std::error::Error>>
+async fn flux_to_mysql(mut recv: Receiver<DataTime>,database:&'static str,_table:&'static str) -> Result<(), Box<dyn std::error::Error>>
 {
+    let table = get_table_name_prefix();
     sleep(std::time::Duration::from_secs(20)).await;
-    let url = "mysql://root:121234@ayanamyrei.com:3000/plc?ssl-mode=DISABLED";
+    let url = format!("mysql://root:121234@ayanamyrei.com:3000/{database}?ssl-mode=DISABLED");
     let creat_cmd = format!("CREATE TABLE if not exists {table}(id bigint auto_increment,val double not null,time timestamp not null,primary key(id))");
     let insert_cmd = format!("INSERT INTO {table}(val,time) VALUES (?, ?)");
     let mut records:Vec<Temperature> = vec![];
     loop {
-        if let Ok(pool) = MySqlPoolOptions::new().connect(url).await {
+        if let Ok(pool) = MySqlPoolOptions::new().connect(&url).await {
             if let Ok(_) = sqlx::query::<MySql>(&creat_cmd).execute(&pool).await {
                 while let Ok(msg) = recv.try_recv(){ records.push(Temperature::from(msg)); }
                 match insert_data(&pool, &records, &insert_cmd).await {
@@ -112,11 +128,11 @@ pub async fn do_record() -> Result<(), Box<dyn std::error::Error>> {
         DataCollector::execute_loop(switch_colletor),
         to_redis_str(switch_vice_colletor.subscribe(), "switchViceStatus"),
         DataCollector::execute_loop(switch_vice_colletor),
-        flux_to_mysql(flux_colletor.subscribe(), "flux"),
+        flux_to_mysql(flux_colletor.subscribe(),"flux", "flux"),
         to_redis_list(flux_colletor.subscribe(), "flux"),
         trim_record(3600, 600, "flux"),
         DataCollector::execute_loop(flux_colletor),
-        flux_to_mysql(flux_vice_colletor.subscribe(), "fluxVice"),
+        flux_to_mysql(flux_vice_colletor.subscribe(),"fluxVice", "fluxVice"),
         to_redis_list(flux_vice_colletor.subscribe(), "fluxVice"),
         trim_record(3600, 600, "fluxVice"),
         DataCollector::execute_loop(flux_vice_colletor),

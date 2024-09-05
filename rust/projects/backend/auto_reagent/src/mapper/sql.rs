@@ -2,13 +2,15 @@ use actix_web::web;
 use chrono::prelude::*;
 use sqlx::{pool, MySql, MySqlPool};
 use crate::models::{TempRecord::TempRecord,TempRecord::DateTimeRng};
+use std::collections::HashMap;
 
-pub async fn get_data_in_range(pool: &web::Data<MySqlPool>,time_pair:DateTimeRng,table:&str) -> Vec<TempRecord<DateTime<Utc>>> {
+pub async fn get_data_in_range(pool: &web::Data<HashMap<String,MySqlPool>>,time_pair:DateTimeRng,db_name:&str,table:&str) -> Vec<TempRecord<DateTime<Utc>>> {
+    let pool = pool.get(db_name).unwrap();
     let query = format!("SELECT val,id,time FROM {table} WHERE time BETWEEN ? AND ?");
     let data = sqlx::query_as::<MySql, TempRecord<DateTime<Utc>>>(&query)
         .bind(time_pair.0)
         .bind(time_pair.1)
-        .fetch_all(pool.as_ref())
+        .fetch_all(pool)
         .await;
-        data.unwrap()
+    data.unwrap_or(vec![])
 }
