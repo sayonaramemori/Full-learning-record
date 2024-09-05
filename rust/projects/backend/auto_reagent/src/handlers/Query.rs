@@ -78,7 +78,11 @@ async fn history(req: HttpRequest, redis_data: web::Data<RedisState>,pool: web::
             let end = end.with_timezone(&offset).naive_local();
             let time_pair = DateTimeRng(start,end);
             let res = get_data_in_range(&pool, time_pair,table).await;
+<<<<<<< HEAD
             let step = res.len()/250;
+=======
+            let step = res.len()/200;
+>>>>>>> f175617e40f2ef220995152fb8bd461d94184463
             let mut res_kept_iter = res.into_iter();
             let mut res:Vec<TempRecord<NaiveDateTime>> = vec![];
             while let Some(item) = res_kept_iter.nth(step) {
