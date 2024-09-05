@@ -73,6 +73,31 @@ impl RedisState {
             }
         }
     }
+
+    pub async fn sadd(&self,key:&str,val:&str) ->RedisResult<()>{
+        let mut conn = self.get_auth_connection().await?;
+        match redis::cmd("SADD").arg(key).arg(val).query_async::<_,()>(&mut conn).await {
+            Ok(_) => Ok(()),
+            Err(e) => Err(e),
+        }
+    }
+
+    pub async fn sismember(&self,key:&str,val:&str) ->RedisResult<bool>{
+        let mut conn = self.get_auth_connection().await?;
+        match redis::cmd("SISMEMBER").arg(key).arg(val).query_async::<_,bool>(&mut conn).await {
+            Ok(res) => Ok(res),
+            Err(e) => Err(e),
+        }
+    }
+
+    pub async fn expire(&self,key:&str,sec:u64) ->RedisResult<()>{
+        let mut conn = self.get_auth_connection().await?;
+        match redis::cmd("EXPIRE").arg(key).arg(sec).query_async::<_,()>(&mut conn).await {
+            Ok(_) => Ok(()),
+            Err(e) => Err(e),
+        }
+    }
+
     pub async fn get(&self,key:&str) ->RedisResult<String>{
         let mut conn = self.get_auth_connection().await?;
         match redis::cmd("GET").arg(key).query_async::<_,String>(&mut conn).await {

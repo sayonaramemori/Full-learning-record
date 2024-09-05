@@ -18,15 +18,18 @@ pub struct Claims{
     pub info: LoginInfo,
     pub expire_time: i64,
 }
+impl Claims {
+    pub fn user_id_wrapper(&self) -> String {
+        //device imformation should be added
+        format!("User{}{}",self.info.username,self.expire_time.to_string())
+    }
+}
 
 pub const SECRETKEY :&[u8;8]= b"sayonara";
 
-
-pub struct StatusMsg(bool,String);
-impl StatusMsg {
-    pub fn is_good(&self) -> bool{ return self.0; }
-    pub fn msg(&self) -> String { return self.1.clone(); }
-    pub fn parsed_name(&self) -> String {return self.1.clone();}
+pub fn user_id_wrapper(username:&str,timestamp:i64) -> String {
+    //device imformation should be added
+    format!("User{username}{}",timestamp.to_string())
 }
 
 pub fn generate_token(info:LoginInfo,expire_time:i64) -> String {
@@ -36,57 +39,65 @@ pub fn generate_token(info:LoginInfo,expire_time:i64) -> String {
     return claims;
 }
 
-//Query DB first then cache the token to Redis
-pub async fn exist_user(info: &LoginInfo,redis_data: &web::Data<RedisState>,pool: &web::Data<MySqlPool>,token:Option<&str>) -> StatusMsg{
-    let res = sqlx::query_as::<MySql,LoginInfo>("select username, password from admin where username=? and password=?")
+//Query DB first then cache the token to Redis,return user id
+pub async fn exist_user(info: &LoginInfo,pool: &web::Data<MySqlPool>) -> Option<LoginInfo>{
+    let res = sqlx::query_as::<MySql,LoginInfo>("select id,username, password from admin where username=? and password=?")
         .bind(&info.username)
         .bind(&info.password)
         .fetch_one(pool.get_ref())
         .await;
-    if let Ok(_user_info) = res {
-        debug_println!("Query user in DB");
-        if let Some(token)= token {
-            let _ = redis_data.setex(token, 1, 3600).await;
-        }
-        return StatusMsg(true,String::from(""));
+    if let Ok(info) = res {
+        debug_println!("Query user in DB Success");
+        Some(info)
     }else{
-        return StatusMsg(false,String::from("Error User Info"))
+        debug_println!("Query user in DB Failed");
+        None
     }
 }
 
-pub async fn verify_token(token:&str,redis_data: &web::Data<RedisState>,pool: &web::Data<MySqlPool>) -> StatusMsg{
-    //Query Redis first
-    if let Ok(res) = redis_data.get(token).await {
-        debug_println!("Query user in Redis");
-        if !res.is_empty(){ return StatusMsg(true,String::from("Ok")); }
-    }
-    //Inspect the token
+pub async fn verify_token(token:&str,redis_data: &web::Data<RedisState>,pool: &web::Data<MySqlPool>) -> Option<Claims>{
     let key: Hmac<Sha256> = Hmac::new_from_slice(SECRETKEY).unwrap();
     match VerifyWithKey::<Claims>::verify_with_key(token, &key){
         Ok(claims) => {
-            let res = exist_user(&claims.info, redis_data, pool,Some(token)).await;
-            if res.is_good(){
-                let now = Utc::now().timestamp();
-                if claims.expire_time > now { return StatusMsg(true,claims.info.username); }
-                else { return StatusMsg(false,String::from("Expired token")); }
-            }else{
-                return res;
+            let key = user_id_wrapper(&claims.info.username, claims.expire_time);
+            //check in redis first
+            match redis_data.get(&key).await {
+                Ok(res) => { if res == token {debug_println!("Query in Redis"); return Some(claims);}else{debug_println!("Not equal")}}
+                Err(_e) => {}, 
+            }
+            let now = Utc::now().timestamp();
+            //Well Decoded token, then check the information
+            if claims.expire_time < now {  
+                debug_println!("Expired Token");
+                return None;
+            }
+            match exist_user(&claims.info, pool).await {
+                Some(user) => {
+                    //Trust this token and store it in Redis for quick query
+                    if user == claims.info {
+                        debug_println!("Store into Redis");
+                        let _ = redis_data.setex(&key, token, 3600*24).await;
+                        return Some(claims);
+                    }else{ debug_println!("Cheating Token"); }
+                },
+                None => { debug_println!("No such user"); },
             }
         },
-        _ => return StatusMsg(false,String::from("Bad token")),
+        _ => { debug_println!("Error token"); }
     }
+    None
 }
 
-// return (bool,msg) in which msg is error msg 
-// when bool is false and msg is username when bool is true for the first time to query
-pub async fn verify(req: &HttpRequest, redis_data: &web::Data<RedisState>,pool: &web::Data<MySqlPool>) -> StatusMsg { 
+pub async fn verify(req: &HttpRequest, redis_data: &web::Data<RedisState>,pool: &web::Data<MySqlPool>) -> Option<Claims>{ 
     let token = match req.headers().get("token") {
         Some(header_value) => header_value.to_str().unwrap_or(""),
-        None => "",
+        _ => "",
     };
-    if token.is_empty() { return StatusMsg(false,"No token provided".to_string()); }
-    let res = verify_token(token, redis_data, pool).await;
-    return res;
+    if token.is_empty() {
+        debug_println!("No token provided");
+        return None;
+    }
+    verify_token(token, redis_data, pool).await
 }
 
 pub async fn get_connection(client: &RedisState) ->Result<MultiplexedConnection, redis::RedisError> {

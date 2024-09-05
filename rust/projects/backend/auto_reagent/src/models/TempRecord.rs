@@ -31,6 +31,15 @@ impl<T> TempRecord<T>{
     }
 }
 
+impl From<TempRecord<DateTime<Utc>>> for TempRecord<NaiveDateTime>{
+    fn from(value: TempRecord<DateTime<Utc>>) -> Self {
+        TempRecord {
+            val: value.val,
+            id: value.id,
+            time: value.time.naive_local(),
+        }
+    }
+}
 impl From<(Record,i64)> for TempRecord<String> {
     fn from(value: (Record,i64)) -> TempRecord<String> {
         let (record,id) = value;

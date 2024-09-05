@@ -1,6 +1,5 @@
 use chrono::prelude::*;
-use opcua::types::Variant;
-pub(crate) trait StoreValueTime {
+pub trait StoreValueTime {
     fn new() -> Self;
     fn set_value(&mut self,val: String)->&mut Self;
     fn set_time(&mut self,time: DateTime<Utc>)->&mut Self;

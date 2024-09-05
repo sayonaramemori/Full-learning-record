@@ -28,6 +28,7 @@ async fn main() -> std::io::Result<()> {
              .allowed_headers(vec![actix_web::http::header::AUTHORIZATION, actix_web::http::header::ACCEPT,])
              .allowed_header(actix_web::http::header::CONTENT_TYPE)
              .allowed_header("token")
+             .expose_headers(vec!["token"])
              .max_age(3600);
         App::new()
             .app_data(web::Data::new(pool.clone()))
@@ -50,8 +51,8 @@ async fn main() -> std::io::Result<()> {
             .service(websocket_index)
             // .service(send_instruction)
     })
-    .bind("0.0.0.0:8080")?
-    // .bind("localhost:8080")?
+    // .bind("0.0.0.0:8080")?
+    .bind("localhost:8080")?
     .run()
     .await
 }

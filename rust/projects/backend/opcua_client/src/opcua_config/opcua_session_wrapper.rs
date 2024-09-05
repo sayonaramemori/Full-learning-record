@@ -109,13 +109,9 @@ impl OpcuaSession {
         };
         let write_values = vec![write_value];
         match session.write(&write_values){
-            Ok(res) => {
-                if res[0].is_good(){
+            Ok(res) if res[0].is_good() => {
                     debug_println!("Write operation success");
                     return Ok(());
-                }else {
-                    return Err(res[0]);
-                }
             },
             Err(e) => {
                 debug_println!("Write operation failed");
@@ -123,7 +119,11 @@ impl OpcuaSession {
                 drop(guard);
                 self.gain_new_session();
                 return Err(e);
-            }
+            },
+            Ok(res) => {
+                debug_println!("Write this specific node failed");
+                return Err(res[0])
+            },
         }
     }
 
@@ -155,7 +155,7 @@ impl OpcuaSession {
     //Only when target and val provided matches, then write operation will performe actually.
     pub async fn async_write(session: Arc<OpcuaSession>, target: &str, val: String)->Result<(), StatusCode>{
         let config = get_node_config().await;
-        let node_id = config.node(target);
+        let node_id = config.get_node(target);
         let variant = config.get_variant(target,val);
         if let (Some(id),Some(val)) = (node_id,variant) {
             Self::async_write_single_retry(session,id,val,5).await
@@ -179,7 +179,7 @@ impl OpcuaSession {
     where T: 'static + Clone + StoreValueTime + Send + Sync
     {
         let config = get_node_config().await;
-        if let Some(id) = config.node(target){
+        if let Some(id) = config.get_node(target){
             task::spawn_blocking(move || {session.read_single(&id)}).await.unwrap()
         }else{
             Err(StatusCode::BadNodeIdUnknown)
@@ -190,7 +190,7 @@ impl OpcuaSession {
     pub async fn async_read_batch(session: Arc<OpcuaSession>, target: &[String]) -> Result<Vec<DataTime>,StatusCode>
     {
         let config = get_node_config().await;
-        let node_ids = target.into_iter().map(|v|{config.node(v)}).collect::<Vec<Option<NodeId>>>();
+        let node_ids = target.into_iter().map(|v|{config.get_node(v)}).collect::<Vec<Option<NodeId>>>();
         if node_ids.contains(&None) {
             Err(StatusCode::BadNodeIdInvalid)
         }else{

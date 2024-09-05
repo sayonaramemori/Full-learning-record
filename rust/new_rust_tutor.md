@@ -2,7 +2,7 @@
 > `curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh`  
     - `cargo --version`  
     - `rustc --version`  
-    - 'rustdoc --version`  
+    - `rustdoc --version`  
     - `rustup update`  
 
 > Proxy is preferable.  
@@ -252,7 +252,7 @@ fn new_map(size:i32,pixels:Vec<u8>)->GrayscaleMap {
     GrascaleMap{pixels,size}
 }
 ```
-3. Using `.. Expr` to copy the same value from another struct(the rest field should possess the copy trait, otherwise ownship happening)  
+3. Using `.. Expr` to copy the same value from another struct(the rest field should possess the copy trait, otherwise ownship exchanging)  
 ```rust
 struct Broom {
     name: String,
@@ -288,9 +288,9 @@ impl someTrait for Ordering{
 //define a enum possessing data type  
 //default public, a bit different from struct
 enum RoughTime{
-    InThePast(TimeUnit,u32),            //tuple variant
+    InThePast(f64,u32),            //tuple variant
     JustNow,                            //basic unit
-    InTheFuture(TimeUnit,u32),
+    InTheFuture(f64,u32),
     Sphere {center: Point3d, radius: f32}, //struct variant
 }
 
@@ -315,11 +315,7 @@ match value {
     _ => expr,
 }
 
-if let pattern = value {
-    block1
-}else{
-    block2
-}
+if let pattern = value { ... }else{ ... }
 ```
 
 |Type|Example|Explanation|  
@@ -329,7 +325,7 @@ if let pattern = value {
 |Wild Card|_|Match anything| 
 |Varaible|name|Get the ownship|  
 |ref Variable|ref field|Not get the ownship|  
-|Sub pattern|val @ 0...99||  
+|Sub pattern bind|val @ 0...99|Move the matched to val|  
 |Enum|Some(val), None||
 |Tuple|(key, value)||
 |Struct|Color(r, g, b), Point{x, y}||  
@@ -338,6 +334,11 @@ if let pattern = value {
 |Condition-pattern|x if x\*x <= r2|Only in match|  
 
 ```rust
+//use other as default match  
+let calendar = match settings.get_string("calendar") {
+    "chinese" => Calendar::Chinese,
+    other => return parse_error("calendar",other),
+}
 //only care the specific field
 match account {
     Account {ref name, ref language, .. } => {
@@ -354,6 +355,8 @@ match line_result {
         handle(line);
     }
 }
+//@ mode
+rect @ Shape::Rect(..) => optimized_paint(&rect)
 ```
 
 #### Multiply/if/@ match  
@@ -371,6 +374,18 @@ match robot.last_location() {
 match chars.next() {
     Some(digit @ '0' ... '9') => read_number(digit,chars),
     _ => (),
+}
+```
+
+#### Where to use Pattern match  
+```rust
+//destruct a structure
+let Track {album,track_number,title,..} = song;
+//destruct a tuple
+fn distance_to((x,y):(f64,f64)) -> f64 {...}
+//destruct a key & val for hashmap  
+for (id,document) in &cache_map {
+    println!("Document #{}:{}",id, document.title);
 }
 ```
 
@@ -418,14 +433,22 @@ pub trait Mul<RHS=Self>{
 ### Closure  
 1. Fn default ref  
 2. FnMut default ref\_mut  
-3. add move to gain the ownship  
+3. Keyword `move` to gain the ownship  
 
 
 #### Iterator adapter  
 > Gain the ownship of iterator.
 
 > Not consuming a iterator, only return a new iterator: What should be done when calling `next()`. 
-1. `map` and `filter`, and `filter_map`   
+1. `map` and `filter`, and `filter_map` & `flat_map`     
+```rust
+let text = "1\nfrond .25 289\n3.14 estuary";
+//return Option<_> Some to be kept and None to be discarded
+for i in text.split_whitespace().filter_map(|w| f64::from_str(w).ok()) {
+    println!("{}",i.sqrt());
+}
+```
+            
 2. `take` and `take_while` 
 ```rust
 //fn take(self, n:usize) -> some Iterator<Item=Self::Item>;
@@ -435,14 +458,14 @@ for header in message.lines().take_while(|l| !l.is_empty()) {
     println!("{}",header);
 }
 ```
-3. `skip` and `ship_while`, complement `take`.  
+3. `skip` and `ship_while`, as a complement to `take`  
 ```rust
 for arg in std::env::args().skip(1) {
     ...
 }
 ```
 4. `std::iter::DoubleEndIterator`, `rev`  
-5. `inspect`  
+5. `fuse` to make sure always return None when encoutering the first None.  
 6. `chain`  
 ```rust
 let v:Vec<i32> = (1..4).chain(vec![2,3,4]).collect();
@@ -464,7 +487,21 @@ assert_eq!(v.vec![(0,'A'),(1,'B'),(2,'C'),(3,'D')];
 //iteratable obj is ok as well
 zip(T:Iterable)
 ```
-9. `by\_ref` and `cloned` 
+9. `by_ref` 
+```rust
+let message = "To: jumb\r\n
+               From: id\r\n
+               \r\n
+               Ooooh, donuts!!\r\n";
+let mut lines = message.lines();
+//without take the ownship of lines using by_ref
+lines.by_ref().take_while(|l| !l.is_empty()).last();
+for body in lines {
+    println!("{}",body);
+}
+```
+10. 'cycle`  
+
 
 
 #### Other Iterator providers  
@@ -515,15 +552,17 @@ assert_eq!(inner,"art");
 4. `max` and `min`, std::cmp::Ord trait is needed  
 5. `max_by(predict)` and `min_by`  
 6. `any` and `all`
-7. `position` and `rposition`  
+7. `position` and `rposition` to index   
 8. `last`, consuming to the last element.  
-9. `collect` and `from_iter` in trait `FromIterator`  
-10. `extend`  
+9. `find`, find the first item satisfy the closure  
+10. `collect` and `from_iter` in trait `FromIterator`  
+11. `extend` which implement IntoIterator  
+
 ```rust
 let v: Vec<i32> = (0..5).map(|i| 1<<i).collect();
 v.extend(&[1,2,3,4]);
 ```
-11. `partition`  
+12. `partition`  
 ```rust
 //std::default::Default is needed for the target type
 let (living,nonliving):(Vec<&str>,Vec<&str>)
@@ -762,6 +801,22 @@ let writer = BufWriter::new(file);
 ### Spawn  
 
 ### Macro  
+The type supported by `macro_rules!`  
+|Type|Example|  
+|:--|:-|
+|expr|2+2,"ubdo",x.len()|  
+|stmt|expression|  
+|ty|String, Vec<u8>|  
+|path|::std::sync::mpsc|  
+|pat|pattern|  
+|item| 特性项|  
+|block| code block|  
+|meta| Attribute body|  
+|ident|std,Json|  
+|tt|token tree: ; >= {},[]|  
+
+
+
 
 ### Unsafe Code  
 
