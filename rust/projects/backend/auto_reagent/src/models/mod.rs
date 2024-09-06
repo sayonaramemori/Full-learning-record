@@ -3,6 +3,7 @@ pub mod LoginInfo;
 pub mod TurbineState;
 pub mod redis_data;
 pub mod record;
+pub mod sqlx_manager;
 
 pub enum Operation {
     Start,

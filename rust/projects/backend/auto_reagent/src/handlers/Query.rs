@@ -4,22 +4,22 @@ use std::io::Write;
 use chrono::{prelude::*, Duration};
 use sqlx::{pool, MySql, MySqlPool};
 use crate::models::{record::Record, TempRecord::{DateTimeRange, DateTimeRng, HistoryData, TempRecord}, TurbineState::TurbineState};
-use crate::models::redis_data::RedisState;
+use crate::models::{redis_data::RedisState,sqlx_manager::SqlxManager};
 use super::Verify::verify;
 use crate::mapper::sql::get_data_in_range;
 use std::str::FromStr;
 
 #[get("/findlastVice/{num}")]
-pub async fn findlast_vice(req: HttpRequest,num: web::Path<f64>,redis_data:web::Data<RedisState>,pool:web::Data<HashMap<String,MySqlPool>>) -> impl Responder {
+pub async fn findlast_vice(req: HttpRequest,num: web::Path<f64>,redis_data:web::Data<RedisState>,pool:web::Data<SqlxManager>) -> impl Responder {
     return findlast_record(req, num, redis_data, pool, "fluxVice").await;
 }
 
 #[get("/findlast/{num}")]
-pub async fn findlast(req: HttpRequest,num: web::Path<f64>,redis_data:web::Data<RedisState>,pool:web::Data<HashMap<String,MySqlPool>>) -> impl Responder {
+pub async fn findlast(req: HttpRequest,num: web::Path<f64>,redis_data:web::Data<RedisState>,pool:web::Data<SqlxManager>) -> impl Responder {
     return findlast_record(req, num, redis_data, pool, "flux").await;
 }
 
-async fn findlast_record(req: HttpRequest,num: web::Path<f64>,redis_data:web::Data<RedisState>,pool:web::Data<HashMap<String,MySqlPool>>,target:&'static str) -> impl Responder {
+async fn findlast_record(req: HttpRequest,num: web::Path<f64>,redis_data:web::Data<RedisState>,pool:web::Data<SqlxManager>,target:&'static str) -> impl Responder {
     let res = verify(&req, &redis_data,&pool).await;
     if res.is_some() {
         let num = num.into_inner() as i64;
@@ -40,7 +40,7 @@ async fn findlast_record(req: HttpRequest,num: web::Path<f64>,redis_data:web::Da
 }
 
 #[get("/state")]
-async fn turbine_state(req: HttpRequest, redis_data: web::Data<RedisState>,pool: web::Data<HashMap<String,MySqlPool>>) -> HttpResponse {
+async fn turbine_state(req: HttpRequest, redis_data: web::Data<RedisState>,pool: web::Data<SqlxManager>) -> HttpResponse {
     let res = verify(&req, &redis_data,&pool).await;
     if res.is_some() {
         match redis_data.hgetall::<HashMap<String,String>>(vec!["turbineState:001","turbineState:002"]).await {
@@ -60,12 +60,12 @@ async fn turbine_state(req: HttpRequest, redis_data: web::Data<RedisState>,pool:
 }
 
 #[post("/historyMain")]
-async fn main_history(req: HttpRequest, redis_data: web::Data<RedisState>,pool: web::Data<HashMap<String,MySqlPool>>,data:web::Json<DateTimeRange>) -> HttpResponse {
+async fn main_history(req: HttpRequest, redis_data: web::Data<RedisState>,pool: web::Data<SqlxManager>,data:web::Json<DateTimeRange>) -> HttpResponse {
     return history(req,redis_data,pool,data,"flux").await;
 }
 
 #[post("/historyVice")]
-async fn vice_history(req: HttpRequest, redis_data: web::Data<RedisState>,pool: web::Data<HashMap<String,MySqlPool>>,data:web::Json<DateTimeRange>) -> HttpResponse {
+async fn vice_history(req: HttpRequest, redis_data: web::Data<RedisState>,pool: web::Data<SqlxManager>,data:web::Json<DateTimeRange>) -> HttpResponse {
     return history(req,redis_data,pool,data,"fluxVice").await;
 }
 
@@ -77,7 +77,7 @@ fn get_table_name_prefix() -> String {
     format!("{}_{}", formatted_date, weekday)
 }
 
-async fn history(req: HttpRequest, redis_data: web::Data<RedisState>,pool: web::Data<HashMap<String,MySqlPool>>,data:web::Json<DateTimeRange>,table:&'static str) -> HttpResponse {
+async fn history(req: HttpRequest, redis_data: web::Data<RedisState>,pool: web::Data<SqlxManager>,data:web::Json<DateTimeRange>,table:&'static str) -> HttpResponse {
     let res = verify(&req, &redis_data,&pool).await;
     if res.is_some() {
         if let (Ok(start),Ok(end)) = (data.start.parse::<DateTime<Utc>>(),data.end.parse::<DateTime<Utc>>()) {

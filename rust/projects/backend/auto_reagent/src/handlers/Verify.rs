@@ -11,7 +11,7 @@ use jwt::SignWithKey;
 use sha2::Sha256;
 use chrono::prelude::*;
 
-use crate::models::redis_data::RedisState;
+use crate::models::{redis_data::RedisState,sqlx_manager::SqlxManager};
 use crate::models::LoginInfo::LoginInfo;
 use crate::debug_println;
 
@@ -42,7 +42,7 @@ pub fn generate_token(info:LoginInfo,expire_time:i64) -> String {
 }
 
 //Query DB first then cache the token to Redis,return user id
-pub async fn exist_user(info: &LoginInfo,pool: &web::Data<HashMap<String,MySqlPool>>) -> Option<LoginInfo>{
+pub async fn exist_user(info: &LoginInfo,pool: &web::Data<SqlxManager>) -> Option<LoginInfo>{
     let pool = pool.get("plc").unwrap();
     let res = sqlx::query_as::<MySql,LoginInfo>("select id,username, password from admin where username=? and password=?")
         .bind(&info.username)
@@ -58,7 +58,7 @@ pub async fn exist_user(info: &LoginInfo,pool: &web::Data<HashMap<String,MySqlPo
     }
 }
 
-pub async fn verify_token(token:&str,redis_data: &web::Data<RedisState>,pool: &web::Data<HashMap<String,MySqlPool>>) -> Option<Claims>{
+pub async fn verify_token(token:&str,redis_data: &web::Data<RedisState>,pool: &web::Data<SqlxManager>) -> Option<Claims>{
     let key: Hmac<Sha256> = Hmac::new_from_slice(SECRETKEY).unwrap();
     match VerifyWithKey::<Claims>::verify_with_key(token, &key){
         Ok(claims) => {
@@ -91,7 +91,7 @@ pub async fn verify_token(token:&str,redis_data: &web::Data<RedisState>,pool: &w
     None
 }
 
-pub async fn verify(req: &HttpRequest, redis_data: &web::Data<RedisState>,pool: &web::Data<HashMap<String,MySqlPool>>) -> Option<Claims>{ 
+pub async fn verify(req: &HttpRequest, redis_data: &web::Data<RedisState>,pool: &web::Data<SqlxManager>) -> Option<Claims>{ 
     let token = match req.headers().get("token") {
         Some(header_value) => header_value.to_str().unwrap_or(""),
         _ => "",
