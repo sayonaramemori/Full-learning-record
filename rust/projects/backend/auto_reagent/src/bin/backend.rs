@@ -41,7 +41,6 @@ async fn main() -> std::io::Result<()> {
             .app_data(web::Data::new(app_state.clone()))
             .app_data(web::Data::new(addr.clone()))
             .wrap(cors)
-            // .default_service(web::to(|| HttpResponse::Ok()))
             .service(findlast)
             .service(findlast_vice)
             .service(login)
@@ -56,6 +55,7 @@ async fn main() -> std::io::Result<()> {
             .service(set_point)
             .service(websocket_index)
             // .service(send_instruction)
+            // .default_service(web::to(|| HttpResponse::Ok()))
     })
     .bind("0.0.0.0:8080")?
     // .bind("localhost:8080")?

@@ -14,56 +14,45 @@ impl RedisState {
         let redis_data = Self::new("Iloveyouxuwu121234","redis://:Iloveyouxuwu121234@ayanamyrei.com", );
         Arc::new(redis_data)
     }
+
     pub fn new(pass:&str,url:&str) -> RedisState{
         let redis_client = redis::Client::open(url).unwrap();
         return RedisState{redis_client: Arc::new(redis_client),redis_passwd:pass.to_string()}
     }
+
     pub async fn llen(&self,key:&str) -> RedisResult<i32>{
         let mut conn = self.get_auth_connection().await?;
-        match redis::cmd("LLEN").arg(key).query_async::<_,i32>(&mut conn).await {
-            Ok(res) => Ok(res),
-            Err(e) => Err(e),
-        }
+        redis::cmd("LLEN").arg(key).query_async::<_,i32>(&mut conn).await
     }
-    pub async fn get_auth_connection(&self) ->Result<MultiplexedConnection, redis::RedisError> {
+
+    pub async fn get_auth_connection(&self) ->RedisResult<MultiplexedConnection> {
         let mut conn = self.redis_client.get_multiplexed_async_connection().await?;
         redis::cmd("AUTH").arg(&self.redis_passwd).query_async(&mut conn).await?;
         Ok(conn)
     }
+
     pub async fn lpop(&self,key:&str,count:usize) ->RedisResult<Vec<String>> {
         let mut conn = self.get_auth_connection().await?;
-        match redis::cmd("LPOP").arg(key).arg(count).query_async::<_,Vec<String>>(&mut conn).await {
-            Ok(res) => Ok(res),
-            Err(e) => Err(e),
-        }
+        redis::cmd("LPOP").arg(key).arg(count).query_async::<_,Vec<String>>(&mut conn).await
     }
+
     pub async fn rpop(&self,key:&str,count:usize) ->RedisResult<Vec<String>> {
         let mut conn = self.get_auth_connection().await?;
-        match redis::cmd("RPOP").arg(key).arg(count).query_async::<_,Vec<String>>(&mut conn).await {
-            Ok(res) => Ok(res),
-            Err(e) => Err(e),
-        }
+        redis::cmd("RPOP").arg(key).arg(count).query_async::<_,Vec<String>>(&mut conn).await
     }
+
     pub async fn set(&self,key:&str,val:String) ->RedisResult<()> {
         let mut conn = self.get_auth_connection().await?;
-        match redis::cmd("SET").arg(key).arg(val).query_async::<_,()>(&mut conn).await {
-            Ok(_) => Ok(()),
-            Err(e) => Err(e),
-        }
+        redis::cmd("SET").arg(key).arg(val).query_async::<_,()>(&mut conn).await
     }
 
     pub async fn setex<T>(&self,key:&str,val:T,sec:u32) ->RedisResult<()> 
     where T: ToString
     {
         let mut conn = self.get_auth_connection().await?;
-        match redis::cmd("SETEX").arg(key).arg(sec.to_string()).arg(val.to_string()).query_async::<_,()>(&mut conn).await {
-            Ok(_) => Ok(()),
-            Err(e) => {
-                debug_println!("Setex failed for {e}");
-                Err(e)
-            },
-        }
+        redis::cmd("SETEX").arg(key).arg(sec.to_string()).arg(val.to_string()).query_async::<_,()>(&mut conn).await
     }
+
     pub async fn setex_retry<T>(&self,key:&str,val:T,sec:u32,count:usize)
     where T: Clone + Display
     {
@@ -76,45 +65,32 @@ impl RedisState {
 
     pub async fn sadd(&self,key:&str,val:&str) ->RedisResult<()>{
         let mut conn = self.get_auth_connection().await?;
-        match redis::cmd("SADD").arg(key).arg(val).query_async::<_,()>(&mut conn).await {
-            Ok(_) => Ok(()),
-            Err(e) => Err(e),
-        }
+        redis::cmd("SADD").arg(key).arg(val).query_async::<_,()>(&mut conn).await
     }
 
     pub async fn sismember(&self,key:&str,val:&str) ->RedisResult<bool>{
         let mut conn = self.get_auth_connection().await?;
-        match redis::cmd("SISMEMBER").arg(key).arg(val).query_async::<_,bool>(&mut conn).await {
-            Ok(res) => Ok(res),
-            Err(e) => Err(e),
-        }
+        redis::cmd("SISMEMBER").arg(key).arg(val).query_async::<_,bool>(&mut conn).await
     }
 
     pub async fn expire(&self,key:&str,sec:u64) ->RedisResult<()>{
         let mut conn = self.get_auth_connection().await?;
-        match redis::cmd("EXPIRE").arg(key).arg(sec).query_async::<_,()>(&mut conn).await {
-            Ok(_) => Ok(()),
-            Err(e) => Err(e),
-        }
+        redis::cmd("EXPIRE").arg(key).arg(sec).query_async::<_,()>(&mut conn).await
     }
 
     pub async fn get(&self,key:&str) ->RedisResult<String>{
         let mut conn = self.get_auth_connection().await?;
-        match redis::cmd("GET").arg(key).query_async::<_,String>(&mut conn).await {
-            Ok(res) => Ok(res),
-            Err(e) => Err(e),
-        }
+        redis::cmd("GET").arg(key).query_async::<_,String>(&mut conn).await
     }
+
     pub async fn rpush(&self,key:&str,args:Vec<String>,) ->RedisResult<()>{
         let mut conn = self.get_auth_connection().await?;
         let mut cmd = redis::cmd("RPUSH");
         cmd.arg(key);
         args.into_iter().map(|arg|{cmd.arg(arg);}).last();
-        match cmd.query_async::<_,()>(&mut conn).await {
-            Ok(_) => Ok(()),
-            Err(e) => Err(e),
-        }
+        cmd.query_async::<_,()>(&mut conn).await
     }
+
     pub async fn rpush_retry(&self,key:&str,args:Vec<String>,count:usize) {
         for _ in 0..count {
             if let Ok(_) = Self::rpush(self,key,args.clone()).await {
@@ -122,24 +98,21 @@ impl RedisState {
             }
         }
     }
+
     pub async fn lpush_ex(&self,key:&str,args:Vec<String>,sec:u32) ->RedisResult<()>{
         let mut conn = self.get_auth_connection().await?;
         let mut temp = redis::pipe();
         temp.add_command(redis::cmd("LPUSH")).arg(key);
         args.into_iter().map(|arg|{temp.arg(arg);}).last();
         temp.add_command(redis::cmd("EXPIRE")).arg(key).arg(sec.to_string());
-        match temp.query_async::<_,()>(&mut conn).await {
-            Ok(_) => Ok(()),
-            Err(e) => Err(e),
-        }
+        temp.query_async::<_,()>(&mut conn).await
     }
+
     pub async fn lrange(&self,key:&str,count:usize) -> RedisResult<Vec<String>> {
         let mut conn = self.get_auth_connection().await?;
-        match redis::cmd("LRANGE").arg(key).arg("-".to_string() + &count.to_string()).arg("-1").query_async::<_,Vec<String>>(&mut conn).await {
-            Ok(res) => Ok(res),
-            Err(e) => Err(e),
-        }
+        redis::cmd("LRANGE").arg(key).arg("-".to_string() + &count.to_string()).arg("-1").query_async::<_,Vec<String>>(&mut conn).await
     }
+
     pub async fn hgetall<T>(&self,keys:Vec<&str>)  -> RedisResult<Vec<T>> 
     where T: FromRedisValue
     {
@@ -147,9 +120,7 @@ impl RedisState {
         let mut pipe = redis::pipe();
         let cmd = redis::cmd("HGETALL");
         for key in keys {pipe.add_command(cmd.clone()).arg(key);}
-        match pipe.query_async::<_,Vec<T>>(&mut conn).await {
-            Ok(res) => Ok(res),
-            Err(e) => Err(e),
-        }
+        pipe.query_async::<_,Vec<T>>(&mut conn).await
     }
+
 }

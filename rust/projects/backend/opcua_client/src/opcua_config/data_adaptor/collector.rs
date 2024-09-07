@@ -25,17 +25,17 @@ where T: 'static + Clone + Send + Sync + StoreValueTime
         return res;
     }
 
-    pub async fn execute(&self) -> Result<(),Box<dyn std::error::Error>>{
+    pub async fn execute(&self) -> Result<(),String>{
         let session= OpcuaSession::new_arc().await;
         match OpcuaSession::async_read(session,self.target.as_ref()).await {
             Ok(res) => { let _ = self.sender.send(res); },
-            Err(e) => { return Err(Box::new(e)); },
+            Err(e) => { return Err(format!("Read node failed for {e}")); },
         }
         Ok(())
     }
 
     //Should be called after subscription
-    pub async fn execute_loop(collector: DataCollector<T>) -> Result<(),Box<dyn std::error::Error>>{
+    pub async fn execute_loop(collector: DataCollector<T>) -> Result<(),String>{
         collector.start_with_one_target().await;
         Ok(())
     }

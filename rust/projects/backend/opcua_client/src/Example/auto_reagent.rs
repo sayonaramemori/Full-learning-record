@@ -9,8 +9,10 @@ use crate::entity::temperature::Temperature;
 use crate::debug_println;
 use crate::opcua_config::data_adaptor::{collector::DataCollector,unit::DataTime::DataTime};
 
+type MyResult<T> = Result<T,String>;
+
 //To redis for query from front end
-async fn to_redis_list(mut recv: Receiver<DataTime>,target:&'static str) -> Result<(), Box<dyn std::error::Error>>
+async fn to_redis_list(mut recv: Receiver<DataTime>,target:&'static str) -> MyResult<()>
 {
     let redis_data = RedisData::new_arc();
     while let Ok(res) = recv.recv().await {
@@ -20,7 +22,7 @@ async fn to_redis_list(mut recv: Receiver<DataTime>,target:&'static str) -> Resu
     Ok(())
 }
 
-async fn to_redis_str(mut recv: Receiver<DataTime>,target:&'static str)-> Result<(), Box<dyn std::error::Error>> 
+async fn to_redis_str(mut recv: Receiver<DataTime>,target:&'static str)-> MyResult<()>
 {
     let redis_data = RedisData::new_arc();
     while let Ok(res) = recv.recv().await {
@@ -30,37 +32,33 @@ async fn to_redis_str(mut recv: Receiver<DataTime>,target:&'static str)-> Result
     Ok(())
 }
 
-async fn insert_data(pool: &Pool<MySql>, data: &Vec<Temperature>, sql: &String) -> Result<(), sqlx::Error> 
+async fn insert_data(pool: &Pool<MySql>, data: &Vec<Temperature>, sql: &String) -> MyResult<()>
 {
-    let mut transaction = pool.begin().await?;
+    let mut transaction = pool.begin().await.map_err(|e| format!("Transaction error for {e}"))?;
     for entry in data {
         sqlx::query(sql)
             .bind(entry.val)
             .bind(entry.time)
             .execute(&mut transaction)
-            .await?;
+            .await
+            .map_err(|e| format!("Transaction error for {e}"))?;
     }
-    transaction.commit().await?;
+    transaction.commit().await.map_err(|e| format!("Transaction error for {e}"))?;
     Ok(())
 }
 
 use chrono::Datelike;
 fn get_table_name_prefix() -> String {
-    // Get the current local date and time
     let now = chrono::Local::now();
-    // Get the date part in 'YYYYMMDD' format
     let formatted_date = now.format("%Y%m%d").to_string();
-    // Get the weekday number (0 for Monday, 6 for Sunday)
     let weekday = now.weekday().num_days_from_monday() + 1;
-    // Combine the formatted date with the weekday number
     let result = format!("{}_{}", formatted_date, weekday);
-    // Print the result
     debug_println!("{result}");
     result
 }
 
 //store to database
-async fn flux_to_mysql(mut recv: Receiver<DataTime>,database:&'static str,_table:&'static str) -> Result<(), Box<dyn std::error::Error>>
+async fn flux_to_mysql(mut recv: Receiver<DataTime>,database:&'static str) -> MyResult<()>
 {
     let table = get_table_name_prefix();
     sleep(std::time::Duration::from_secs(20)).await;
@@ -92,7 +90,7 @@ async fn flux_to_mysql(mut recv: Receiver<DataTime>,database:&'static str,_table
 }
 
 //trim the record list to specified length with the specific time interval
-async fn trim_record(max_num:i32,interval:u64,target:&'static str)-> Result<(), Box<dyn std::error::Error>>
+async fn trim_record(max_num:i32,interval:u64,target:&'static str)-> MyResult<()>
 {
     let redis_data = RedisData::new_arc();
     loop {
@@ -110,33 +108,40 @@ async fn trim_record(max_num:i32,interval:u64,target:&'static str)-> Result<(), 
     }
 }
 
+async fn gain_status(collector:DataCollector<DataTime>,target:&'static str)-> MyResult<()>{
+    let j1 = tokio::spawn(to_redis_str(collector.subscribe(), target));
+    let j2 = tokio::spawn(DataCollector::execute_loop(collector));
+    match tokio::try_join!(j1,j2) {
+        Ok(_) => Ok(()),
+        Err(_) => Err("Bad tokio task".to_string()),
+    }
+}
+async fn record_to_redis_mysql(collector:DataCollector<DataTime>,target:&'static str)->MyResult<()>{
+    let j1 = tokio::spawn(flux_to_mysql(collector.subscribe(),target));
+    let j2 = tokio::spawn(to_redis_list(collector.subscribe(),target));
+    let j3 = tokio::spawn(trim_record(3600,600,target));
+    let j4 = tokio::spawn(DataCollector::execute_loop(collector));
+    match tokio::try_join!(j1,j2,j3,j4) {
+        Ok(_) => Ok(()),
+        Err(_) => Err("Bad tokio task".to_string()),
+    }
+}
+
 // business
-pub async fn do_record() -> Result<(), Box<dyn std::error::Error>> {
+pub async fn do_record() -> MyResult<()>{
     let sp_colletor: DataCollector<DataTime> = DataCollector::new("setpoint",3600);
     let sp_vice_colletor: DataCollector<DataTime> = DataCollector::new("setpointVice",3600);
     let switch_colletor: DataCollector<DataTime> = DataCollector::new("switch",3600);
     let switch_vice_colletor: DataCollector<DataTime> = DataCollector::new("switchVice",3600);
     let flux_colletor: DataCollector<DataTime> = DataCollector::new("flux",3600);
     let flux_vice_colletor: DataCollector<DataTime> = DataCollector::new("fluxVice",3600);
-    
-    tokio::try_join!(
-        to_redis_str(sp_colletor.subscribe(), "setpointStatus"),
-        DataCollector::execute_loop(sp_colletor),
-        to_redis_str(sp_vice_colletor.subscribe(), "setpointViceStatus"),
-        DataCollector::execute_loop(sp_vice_colletor),
-        to_redis_str(switch_colletor.subscribe(), "switchStatus"),
-        DataCollector::execute_loop(switch_colletor),
-        to_redis_str(switch_vice_colletor.subscribe(), "switchViceStatus"),
-        DataCollector::execute_loop(switch_vice_colletor),
-        flux_to_mysql(flux_colletor.subscribe(),"flux", "flux"),
-        to_redis_list(flux_colletor.subscribe(), "flux"),
-        trim_record(3600, 600, "flux"),
-        DataCollector::execute_loop(flux_colletor),
-        flux_to_mysql(flux_vice_colletor.subscribe(),"fluxVice", "fluxVice"),
-        to_redis_list(flux_vice_colletor.subscribe(), "fluxVice"),
-        trim_record(3600, 600, "fluxVice"),
-        DataCollector::execute_loop(flux_vice_colletor),
+    tokio::try_join!( 
+        gain_status(sp_colletor,"setpointStatus"),
+        gain_status(sp_vice_colletor,"setpointViceStatus"),
+        gain_status(switch_colletor,"switchStatus"),
+        gain_status(switch_vice_colletor,"switchViceStatus"),
+        record_to_redis_mysql(flux_colletor,"flux"),
+        record_to_redis_mysql(flux_vice_colletor,"fluxVice"),
     )?;
-
     Ok(())
 }
