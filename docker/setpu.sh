@@ -42,6 +42,7 @@ echo \
       # Step 7: Test Docker installation by pulling an image
       echo "Testing Docker installation by pulling the hello-world image..."
       docker pull hello-world
+	  docker pull teddysun/v2ray
 
       # Step 8: Clear apt proxy configuration
       echo "Clearing apt proxy configuration..."
