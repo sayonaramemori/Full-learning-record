@@ -1,0 +1,12 @@
+services:
+    v2ray:
+        image: teddysun/v2ray
+        container_name: v2ray
+        ports:
+            - "9000:10808"
+        volumes: 
+            - v2ray:/etc/v2ray
+
+volumes:
+    v2ray:
+        external: true
