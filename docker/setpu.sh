@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Set proxy variables
-HTTP_PROXY="socks5://127.0.0.1:10808/"
+HTTP_PROXY="http://192.168.31.113:10809/"
 HTTPS_PROXY=$HTTP_PROXY
 
 # Step 1: Configure apt to use the proxy
