@@ -1,0 +1,21 @@
+services:
+ redis:
+  build:
+   context: .
+   dockerfile: Dockerfile.redis
+# image: redis
+  restart: always
+  ports:
+   - "6379:6379"
+ mysql:
+  image: mysql
+  ports:
+   - "3000:3306"
+  volumes:
+   - mysql_data:/var/lib/mysql
+  environment:
+   - MYSQL_ROOT_PASSWORD=121234
+
+volumes:
+ mysql_data:
+  external: true
