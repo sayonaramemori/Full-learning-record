@@ -78,7 +78,18 @@ unset https_proxy
 docker pull teddysun/v2ray
 docker run -d -p 9000:10808 --name v2ray -v v2ray:/etc/v2ray teddysun/v2ray
 
-# Config for http proxy  
+# 1. Using with proxychains  
+sudo apt-get install proxychains
+sudo vim /etc/proxychains.conf
+
+# Delete socks4 and add this line  
+socks5 127.0.0.1 10808
+
+# Test with github  
+proxychains git clone https://github.com/bhilburn/powerlevel9k.git
+
+
+# 2. Config for http proxy  
 sudo apt-get install privoxy
 sudo vim /etc/privoxy/config
 
