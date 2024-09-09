@@ -1,4 +1,5 @@
 use std::sync::Arc;
+use crate::opcua_config::data_adaptor::interface::transfer::InstructionInfo;
 use tokio::task;
 use opcua::{client::prelude::{Client, Session,*}, sync::*};
 use crate::debug_println;
@@ -6,7 +7,6 @@ use crate::utility::time::*;
 use crate::opcua_config::node_config::NodeConfig::get_node_config;
 use super::data_adaptor::unit::DataTime::DataTime;
 use super::data_adaptor::interface::collect::StoreValueTime;
-
 
 
 pub struct OpcuaSession {
@@ -137,8 +137,8 @@ impl OpcuaSession {
 
 //Interface exposed
 impl OpcuaSession {
-    pub async fn new_arc() -> Arc<OpcuaSession> {
-        Arc::new(OpcuaSession::new("opc.tcp://127.0.0.1:49320").await)
+    pub async fn new_arc(endpoint_url:String) -> Arc<OpcuaSession> {
+        Arc::new(OpcuaSession::new(&endpoint_url).await)
     }
 
     pub async fn new(endpoint_url:&str) -> OpcuaSession {
@@ -162,19 +162,18 @@ impl OpcuaSession {
         }else{ Err(StatusCode::BadNodeIdUnknown) }
     }
 
-    pub async fn async_write_once(target: &str, val: String)->Result<(), StatusCode>{
-        let session = OpcuaSession::new_arc().await;
-        Self::async_write(session, target, val).await
+    pub async fn async_write_once(endpoint_url:String,instruction: Box<dyn InstructionInfo + Send + Sync>)->Result<(), StatusCode>{
+        let session = OpcuaSession::new_arc(endpoint_url).await;
+        Self::async_write(session, &instruction.get_target(), instruction.get_value()).await
     }
 
-    pub async fn async_read_once<T>(target: &str) -> Result<T,StatusCode>
+    pub async fn async_read_once<T>(endpoint_url:String,target: &str) -> Result<T,StatusCode>
     where T: 'static + Clone + StoreValueTime + Send + Sync
     {
-        let session = OpcuaSession::new_arc().await;
+        let session = OpcuaSession::new_arc(endpoint_url).await;
         Self::async_read(session, target).await
     }
 
-    //read one node with one try
     pub async fn async_read<T>(session: Arc<OpcuaSession>, target: &str) -> Result<T,StatusCode>
     where T: 'static + Clone + StoreValueTime + Send + Sync
     {
@@ -196,15 +195,8 @@ impl OpcuaSession {
         }else{
             let node_ids = node_ids.into_iter().map(|v| v.unwrap()).collect::<Vec<NodeId>>();
             match task::spawn_blocking(move || {session.read_batch(node_ids)}).await {
-                Ok(res) => {
-                    match res {
-                        Ok(res) => {
-                            return Ok(res);
-                        },
-                        Err(e) => {Err(e)},
-                    }
-                },
-                Err(_e) => {Err(StatusCode::BadOutOfMemory)},
+                Ok(res) => res,
+                Err(_e) => Err(StatusCode::BadOutOfMemory),
             }
         }
     }

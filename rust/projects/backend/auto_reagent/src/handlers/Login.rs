@@ -1,8 +1,5 @@
-use std::collections::HashMap;
-
 use actix_web::{get, post, web, HttpRequest, HttpResponse};
 use chrono::{Duration, Utc};
-use sqlx::{MySql, MySqlPool};
 use crate::models::LoginInfo::LoginInfo;
 use super::Verify::{get_connection,verify,exist_user,generate_token};
 use crate::models::{redis_data::RedisState,sqlx_manager::SqlxManager};
@@ -14,13 +11,12 @@ async fn login(info: web::Json<LoginInfo>, _redis_data: web::Data<RedisState>, p
     if res.is_some() {
         let verify_interval = Duration::hours(24);
         let user_info = info.into_inner();
-        return HttpResponse::Ok()
+        HttpResponse::Ok()
         .insert_header(("token",generate_token(user_info,Utc::now().checked_add_signed(verify_interval).unwrap().timestamp())))
-        .body("Ok");
+        .body("Ok")
     }else{
-        return HttpResponse::Unauthorized().body("Bad User Info");
+        HttpResponse::Unauthorized().body("Bad User Info")
     }
-    
 }
 
 #[get("/logout")]

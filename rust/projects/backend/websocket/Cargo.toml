@@ -14,3 +14,4 @@ tokio-util = "=0.7.11"
 client_test = {path="../opcua_client"}
 chrono = { version = "0.4.31", features = ["serde"]}
 AutoReagent = { version="0.1.0",path="../auto_reagent" }
+dotenvy = "0.15.7"

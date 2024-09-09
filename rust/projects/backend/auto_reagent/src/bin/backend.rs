@@ -1,6 +1,5 @@
 use actix_web::{get, guard, web, App, Error, HttpRequest, HttpResponse, HttpServer};
 use actix_cors::Cors;
-use chrono::format::format;
 use sqlx::{mysql::MySqlPoolOptions,MySqlPool};
 extern crate AutoReagent;
 use AutoReagent::handlers::MachineButton::*;
@@ -9,18 +8,15 @@ use AutoReagent::models::{redis_data::RedisState,sqlx_manager::SqlxManager};
 use actix::prelude::Addr;
 use std::sync::{RwLock,Arc};
 use AutoReagent::websocket::myws::{Instruction,MyWs,*};
-use std::collections::HashMap;
 
 
 #[actix_web::main] // or #[tokio::main]
 async fn main() -> std::io::Result<()> {
-    let db_names = ["flux","fluxVice","plc"];
+    dotenvy::dotenv().unwrap();
+    let db_names = ["MYSQL_FLUX_URL","MYSQL_FLUXVICE_URL","MYSQL_PLC_URL"];
     let mut sqlx_state = SqlxManager::new();
-    for name in db_names {
-        let url = format!("mysql://root:121234@ayanamyrei.com:3000/{name}?ssl-mode=DISABLED");
-        sqlx_state.add_database(name, &url).await;
-    }
-    let app_state = RedisState::new("Iloveyouxuwu121234", "redis://:Iloveyouxuwu121234@ayanamyrei.com");
+    for name in db_names { sqlx_state.add_database(name, dotenvy::var(name).unwrap()).await; }
+    let app_state = RedisState::new(dotenvy::var("REDIS_PASSWD").unwrap(), dotenvy::var("REDIS_URL").unwrap());
     let addr: Arc<RwLock<Vec<Addr<MyWs>>>> = Arc::new(RwLock::new(vec![]));
     HttpServer::new(move || {
        let cors = Cors::default()

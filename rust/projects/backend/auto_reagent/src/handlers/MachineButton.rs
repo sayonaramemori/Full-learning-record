@@ -1,13 +1,11 @@
 use super::Verify::verify;
 use actix_web::{post,get, web, Responder, HttpResponse,HttpRequest};
-use sqlx::MySqlPool;
 use crate::debug_println;
 use crate::models::{redis_data::RedisState,sqlx_manager::SqlxManager};
 use crate::models::Operation;
 use crate::websocket::myws::*;
 
 use actix::prelude::*;
-use std::collections::HashMap;
 use std::sync::{RwLock,Arc};
 
 pub async fn start_or_stop(data: web::Data<Arc<RwLock<Vec<Addr<MyWs>>>>>,num:web::Path<u32>,req:HttpRequest,redis_data:web::Data<RedisState>,pool:web::Data<SqlxManager>,op:Operation) -> HttpResponse {

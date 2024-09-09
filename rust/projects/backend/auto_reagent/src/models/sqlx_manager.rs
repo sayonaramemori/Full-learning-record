@@ -10,8 +10,8 @@ impl SqlxManager {
     pub fn new() -> SqlxManager {
         SqlxManager { databases: HashMap::new() }
     }
-    pub async fn add_database(&mut self,name:&str,url: &str){
-        let pool = MySqlPoolOptions::new().connect(url).await.unwrap();
+    pub async fn add_database(&mut self,name: &str,url: String){
+        let pool = MySqlPoolOptions::new().connect(&url).await.unwrap();
         self.databases.insert(name.to_string(), pool);
     }
     pub fn get(&self,db_name:&str) -> Option<&MySqlPool>{

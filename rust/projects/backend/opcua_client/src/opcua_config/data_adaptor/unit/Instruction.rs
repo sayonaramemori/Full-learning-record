@@ -1,6 +1,6 @@
 use crate::opcua_config::data_adaptor::interface::transfer::InstructionInfo;
 use serde::Deserialize;
-#[derive(Deserialize,Debug)]
+#[derive(Deserialize,Debug,Clone)]
 pub struct Instruction {
     pub target: String,
     pub value: String,

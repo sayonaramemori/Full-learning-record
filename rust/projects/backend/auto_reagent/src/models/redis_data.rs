@@ -1,8 +1,6 @@
-use std::{clone, fmt::Display, sync::Arc};
-use mysql::binlog::value;
-use redis::{aio::MultiplexedConnection, AsyncCommands, FromRedisValue, RedisError, RedisResult};
+use std::{fmt::Display, sync::Arc};
+use redis::{aio::MultiplexedConnection,  FromRedisValue, RedisResult};
 
-use crate::debug_println;
 #[derive(Clone)]
 pub struct RedisState {
     pub redis_client: Arc<redis::Client>,
@@ -10,14 +8,14 @@ pub struct RedisState {
 }
 
 impl RedisState {
-    pub fn new_arc() -> Arc<RedisState> {
-        let redis_data = Self::new("Iloveyouxuwu121234","redis://:Iloveyouxuwu121234@ayanamyrei.com", );
+    pub fn new_arc(pass:String,url:String) -> Arc<RedisState> {
+        let redis_data = Self::new(pass,url);
         Arc::new(redis_data)
     }
 
-    pub fn new(pass:&str,url:&str) -> RedisState{
+    pub fn new(pass:String,url: String) -> RedisState{
         let redis_client = redis::Client::open(url).unwrap();
-        return RedisState{redis_client: Arc::new(redis_client),redis_passwd:pass.to_string()}
+        return RedisState{redis_client: Arc::new(redis_client),redis_passwd: pass}
     }
 
     pub async fn llen(&self,key:&str) -> RedisResult<i32>{
