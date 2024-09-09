@@ -1,6 +1,5 @@
 use super::Verify::verify;
 use actix_web::{post,get, web, Responder, HttpResponse,HttpRequest};
-use crate::debug_println;
 use crate::models::{redis_data::RedisState,sqlx_manager::SqlxManager};
 use crate::models::Operation;
 use crate::websocket::myws::*;
@@ -8,31 +7,44 @@ use crate::websocket::myws::*;
 use actix::prelude::*;
 use std::sync::{RwLock,Arc};
 
-pub async fn start_or_stop(data: web::Data<Arc<RwLock<Vec<Addr<MyWs>>>>>,num:web::Path<u32>,req:HttpRequest,redis_data:web::Data<RedisState>,pool:web::Data<SqlxManager>,op:Operation) -> HttpResponse {
+#[get("/startMain")]
+pub async fn start_main(data: web::Data<Arc<RwLock<Vec<Addr<MyWs>>>>>,req:HttpRequest,redis_data:web::Data<RedisState>,pool:web::Data<SqlxManager>,) -> HttpResponse {
     let res = verify(&req, &redis_data, &pool).await;
     if res.is_some() {
-        let number = num.into_inner();
-        let target = match number {
-            0 => "switch",
-            1 => "switchVice",
-            _ => return HttpResponse::BadRequest().json("Bad params"),
-        };
-        match op{
-            Operation::Start => return start(target.to_string(),data).await,
-            Operation::Stop => return stop(target.to_string(),data).await,
-        }
+        let target = "switch";
+        return start(target.to_string(),data).await;
     }
     HttpResponse::Unauthorized().json("Bad Token")
 }
 
-#[get("/start/{num}")]
-pub async fn start_operation(data: web::Data<Arc<RwLock<Vec<Addr<MyWs>>>>>,num:web::Path<u32>,req:HttpRequest,redis_data:web::Data<RedisState>,pool:web::Data<SqlxManager>,) -> HttpResponse {
-    start_or_stop(data, num, req, redis_data, pool, Operation::Start).await
+#[get("/startVice")]
+pub async fn start_vice(data: web::Data<Arc<RwLock<Vec<Addr<MyWs>>>>>,req:HttpRequest,redis_data:web::Data<RedisState>,pool:web::Data<SqlxManager>,) -> HttpResponse {
+    let res = verify(&req, &redis_data, &pool).await;
+    if res.is_some() {
+        let target = "switchVice";
+        return start(target.to_string(),data).await;
+    }
+    HttpResponse::Unauthorized().json("Bad Token")
 }
 
-#[get("/stop/{num}")]
-pub async fn stop_operation(data: web::Data<Arc<RwLock<Vec<Addr<MyWs>>>>>,num:web::Path<u32>,req:HttpRequest,redis_data:web::Data<RedisState>,pool:web::Data<SqlxManager>) -> HttpResponse {
-    start_or_stop(data, num, req, redis_data, pool, Operation::Stop).await
+#[get("/stopMain")]
+pub async fn stop_main(data: web::Data<Arc<RwLock<Vec<Addr<MyWs>>>>>,req:HttpRequest,redis_data:web::Data<RedisState>,pool:web::Data<SqlxManager>,) -> HttpResponse {
+    let res = verify(&req, &redis_data, &pool).await;
+    if res.is_some() {
+        let target = "switch";
+        return stop(target.to_string(),data).await;
+    }
+    HttpResponse::Unauthorized().json("Bad Token")
+}
+
+#[get("/stopVice")]
+pub async fn stop_vice(data: web::Data<Arc<RwLock<Vec<Addr<MyWs>>>>>,req:HttpRequest,redis_data:web::Data<RedisState>,pool:web::Data<SqlxManager>,) -> HttpResponse {
+    let res = verify(&req, &redis_data, &pool).await;
+    if res.is_some() {
+        let target = "switchVice";
+        return stop(target.to_string(),data).await;
+    }
+    HttpResponse::Unauthorized().json("Bad Token")
 }
 
 #[get("/pumpStatus/{num}")]

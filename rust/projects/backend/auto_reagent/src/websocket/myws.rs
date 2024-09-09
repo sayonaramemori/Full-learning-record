@@ -64,9 +64,7 @@ async fn send_instruction(
 }
 pub struct MyWs;
 
-impl Actor for MyWs {
-    type Context = ws::WebsocketContext<Self>;
-}
+impl Actor for MyWs { type Context = ws::WebsocketContext<Self>; }
 
 //handle receive
 impl StreamHandler<Result<ws::Message, ws::ProtocolError>> for MyWs {
@@ -112,6 +110,6 @@ async fn websocket_index(req: HttpRequest, stream: web::Payload, addr: web::Data
             guard.push(addr);
             return Ok(response);
         },
-        Err(e) => {return Err(e)},
+        Err(e) => Err(e),
     }
 }
