@@ -72,3 +72,22 @@ sudo systemctl stop v2ray.service
 unset http_proxy
 unset https_proxy
 ```
+
+### Install by Docker  
+```shell
+docker pull teddysun/v2ray
+docker run -d -p 9000:10808 --name v2ray -v v2ray:/etc/v2ray teddysun/v2ray
+
+# Config for http proxy  
+sudo apt-get install privoxy
+sudo vim /etc/privoxy/config
+
+# Find this Line, Modify Default running port for Privoxy  
+listen-address 127.0.0.1:10809
+
+# Add this line below to receive http network stream and convert it to socks5 to v2ray
+forward-socks5 / 127.0.0.1:9000 .
+
+# Test using curl
+curl -i google.com --proxy http://127.0.0.1:10809
+```
