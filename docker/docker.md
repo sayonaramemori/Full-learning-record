@@ -103,6 +103,24 @@ docker run -v [path]:/var/lib/mysql --name mysql -d mysql
 
 ```
 
+### Docker Compose  
+1. Use Yaml file as config, often named with compose.yml or docker-compose.yml in a independent directory.  
+```yml
+service: 
+    app1:
+        image: mysql
+        container_name: app1
+        ports:
+            - "80:80"
+        volumes:
+            - app_data:/etc/config
+        environment:
+            - PASSWORD=true
+volumes:
+    app_data: 
+        #external: true
+```
+
 ### Network  
 > Self define network: Every application in the same network can access every one by container name  
 ```shell
