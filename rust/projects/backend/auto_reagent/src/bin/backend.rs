@@ -13,7 +13,7 @@ use AutoReagent::websocket::myws::{Instruction,MyWs,*};
 #[actix_web::main] // or #[tokio::main]
 async fn main() -> std::io::Result<()> {
     dotenvy::dotenv().unwrap();
-    let db_names = ["MYSQL_FLUX_URL","MYSQL_FLUXVICE_URL","MYSQL_PLC_URL"];
+    let db_names = ["flux","fluxVice","plc"];
     let mut sqlx_state = SqlxManager::new();
     for name in db_names { sqlx_state.add_database(name, dotenvy::var(name).unwrap()).await; }
     let app_state = RedisState::new(dotenvy::var("REDIS_PASSWD").unwrap(), dotenvy::var("REDIS_URL").unwrap());
@@ -55,8 +55,8 @@ async fn main() -> std::io::Result<()> {
             // .service(send_instruction)
             // .default_service(web::to(|| HttpResponse::Ok()))
     })
-    .bind("0.0.0.0:8080")?
-    // .bind("localhost:8080")?
+    // .bind("0.0.0.0:8080")?
+    .bind("localhost:8080")?
     .run()
     .await
 }
