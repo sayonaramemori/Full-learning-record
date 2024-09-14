@@ -1,3 +1,5 @@
+## Install V2ray Manually  
+
 ### 1. Open the websites below  
 1. [Get started](https://www.v2ray.com/chapter_00/install.html)
 2. [Release dist](https://github.com/v2ray/dist)  
@@ -73,24 +75,13 @@ unset http_proxy
 unset https_proxy
 ```
 
-### Install by Docker & Usage Trick  
+## After Installation  
+
+### Privoxy for HTTP  
+> HTTP proxy not is not built in v2ray  
 ```shell
-docker pull teddysun/v2ray
-docker run -d -p 9000:10808 --name v2ray -v v2ray:/etc/v2ray teddysun/v2ray
-
-# 1. Using with proxychains  
-sudo apt-get install proxychains
-sudo vim /etc/proxychains.conf
-
-# Delete socks4 and add this line  
-socks5 127.0.0.1 10808
-
-# Test with github, not work for docker pull (deamon running)
-proxychains git clone https://github.com/bhilburn/powerlevel9k.git
-
-
-# 2. Config for http proxy  
 sudo apt-get install privoxy
+
 sudo vim /etc/privoxy/config
 
 # Find this Line, Modify Default running port for Privoxy  
@@ -101,4 +92,22 @@ forward-socks5 / 127.0.0.1:9000 .
 
 # Test using curl
 curl -i google.com --proxy http://127.0.0.1:10809
+```
+
+### Install by Docker & Usage Trick  
+```shell
+docker pull teddysun/v2ray
+
+docker run -d -p 9000:10808 --name v2ray -v v2ray:/etc/v2ray teddysun/v2ray
+
+# Using with proxychains  
+sudo apt-get install proxychains
+
+sudo vim /etc/proxychains.conf
+
+# Delete socks4 and add this line  
+socks5 127.0.0.1 9000
+
+# Test with github, not work for docker pull (deamon running)
+proxychains git clone https://github.com/bhilburn/powerlevel9k.git
 ```
