@@ -73,7 +73,7 @@ unset http_proxy
 unset https_proxy
 ```
 
-### Install by Docker  
+### Install by Docker & Usage Trick  
 ```shell
 docker pull teddysun/v2ray
 docker run -d -p 9000:10808 --name v2ray -v v2ray:/etc/v2ray teddysun/v2ray
@@ -85,7 +85,7 @@ sudo vim /etc/proxychains.conf
 # Delete socks4 and add this line  
 socks5 127.0.0.1 10808
 
-# Test with github  
+# Test with github, not work for docker pull (deamon running)
 proxychains git clone https://github.com/bhilburn/powerlevel9k.git
 
 
