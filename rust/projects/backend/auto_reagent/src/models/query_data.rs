@@ -10,7 +10,7 @@ pub async fn get_data_in_range(pool: &web::Data<SqlxManager>,time_pair:NaiveDate
     let pool = pool.get(db_name).unwrap();
     let query = format!("SELECT val,id,time FROM {table} WHERE time BETWEEN ? AND ?");
     //Any feature currently not support chrono.
-    sqlx::query_as::<MySql,TempRecord<DateTime<Utc>>>(&query)
+    sqlx::query_as::<_,TempRecord<DateTime<Utc>>>(&query)
         .bind(time_pair.0)
         .bind(time_pair.1)
         .fetch_all(pool)
