@@ -1,13 +1,11 @@
 use actix_web::{get, guard, web, App, Error, HttpRequest, HttpResponse, HttpServer};
 use actix_cors::Cors;
-use sqlx::{mysql::MySqlPoolOptions,MySqlPool};
 extern crate AutoReagent;
-use AutoReagent::handlers::MachineButton::*;
-use AutoReagent::handlers::{Login::*,Query::*};
-use AutoReagent::models::{redis_data::RedisState,sqlx_manager::SqlxManager};
+use AutoReagent::handlers::{login::*,monitor::*,machine_panel::*,history_data::*,};
+use AutoReagent::middleware::redis_data;
+use AutoReagent::middleware::{myws::{MyWs,websocket_index},redis_data::RedisState,sqlx_manager::SqlxManager};
 use actix::prelude::Addr;
 use std::sync::{RwLock,Arc};
-use AutoReagent::websocket::myws::{Instruction,MyWs,*};
 
 
 #[actix_web::main] // or #[tokio::main]
@@ -16,15 +14,15 @@ async fn main() -> std::io::Result<()> {
     let db_names = ["flux","fluxVice","plc"];
     let mut sqlx_state = SqlxManager::new();
     for name in db_names { sqlx_state.add_database(name, dotenvy::var(name).unwrap()).await; }
-    let app_state = RedisState::new(dotenvy::var("REDIS_PASSWD").unwrap(), dotenvy::var("REDIS_URL").unwrap());
+    let redis_state= RedisState::new(dotenvy::var("REDIS_PASSWD").unwrap(), dotenvy::var("REDIS_URL").unwrap());
     let addr: Arc<RwLock<Vec<Addr<MyWs>>>> = Arc::new(RwLock::new(vec![]));
     HttpServer::new(move || {
        let cors = Cors::default()
             //  .allow_any_origin()
             //  .allow_any_header()
             //  .allow_any_method()
-             .allowed_origin("http://localhost:5173")
-             .allowed_origin("http://47.92.144.135")
+            //  .allowed_origin("http://localhost:5173")
+            //  .allowed_origin("http://47.92.144.135")
              .supports_credentials()
              .allowed_methods(vec!["GET", "POST"])
              .allowed_headers(vec![actix_web::http::header::AUTHORIZATION, actix_web::http::header::ACCEPT,])
@@ -34,7 +32,7 @@ async fn main() -> std::io::Result<()> {
              .max_age(3600);
         App::new()
             .app_data(web::Data::new(sqlx_state.clone()))
-            .app_data(web::Data::new(app_state.clone()))
+            .app_data(web::Data::new(redis_state.clone()))
             .app_data(web::Data::new(addr.clone()))
             .wrap(cors)
             .service(findlast)

@@ -1,19 +1,13 @@
 use chrono::prelude::*;
 use serde::{Deserialize,Serialize};
+use sqlx::FromRow;
 use std::convert::From;
 use super::record::Record;
 
 
 
-#[derive(Deserialize,Serialize,Debug)]
-pub struct DateTimeRng(pub NaiveDateTime,pub NaiveDateTime);
-#[derive(Deserialize,Serialize,Debug)]
-pub struct DateTimeRange {
-    pub start: String, // or chrono::NaiveDateTime if you want to parse dates
-    pub end: String,   // or chrono::NaiveDateTime
-}
 
-#[derive(Deserialize,Serialize,Default,Clone,sqlx::FromRow,Debug)]
+#[derive(Deserialize,Serialize,Default,Clone,Debug,FromRow)]
 pub struct TempRecord<T>
 {
     pub val: f64,
@@ -40,6 +34,7 @@ impl From<TempRecord<DateTime<Utc>>> for TempRecord<NaiveDateTime>{
         }
     }
 }
+
 impl From<(Record,i64)> for TempRecord<String> {
     fn from(value: (Record,i64)) -> TempRecord<String> {
         let (record,id) = value;
@@ -52,10 +47,3 @@ impl From<(Record,i64)> for TempRecord<String> {
     }
 }
 
-#[derive(Deserialize,Serialize,Default,Debug)]
-pub struct HistoryData<T>
-{
-    pub average: f64,
-    pub total_time: f64,
-    pub records: Vec<TempRecord<T>>,
-}

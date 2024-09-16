@@ -1,5 +1,5 @@
-extern crate client_test;
-use client_test::example::auto_reagent::*;
+extern crate opcua_client;
+use opcua_client::example::auto_reagent::*;
 use tokio;
 
 #[tokio::main]

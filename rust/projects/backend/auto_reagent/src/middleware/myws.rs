@@ -1,6 +1,6 @@
 use actix_web::{get, guard, web, App, Error, HttpRequest, HttpResponse, HttpServer};
 use serde_json;
-use crate::handlers::{Login::*,Query::*};
+use crate::handlers::{login::*,monitor::*};
 use std::sync::{RwLock,Arc};
 use actix_web_actors::ws;
 use actix::prelude::*;

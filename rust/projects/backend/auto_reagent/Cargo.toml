@@ -10,7 +10,7 @@ actix-rt = "2.9.0"
 actix-cors = "0.6.5"
 serde = { version = "1.0.188", features = ["derive"]}
 chrono = { version = "0.4.31", features = ["serde"]}
-sqlx = { version = "0.8.2", features = ["mysql", "runtime-tokio", "chrono","tls-rustls-ring"] }
+sqlx = { version = "0.8.2", features = ["mysql", "postgres", "sqlite","runtime-tokio", "chrono","tls-rustls-ring"] }
 rustls = "=0.23.13"
 
 redis = { version = "0.25.4", features = ["tokio-comp"] }

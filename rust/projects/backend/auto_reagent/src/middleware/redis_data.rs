@@ -81,6 +81,11 @@ impl RedisState {
         redis::cmd("GET").arg(key).query_async::<_,String>(&mut conn).await
     }
 
+    pub async fn del(&self,key:&str) ->RedisResult<()>{
+        let mut conn = self.get_auth_connection().await?;
+        redis::cmd("DEL").arg(key).query_async::<_,()>(&mut conn).await
+    }
+
     pub async fn rpush(&self,key:&str,args:Vec<String>,) ->RedisResult<()>{
         let mut conn = self.get_auth_connection().await?;
         let mut cmd = redis::cmd("RPUSH");

@@ -1,4 +1,3 @@
-use client_test::opcua_config::opcua_session_wrapper::OpcuaSession;
 use tokio_tungstenite::connect_async;
 
 use tokio_tungstenite::tungstenite::protocol::Message;
@@ -11,10 +10,11 @@ use tokio::net::TcpStream;
 use futures::stream::{StreamExt,SplitStream,SplitSink};
 use futures::SinkExt;
 
-use AutoReagent::models::redis_data::RedisState as RedisData;
-use client_test::opcua_config::data_adaptor::unit::Instruction::Instruction;
+use AutoReagent::middleware::redis_data::RedisState as RedisData;
+use opcua_client::opcua_config::data_adaptor::unit::Instruction::Instruction;
+use opcua_client::opcua_config::opcua_session_wrapper::OpcuaSession;
 // use client_test::opcua_config::data_adaptor::interface::transfer::InstructionInfo;
-use client_test::debug_println;
+use opcua_client::debug_println;
 
 
 
