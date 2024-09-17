@@ -6,7 +6,7 @@ use crate::models::entities::prelude::*;
 use crate::handlers::entities::date_time_range::*;
 
 /// Query the datas between the given time range.
-pub async fn get_data_in_range(pool: &web::Data<SqlxManager>,time_pair:NaiveDateTimeRng,db_name:&str,table:&str) -> Result<Vec<TempRecord<DateTime<Utc>>>,sqlx::Error> {
+pub async fn get_data_in_range(pool: &web::Data<SqlxManager>,time_pair:(NaiveDateTime,NaiveDateTime),db_name:&str,table:&str) -> Result<Vec<TempRecord<DateTime<Utc>>>,sqlx::Error> {
     let pool = pool.get(db_name).unwrap();
     let query = format!("SELECT val,id,time FROM {table} WHERE time BETWEEN ? AND ?");
     //Any feature currently not support chrono.

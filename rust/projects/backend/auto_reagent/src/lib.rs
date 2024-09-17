@@ -1,5 +1,6 @@
 pub mod handlers;
 pub mod models;
+pub mod utility;
 pub mod middleware;
 
 #[macro_export]

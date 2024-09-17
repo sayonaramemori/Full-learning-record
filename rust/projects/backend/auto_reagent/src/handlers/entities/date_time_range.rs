@@ -7,6 +7,4 @@ pub struct StringDateTimeRng {
     pub end: String,   // or chrono::NaiveDateTime
 }
 
-#[derive(Deserialize,Serialize,Debug)]
-pub struct NaiveDateTimeRng(pub NaiveDateTime,pub NaiveDateTime);
 

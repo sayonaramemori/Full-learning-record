@@ -18,7 +18,7 @@ async fn main() -> std::io::Result<()> {
     let addr: Arc<RwLock<Vec<Addr<MyWs>>>> = Arc::new(RwLock::new(vec![]));
     HttpServer::new(move || {
        let cors = Cors::default()
-            //  .allow_any_origin()
+             .allow_any_origin()
             //  .allow_any_header()
             //  .allow_any_method()
             //  .allowed_origin("http://localhost:5173")
@@ -53,8 +53,8 @@ async fn main() -> std::io::Result<()> {
             // .service(send_instruction)
             // .default_service(web::to(|| HttpResponse::Ok()))
     })
-    .bind("0.0.0.0:8080")?
-    // .bind("localhost:8080")?
+    // .bind("0.0.0.0:8080")?
+    .bind("localhost:8080")?
     .run()
     .await
 }
