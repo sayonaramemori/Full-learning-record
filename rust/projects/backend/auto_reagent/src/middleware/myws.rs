@@ -63,7 +63,6 @@ async fn send_instruction(
     }
 }
 pub struct MyWs;
-
 impl Actor for MyWs { type Context = ws::WebsocketContext<Self>; }
 
 //handle receive
