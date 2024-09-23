@@ -1,6 +1,6 @@
 services:
  rustp:
-  image: backend:1.3
+  image: rust-test
   restart: always
   ports:
    - "8080:8080"
