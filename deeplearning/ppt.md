@@ -28,5 +28,16 @@
 ![neural](./img/neural.jpg)
 
 
+### Gradient Descent
+
+#### True Power -- Chain Rule  
+![backpropagation](./img/backpropagation.jpg)
+
+#### Batch Size  
+> For an iteration, the train data set with specific size is considered for parameter updating.  
+$\theta = \theta - \eta\times\frac{1}{N}\sum_{i}^N$
+
+
+
 
 
