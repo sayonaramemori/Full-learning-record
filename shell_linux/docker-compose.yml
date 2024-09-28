@@ -1,0 +1,66 @@
+services:
+  privoxy1:
+    image: ajoergensen/privoxy
+    restart: always
+    ports:
+      - "1001:10809"
+    volumes:
+      - g1:/etc/privoxy
+    networks:
+      - proxy
+
+  v1:
+    image: teddysun/v2ray
+    restart: always
+    volumes:
+      - g1:/etc/v2ray
+    networks:
+      - proxy
+
+  privoxy2:
+    image: ajoergensen/privoxy
+    restart: always
+    ports:
+      - "1002:10809"
+    volumes:
+      - g2:/etc/privoxy
+    networks:
+      - proxy
+  v2:
+    image: teddysun/v2ray
+    restart: always
+    volumes:
+      - g2:/etc/v2ray
+    networks:
+      - proxy
+
+
+  privoxy3:
+    image: ajoergensen/privoxy
+    restart: always
+    ports:
+      - "1003:10809"
+    volumes:
+      - g3:/etc/privoxy
+    networks:
+      - proxy
+
+  v3:
+    image: teddysun/v2ray
+    restart: always
+    volumes:
+      - g3:/etc/v2ray
+    networks:
+      - proxy
+
+networks:
+  proxy:
+
+volumes:
+  g1:
+    external: true
+  g2:
+    external: true
+  g3:
+    external: true
+

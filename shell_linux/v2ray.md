@@ -111,3 +111,40 @@ socks5 127.0.0.1 9000
 # Test with github, not work for docker pull (deamon running)
 proxychains git clone https://github.com/bhilburn/powerlevel9k.git
 ```
+
+### Deploy in LAN via Docker compose  
+> Only one node will be exported even multiple nodes selected.  
+
+1. In volume g1, you should copy all files located in /etc/privoxy/*
+    > config.json file for v2ray  
+    > config file(without suffix) for privoxy  
+2. Config your PC settings of proxy for happiness :D
+
+```yml
+services:
+  privoxy1:
+    image: ajoergensen/privoxy
+    restart: always
+    ports:
+      - "1001:10809"
+    volumes:
+      - g1:/etc/privoxy
+    networks:
+      - proxy
+
+  v1:
+    image: teddysun/v2ray
+    restart: always
+    volumes:
+      - g1:/etc/v2ray
+    networks:
+      - proxy
+
+networks:
+  proxy:
+
+volumes:
+  g1:
+    external: true
+```
+
