@@ -1,3 +1,6 @@
+### Help  
+> Select the confusing block, then press F1  
+
 ### Data Type  
 |Type|Number of bit|Explain|  
 |:--|:--|:--| 
@@ -31,8 +34,28 @@
 |S|Set 1 for specific successive bits|
 |R|Reset 0 for specific succesive bits|
 
+### Teleport  
+> Assign value  
 
-P19
+### Transform   
+> Data Type Conversion  
+
+### Comparison  
+
+### Clock  
+> Data Type is INT  
+> Different Resolution(1ms,10ms,100ms)  
+
+1. TON(100ms)  
+    > Times x Resolution = Total Time  
+    > Restore when no electricty
+2. TONR  
+    > Times x Resolution = Total Time  
+    > Keep time record even no electricty  
+    > Using Reset Cmd to Restore  
+
+
+
 
 
 

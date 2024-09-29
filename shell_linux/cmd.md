@@ -142,3 +142,7 @@ find [PATH] -type f -exec chmod 666 {} \;
 find [PATH] -type f | xargs chmod 666 
 ```
 
+### Time Zone  
+```shell
+timedatectl list-timezones
+```
