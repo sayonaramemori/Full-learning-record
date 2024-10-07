@@ -543,10 +543,80 @@ int main()
 
 ### move constructor & move operator=  
 > A shallow copy; constructor but take care of memory leakage.    
-
 > `std::move` converts a lvalue to rvalue, to call move method.  
 ```
+#include <iostream>
+#include <memory>
+#include <cstring>
 
+class String 
+{
+public:
+    ~String(){
+        std::cout<<"destroyed"<<std::endl;
+        delete ptr;
+    }
+    String() = delete;
+    String(const char* s){
+        std::cout<<"constructed"<<std::endl;
+        size = strlen(s) + 1;
+        ptr = new char[size];
+        memcpy(ptr,s,size);
+    };
+    String(const String& s){
+        std::cout<<"Copyed"<<std::endl;
+        this->size = s.size;
+        this->ptr = new char[size];
+        memcpy(ptr,s.ptr,size);
+    };
+    String(String&& s){
+        std::cout<<"Moved"<<std::endl;
+        this->size = s.size;
+        this->ptr = s.ptr;
+        s.size = 0;
+        s.ptr = nullptr;
+    }
+    String& operator=(const String& s){
+        if(&s == this){
+            return *this;
+        }
+        std::cout<<"Assign"<<std::endl;
+        delete this->ptr;
+        this->size = s.size;
+        this->ptr = new char[s.size];
+        memcpy(ptr,s.ptr,size);
+        return *this;
+    }
+    String& operator=(String&& s){
+        if(&s == this){
+            return *this;
+        }
+        std::cout<<"Moved Assign"<<std::endl;
+        delete this->ptr;
+        this->ptr = s.ptr;
+        this->size = s.size;
+        s.ptr = nullptr;
+        s.size = 0;
+        return *this;
+    }
+private:
+    size_t size;
+    char *ptr;
+};
+
+int main()
+{
+//constructor
+String a("java");
+//copy constructor
+String b = a;
+//move constructor
+String c = std::move(a);
+//assgin
+c = b;
+//move assgin
+c = std::move(b);
+}
 ```
 
 ### Async  
