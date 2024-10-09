@@ -7,37 +7,80 @@
 template<typename T>
 class List 
 {
-public:
-    List():head(nullptr),tail(nullptr){}
-    ~List(){
+    class ListNode
+    {
+    public:
+        ListNode(const T& v):val(v){}
+        ListNode(const ListNode& v) = delete;
+        ListNode() = delete;
+        ListNode& operator=(const ListNode& v) = delete;
+        ListNode& operator=(ListNode&& v) = delete;
+        ListNode* pre = nullptr;
+        ListNode* next = nullptr;
+        T val;
+    };
+
+private:
+    void destory()
+    {
         for(auto cur=this->head;cur!=nullptr;){
             auto next = cur->next;
             delete cur;
             cur = next;
         }
+        this->head = nullptr;
+        this->tail = nullptr;
     }
-
-    typedef struct ListNode
-    {
-        ListNode(const T& v):pre(nullptr),next(nullptr),val(v){}
-        ListNode* pre;
-        ListNode* next;
-        T val;
-    };
-
-    void reverse() 
-    {
-        std::swap(head,tail);
+public:
+    List(){}
+    ~List(){
+        this->destory();
     }
-
+    // Important: remember to initialize  
+    List(const List& rhv)
+    {
+        LOG("COPY constructor");
+        for(ListNode* cur = rhv.head;cur!=nullptr;cur=cur->next)
+        {
+            this->append(cur->val);
+        }
+    }
+    List(List&& rhv) 
+    {
+        LOG("MOVE constructor");
+        this->head = rhv.head;
+        this->tail = rhv.tail;
+        rhv.tail = rhv.head = nullptr;
+    }
+    List& operator=(const List& rhv)
+    {
+        if(&rhv == this)return *this;
+        this->destory();
+        LOG("COPY Assgin");
+        for(ListNode* cur = rhv.head;cur!=nullptr;)
+        {
+            this->append(cur->val);
+            cur=cur->next;
+        }
+    }
+    List& operator=(List&& rhv)
+    {
+        if(&rhv == this)return *this;
+        this->destory();
+        LOG("MOVE Assgin");
+        this->head = rhv.head;
+        this->tail = rhv.tail;
+        rhv.tail = rhv.head = nullptr;
+    }
+    
     T& append(const T& temp){
-        ListNode* tail = new ListNode(temp);
+        ListNode* new_tail = new ListNode(temp);
         if(this->head==nullptr){
-            this->head = this->tail = tail;
+            this->head = this->tail = new_tail;
         }else{
-            tail->pre = this->tail;
-            this->tail->next = tail;
-            this->tail = tail;
+            new_tail->pre = this->tail;
+            this->tail->next = new_tail;
+            this->tail = new_tail;
         }
         return tail->val;
     }
@@ -145,8 +188,8 @@ public:
     }
 
 private:
-    ListNode* head;
-    ListNode* tail;
+    ListNode* head = nullptr;
+    ListNode* tail = nullptr;
     template<typename U> friend std::ostream& operator<<(std::ostream& os, List<U>& list); 
 };
 
@@ -182,13 +225,9 @@ int main()
     a.insert_after(target,val);
     auto res = a.remove_if([](const int& v){return v%2==0;});
 
-    a.reverse();
     std::cout<<a<<std::endl;
-    for(auto &i:res.value_or(std::vector<int>{})){
-        std::cout<<i<<std::endl;
-    }
-    if(int a=10){
-        std::cout<<a<<std::endl;
-    }
-        std::cout<<a<<std::endl;
+    List<int> b = a;
+    std::cout<<b<<std::endl;
+
+    //for(auto &i:res.value_or(std::vector<int>{})){ std::cout<<i<<std::endl; }
 }

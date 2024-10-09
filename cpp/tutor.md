@@ -3,29 +3,48 @@
 2. Download it the and just follow its wizards  
 3. `pacman -S make` to install make for cmake using.  
 4. If your PC has installed VisualStudio, your should do:  
+
 ```shell
 # open msys2 terminal
 pacman -S make  
 
-# Specify MinGW Makefiles generator
+# Specify MinGW Makefiles generator in terminal  
 cmake -G "MinGW Makefiles" ..
 
 # Search make, may be it named with mingw32-make
 ```
 
+### Head File Guard  
+```c
+// g++ support this feature
+#pragma once
+
+//or using macro  
+#ifndef NOTATION_OF_THIS_FILE
+#define NOTATION_OF_THIS_FILE
+// Your code here
+#endif
+```
 
 ### Pre-Process for include and complie   
 > Preprocess -> Compile -> Link  
 > Simply paste them here  
 
 > Compile independently then link the needed function entities compiled. So you can compile successful only with function declaration but fails when linking if no implementation.  
- 
+
 ### Linking  
  > static(outsides of class) keyword denotea only visable inside its own file when linking.  
  
  > Link every necessay(used) unit COMPILED  
 
  > Standard develop flowsheet: Write declaration in head file then including them in main.cpp. The implementations can be anywhere.  
+ 
+ ```mermaid
+ flowchart LR
+    A(Source Code) -->|Preprocess| B(Code with Pasted contents)
+    B -->|Compile| C(Machine code unit)
+    C -->|Link| D(Executable file or library)
+ ```
 
 ### Variable in CPP  
 > For bool 0 is false and !0 is true, occupys a byte.  
@@ -214,7 +233,7 @@ enum Status {
 Status status = Good;
 ```
 
-### array  
+### Native Array  
 ```cpp
 int example[10];
 example[3] = 5;
@@ -231,7 +250,6 @@ example[2] = 5;
 //Calculate Size, only works on stack
 int a[5];
 int count = sizeof(a)/sizeof(int);
-
 ```
 
 
@@ -315,22 +333,49 @@ std::ostream& operator<<(std::ostream& stream, const Entity& other){}
 ### Smart Pointer  
 > Automatically new and delete, preventing us from memery leakage  
 ```cpp
+#include <iostream>
 #include <memory>
-int main(){
-    {
-        std::unique_ptr<Entity> entity(new Entity());
-        entity->print();
+
+class MyClass {
+public:
+    MyClass() { std::cout << "MyClass constructed!" << std::endl; }
+    ~MyClass() { std::cout << "MyClass destroyed!" << std::endl; }
+    void greet() { std::cout << "Hello from MyClass!" << std::endl; }
+};
+
+int main() {
+    // Create a unique_ptr to manage a MyClass instance
+    std::unique_ptr<MyClass> ptr1 = std::make_unique<MyClass>();
+    ptr1->greet();
+
+    // Transfer ownership to another unique_ptr
+    std::unique_ptr<MyClass> ptr2 = std::move(ptr1);
+
+    if (!ptr1) {
+        std::cout << "ptr1 is now null after ownership transfer." << std::endl;
     }
-        std::shared_ptr<Entity> entity = std::make_shared<Entity>();
-    //Destroyed here
+
+    // Use ptr2 to access MyClass
+    ptr2->greet();
+
+    // Resetting ptr2 (deletes the managed object)
+    ptr2.reset();
+
+    // At this point, MyClass has been destroyed, and ptr2 is now null
+    if (!ptr2) {
+        std::cout << "ptr2 is now null after reset." << std::endl;
+    }
+
+    return 0;
 }
 ```
 
 ### Copy Constructor  
 > A constructor receiving `const type&`  
+
 > Default copy member(shallow copy)  
 ```cpp
-// Add your copy constructor for deep copy  
+// Define your copy constructor for deep copy  
 ```
 
 ### Arrow operator  
@@ -386,6 +431,7 @@ int main()
 > `[capture mode](paras)->ret{body}`
 
 ### Thread  
+
 
 ### Chrono  
 ```cpp
@@ -541,6 +587,30 @@ int main()
 }
 ```
 
+### Overload in inheritence  
+1. If a virtual method, no influence  
+2. If not a virtual method, one in the sub-class hides the all of the base.  
+
+### Initialize class members  
+> In C++, there are three common ways to initialize class members:  
+
+1. Initializer List (in the constructor).  
+    - Members are initialized directly, which is usually more efficient because it avoids a default initialization followed by assignment.  
+    - Certain types of members (like const, references, and members of classes without a default constructor) must be initialized in the initializer list.  
+2. Constructor Function Body.  
+    - Members are first default-initialized (or zero-initialized if they are fundamental types), then they are assigned new values in the constructor body.  
+    - This can lead to inefficient code because the member is initialized twice (first the default initialization, then the assignment).  
+3. In-line Initialization (in the declaration of the member variable).  
+    - This is useful when you want to provide a default value for a member, which is used unless the constructor provides an alternative initialization.  
+
+
+|Method  |Description |Use Case    |Performance |Limitations|
+|:--:|:--:|:--:|:--:|:--:|
+|Initializer List    |Initializes members directly in the initializer list.   |Best for efficiency, required for const and references, and base classes.   |Most efficient, avoids double initialization.   |Required for const and references.|  
+|Constructor Body    |Initializes members after they are default-initialized.| Use when initialization depends on complex logic.|   Can be less efficient (double initialization).|  Cannot be used for const and references. | 
+|In-line Declaration |Initializes members at their point of declaration.  |Good for default values that don't change often.   | Efficient like initializer list for default values.| Overridden by constructor initialization.|  
+
+
 ### move constructor & move operator=  
 > A shallow copy; constructor but take care of memory leakage.    
 > `std::move` converts a lvalue to rvalue, to call move method.  
@@ -620,5 +690,4 @@ c = std::move(b);
 ```
 
 ### Async  
-
 

@@ -14,39 +14,18 @@ iptables -t filter -I DOCKER -s IP -p tcp -dport [container-port] -j DROP
 ### Architecture  
 1. Four tables with five chains  
 2. Table order: raw --> mangle --> nat --> filter  
-```
-                                XXXXXXXXXXXXXXXXXX
-                              XXX     Network    XXX
-                                XXXXXXXXXXXXXXXXXX
-                                        +
-                                        |
-                                        v
-+-------------+              +------------------+
-|table: filter| <---+        | table: nat       |
-|chain: INPUT |     |        | chain: PREROUTING|
-+-----+-------+     |        +--------+---------+
-      |             |                 |
-      v             |                 v
-[local process]     |           ****************          +--------------+
-      |             +---------+ Routing decision +------> |table: filter |
-      v                         ****************          |chain: FORWARD|
-****************                                           +------+-------+
-Routing decision                                                  |
-****************                                                  |
-      |                                                           |
-      v                         ****************                  |
-+-------------+       +------>  Routing decision  <---------------+
-|table: nat   |       |         ****************
-|chain: OUTPUT|       |               +
-+-----+-------+       |               |
-      |               |               v
-      v               |      +-------------------+
-+--------------+      |      | table: nat        |
-|table: filter | +----+      | chain: POSTROUTING|
-|chain: OUTPUT |             +--------+----------+
-+--------------+                      |
-                                      v
-                              XXXXXXXXXXXXXXXXXX
-                             XXX    Network    XXX
-                              XXXXXXXXXXXXXXXXXX
+
+```mermaid
+---
+    title: Top -> Bottom Traffic road map
+---
+flowchart TB
+    A{Network} -->|IN| B[Table: nat <br> Chain: PREROUTING]
+    B -->|TO ME| D[Table: filter <br> Chain: INPUT]
+    B -->|NOT TO ME| E[Table: filter <br> Chain: FORWARD]
+    D --> G[Local Process]
+    G --> H[Table: nat <br> Chain: OUTPUT]
+    H --> I[Table: filter <br> Chain: OUTPUT]
+    I & E --> K[Routing decision]
+    K -->|OUT| L{NetWork}
 ```
