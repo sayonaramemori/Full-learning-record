@@ -25,59 +25,6 @@ nmap -v -sn 192.168.xx.0/20
 ### Rename host
 > `hostnamectl set-hostname [name]`
 
-### User add
-```shell
-'''default config /etc/default/useradd
-'''-m denote create HOME
-useradd -m [name]
-'''show default config
-useradd -D 
-```
-
-### bg work
-```shell
-cmd &
-nohup cmd
-jobs -l
-'''restart bg job
-bg [num]
-# bring back to fore ground
-fg
-```
-
-### File descriptor  
-|descriptor|acronym|description|
-|:----|:-----|:------|
-|0|STDIN||
-|1|STDOUT||
-|2|STDERR||
-```shell
-'''Temporarily impose to output to descriptor, add & to >n
-echo "This is err" >&2
-ls 1> res.txt
-
-'''force output to specified file, often used in shell script
-'''stdout to outputfile and stderr to outputerr
-exec 1>outputfile
-exec 2>outputErr
-
-'''create your won file descriptor
-exec 3>outputfile
-ls >&3
-'''or append
-exec 3>>outputfile
-
-'''redirect descriptor
-'''3 redirect ro 1
-exec 3>&1
-
-'''close descriptor, use &-
-exec 3>&-
-
-'''prevent output
-ls -al > /dev/null
-```
-
 ### Set static IP for Ubuntu
 ```shell
 cd /etc/netplan
@@ -96,17 +43,6 @@ network:
             gateway4: 192.168.31.1
             nameservers:
                 addresses: [223.5.5.5,114.114.114.114]
-```
-
-### chmod with find
-```shell
-# for directory
-find [PATH] -type d -exec chmod 755 {} \;
-find [PATH] -type d | xargs chmod 755
-
-# for file
-find [PATH] -type f -exec chmod 666 {} \;
-find [PATH] -type f | xargs chmod 666 
 ```
 
 ### Amazing relaxing tools

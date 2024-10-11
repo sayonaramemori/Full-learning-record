@@ -2,6 +2,7 @@ use tokio::time::sleep;
 use tokio::sync::broadcast::{self,Sender,Receiver};
 use mysql::*;
 use std::sync::Arc;
+use std::usize;
 use crate::debug_println;
 use crate::opcua_config::opcua_session_wrapper::OpcuaSession;
 use super::interface::collect::StoreValueTime;
@@ -9,6 +10,7 @@ use super::interface::collect::StoreValueTime;
 pub struct DataCollector<T: Send + Sync> {
     target: String,
     sender: Arc<Sender<T>>,
+    //default 1
     collect_interval: usize,
     endpoint_url: String,
 }
@@ -59,6 +61,10 @@ where T: 'static + Clone + Send + Sync + StoreValueTime
 
     pub fn subscribe(&self) -> Receiver<T>{
         self.sender.subscribe()
+    }
+
+    pub fn set_interval(&mut self, interval:usize){
+        self.collect_interval = interval;
     }
 }
 

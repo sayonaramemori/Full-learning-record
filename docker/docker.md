@@ -147,10 +147,3 @@ docker network connect [network-name] [container]
 docker network disconnect [network-name] [container]
 ```
 
-### Example for v2  
-1. pull from remote repository  
-2. run with specified ports  
-3. configure firewall for your computer  
-4. export http\_proxy in terminal
-
-

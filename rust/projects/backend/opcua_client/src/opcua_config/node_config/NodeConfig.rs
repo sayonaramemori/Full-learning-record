@@ -33,7 +33,9 @@ impl NodeConfig {
     pub async fn new() -> NodeConfig{
         //This unwrap only happens at init stage, so it is safe
         let res = tokio::task::spawn_blocking(move||{
-            let content = std::fs::read_to_string("C:\\Users\\13427\\Desktop\\code\\linux-tools\\rust\\projects\\backend\\opcua_client\\src\\opcua_config\\node_config\\config.yml").unwrap();
+            dotenvy::dotenv().unwrap();
+            let path = dotenvy::var("NODE_CONFIG").expect("No config.yml provided or error path of config.yml");
+            let content = std::fs::read_to_string(path).unwrap();
             serde_yml::from_str::<NodeConfig>(&content).unwrap()
         }).await.unwrap();
         Self::init_node_store(res)
@@ -60,6 +62,8 @@ impl NodeConfig {
         config
     }
     
+    /// Return a DataType specified with the tag
+    /// None if no such tag in config.yml
     pub fn get_type(&self,tag:&str) -> Option<DataType> {
         let res = self.node_built.as_ref().unwrap().get(tag);
         match res{
@@ -69,6 +73,7 @@ impl NodeConfig {
     }
                     
     //this unwrap is safe due to it has been initialized
+    /// None if no such tag in config.yml
     pub fn get_node(&self,tag:&str) -> Option<NodeId> {
         let res = self.node_built.as_ref().unwrap().get(tag);
         match res {
@@ -77,7 +82,8 @@ impl NodeConfig {
         }
     }
 
-    //Get a variant with the same type of specific tag, set value
+    /// Get a variant with the same type of specific tag, with specified value set.
+    /// None if no such tag in config.yml
     pub fn get_variant(&self,tag:&str,val:String) -> Option<Variant>{
         if let Some(dt) = Self::get_type(self, tag){
             match dt {

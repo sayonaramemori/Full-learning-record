@@ -1,7 +1,7 @@
 use std::convert::From;
 use chrono::prelude::NaiveDateTime;
 
-use crate::opcua_config::data_adaptor::interface::collect::StoreValueTime;
+use crate::opcua_config::data_adaptor::interface::collect::RetrieveDataTime;
 
 #[derive(Default,Debug)]
 pub struct Temperature {
@@ -10,7 +10,7 @@ pub struct Temperature {
 }
 
 impl<T> From<T> for Temperature 
-where T: StoreValueTime
+where T: RetrieveDataTime 
 {
     fn from(value: T) -> Self {
         let val = value.get_value().parse::<f64>().unwrap_or(0.1234567);

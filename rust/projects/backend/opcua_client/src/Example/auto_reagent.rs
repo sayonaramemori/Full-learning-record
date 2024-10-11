@@ -3,15 +3,16 @@ use sqlx::{MySql, Pool};
 use tokio::time::sleep;
 use tokio::sync::broadcast::Receiver;
 use mysql::*;
-use AutoReagent::models::redis_data::RedisState as RedisData;
+use AutoReagent::middleware::redis_data::RedisState as RedisData;
 
 use crate::entity::temperature::Temperature;
 use crate::debug_println;
 use crate::opcua_config::data_adaptor::{collector::DataCollector,unit::DataTime::DataTime};
 type MyResult<T> = Result<T,Box<dyn std::error::Error + Send + Sync>>;
 
-//To redis for query from front end
-async fn to_redis_list(mut recv: Receiver<DataTime>,target:&'static str,) -> MyResult<()>
+/// Collect data to redis for query from frontend.
+/// This funtion run in a loop, return when error occuers.
+pub async fn to_redis_list(mut recv: Receiver<DataTime>,target:&'static str,) -> MyResult<()>
 {
     let redis_passwd:String = dotenvy::var("REDIS_PASSWD").unwrap();
     let redis_url:String = dotenvy::var("REDIS_URL").unwrap();
@@ -23,7 +24,9 @@ async fn to_redis_list(mut recv: Receiver<DataTime>,target:&'static str,) -> MyR
     Ok(())
 }
 
-async fn to_redis_str(mut recv: Receiver<DataTime>,target:&'static str,)-> MyResult<()>
+/// To simply write a new value to a specific redis key.
+/// This funtion run in a loop, return when error occuers.
+pub async fn to_redis_str(mut recv: Receiver<DataTime>,target:&'static str,)-> MyResult<()>
 {
     let redis_passwd:String = dotenvy::var("REDIS_PASSWD").unwrap();
     let redis_url:String = dotenvy::var("REDIS_URL").unwrap();
@@ -35,7 +38,8 @@ async fn to_redis_str(mut recv: Receiver<DataTime>,target:&'static str,)-> MyRes
     Ok(())
 }
 
-async fn insert_data(pool: &Pool<MySql>, data: &Vec<Temperature>, sql: &String) -> MyResult<()>
+/// Insert data to 
+pub async fn insert_data(pool: &Pool<MySql>, data: &Vec<Temperature>, sql: &String) -> MyResult<()>
 {
     let mut transaction = pool.begin().await.map_err(|e| format!("Transaction error for {e}"))?;
     for entry in data {
@@ -68,24 +72,27 @@ async fn flux_to_mysql(mut recv: Receiver<DataTime>,url:String) -> MyResult<()>
     let insert_cmd = format!("INSERT INTO {table}(val,time) VALUES (?, ?)");
     let mut records:Vec<Temperature> = vec![];
     loop {
-        if let Ok(pool) = MySqlPoolOptions::new().connect(&url).await {
-            if let Ok(_) = sqlx::query::<MySql>(&creat_cmd).execute(&pool).await {
-                while let Ok(msg) = recv.try_recv(){ records.push(Temperature::from(msg)); }
-                match insert_data(&pool, &records, &insert_cmd).await {
-                    Ok(_) => {
-                        debug_println!("Successfully store data to MySql");
-                        records.clear(); 
-                    },
-                    Err(e) => debug_println!("Fail to store data to MySql for {e}"),
+        match MySqlPoolOptions::new().connect(&url).await {
+            Ok(pool) => {
+                if let Ok(_) = sqlx::query::<MySql>(&creat_cmd).execute(&pool).await {
+                    while let Ok(msg) = recv.try_recv(){ records.push(Temperature::from(msg)); }
+                    match insert_data(&pool, &records, &insert_cmd).await {
+                        Ok(_) => {
+                            debug_println!("Successfully store data to MySql");
+                            records.clear(); 
+                        },
+                        Err(e) => debug_println!("Fail to store data to MySql for {e}"),
+                    }
+                    sleep(std::time::Duration::from_secs(300)).await;
+                }else{
+                    debug_println!("Query mysql failed, try agian after 5s");
+                    sleep(std::time::Duration::from_secs(5)).await;
                 }
-                sleep(std::time::Duration::from_secs(300)).await;
-            }else{
-                debug_println!("Query mysql failed, try agian after 5s");
+            },
+            Err(e) => {
+                debug_println!("Connect database failed, for {:?} try agian after 5s",e);
                 sleep(std::time::Duration::from_secs(5)).await;
             }
-        }else{
-            debug_println!("Connect database failed, try agian after 5s");
-            sleep(std::time::Duration::from_secs(5)).await;
         }
     }
 }
@@ -119,6 +126,7 @@ async fn gain_status(collector:DataCollector<DataTime>,target:&'static str,)-> M
 }
 
 async fn record_to_redis_mysql(collector:DataCollector<DataTime>,target:&'static str,mysql_url:String,)->MyResult<()>{
+    println!("Url is {mysql_url}");
     let j1 = tokio::spawn(flux_to_mysql(collector.subscribe(),mysql_url));
     let j2 = tokio::spawn(to_redis_list(collector.subscribe(),target,));
     let j3 = tokio::spawn(trim_record(3600,600,target,));
@@ -142,8 +150,8 @@ pub async fn do_record() -> MyResult<()>{
         gain_status(sp_vice_colletor,"setpointViceStatus",),
         gain_status(switch_colletor,"switchStatus",),
         gain_status(switch_vice_colletor,"switchViceStatus",),
-        record_to_redis_mysql(flux_colletor,"flux",dotenvy::var("MYSQL_FLUX_URL").unwrap(),),
-        record_to_redis_mysql(flux_vice_colletor,"fluxVice",dotenvy::var("MYSQL_FLUXVICE_URL").unwrap(),),
+        record_to_redis_mysql(flux_colletor,"flux",dotenvy::var("flux").unwrap(),),
+        record_to_redis_mysql(flux_vice_colletor,"fluxVice",dotenvy::var("fluxVice").unwrap(),),
     )?;
     Ok(())
 }

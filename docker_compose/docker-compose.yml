@@ -1,4 +1,13 @@
 services:
+ rustp:
+  image: rust-test
+  restart: always
+  ports:
+   - "8080:8080"
+  depends_on:
+   - redis
+   - mysql
+
  redis:
   build:
    context: .
@@ -17,6 +26,11 @@ services:
    - mysql_data:/var/lib/mysql
   environment:
    - MYSQL_ROOT_PASSWORD=121234
+   - flux="mysql://root:121234@mysql/flux?ssl-mode=DISABLED"
+   - plc="mysql://root:121234@mysql/plc?ssl-mode=DISABLED"
+   - fluxVice="mysql://root:121234@mysql/fluxVice?ssl-mode=DISABLED"
+   - REDIS_PASSWD="Iloveyouxuwu121234"
+   - REDIS_URL="redis://:Iloveyouxuwu121234@redis"
 
 volumes:
  mysql_data:

@@ -12,14 +12,15 @@ sudo apt-get update
 ```
 
 ### For docker  
+> Remove proxy by remove docker.service.d  
 ```shell
 sudo mkdir -p /etc/systemd/system/docker.service.d
 sudo vim /etc/systemd/system/docker.service.d/http-proxy.conf
 
 ### Add these 
 [Service]
-Environment="HTTP_PROXY=http://127.0.0.1:10808/"
-Environment="HTTPS_PROXY=http://127.0.0.1:10808/"
+Environment="HTTP_PROXY=http://127.0.0.1:10809/"
+Environment="HTTPS_PROXY=http://127.0.0.1:10809/"
 Environment="NO_PROXY=localhost,127.0.0.1"
 
 sudo systemctl daemon-reload

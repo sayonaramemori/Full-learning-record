@@ -1,2 +1,4 @@
 [workspace]
-members=[ "auto_reagent", "./opcua_client", "websocket"]
+members=[ "auto_reagent", "dling","opcua_client","websocket"]
+#,"opcua_client","websocket"
+resolver = "2"
