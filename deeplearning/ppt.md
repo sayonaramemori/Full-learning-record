@@ -11,6 +11,13 @@
 - $L=\frac{1}{N} \sum_{i=0}^nE$
     - $g=\nabla L(w_0)$
     - $w_1 = w_0 - \eta\times g$
+- Momentum  
+- Error computing  
+    - Mean Square Error  
+        - $e = \sum_{i=0}(\hat{y_i}-y_{i})^2$
+    - Cross-entropy  
+        - $e=-\sum_{i=0}\hat{y_i}lny_i$
+
 
 ### Activation Functions  
 
@@ -28,5 +35,22 @@
 ![neural](./img/neural.jpg)
 
 
+### Hyperparameters  
+
+## Problems  
+
+### Module bias  
+
+### Optimization issues  
+
+#### Learning Rate  
+
+##### Root Mean Square  
+
+##### RMSProp
+
+##### Learining Rate Decay and Warm up  
+
+#### 
 
 
