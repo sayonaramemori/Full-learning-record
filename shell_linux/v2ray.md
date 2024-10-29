@@ -37,8 +37,8 @@ cd v2ray
 ### 6. Move files to their place  
 > These are the files which we should move manually.  
 
+> You can copy the below script into a single shell script, and run it in bash  
 
-> You can copy the below script into a single shell script, and run it with bash  
 ```shell
 #!/bin/bash
 # Make sure your work directory is v2ray, the directory we have just created.

@@ -212,22 +212,22 @@ std::ostream& operator<<(std::ostream& os, List<T>& list)
 //     return os;
 // }
 
-int main() 
-{
-    List<int> a;
-    for(int i=1;i<19;++i)
-    {
-        a.append(i);
-    }
-    int target = 9;
-    int val = 999;
-    a.insert_before(target,val);
-    a.insert_after(target,val);
-    auto res = a.remove_if([](const int& v){return v%2==0;});
+// int main() 
+// {
+//     List<int> a;
+//     for(int i=1;i<19;++i)
+//     {
+//         a.append(i);
+//     }
+//     int target = 9;
+//     int val = 999;
+//     a.insert_before(target,val);
+//     a.insert_after(target,val);
+//     auto res = a.remove_if([](const int& v){return v%2==0;});
 
-    std::cout<<a<<std::endl;
-    List<int> b = a;
-    std::cout<<b<<std::endl;
+//     std::cout<<a<<std::endl;
+//     List<int> b = a;
+//     std::cout<<b<<std::endl;
 
-    //for(auto &i:res.value_or(std::vector<int>{})){ std::cout<<i<<std::endl; }
-}
+//     //for(auto &i:res.value_or(std::vector<int>{})){ std::cout<<i<<std::endl; }
+// }

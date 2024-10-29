@@ -34,6 +34,23 @@ ln -s [origin] [link]
 tee result.txt
 ```
 
+```mermaid
+flowchart LR
+    subgraph S[ ]
+        direction LR
+        A(echo) -->|Pipe| B[tee] 
+    end
+
+    subgraph G[ ]
+        R(result.txt)
+    end
+    subgraph O[ ]
+        D[stdout]
+    end
+    B --> G
+    B --> O
+```
+
 ### Process Substitution
 ```shell
 # as a file-like input

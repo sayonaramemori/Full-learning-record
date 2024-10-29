@@ -1,0 +1,819 @@
+<h3 id="install-by-msys2-project">Install by MSYS2 project</h3>
+<ol type="1">
+<li><a href="https://www.msys2.org/">Click me to go</a><br />
+</li>
+<li>Download it the and just follow its wizards<br />
+</li>
+<li><code>pacman -S make</code> to install make for cmake using.<br />
+</li>
+<li>If your PC has installed VisualStudio, your should do:</li>
+</ol>
+<pre class="shell"><code># open msys2 terminal
+pacman -S make  
+
+# Specify MinGW Makefiles generator in terminal  
+cmake -G &quot;MinGW Makefiles&quot; ..
+
+# Search make, may be it named with mingw32-make</code></pre>
+<h3 id="head-file-guard">Head File Guard</h3>
+<div class="sourceCode" id="cb2"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co">// g++ support this feature</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="pp">#pragma once</span></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="co">//or using macro  </span></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a><span class="pp">#ifndef NOTATION_OF_THIS_FILE</span></span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a><span class="pp">#define NOTATION_OF_THIS_FILE</span></span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a><span class="co">// Your code here</span></span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a><span class="pp">#endif</span></span></code></pre></div>
+<h3 id="pre-process-for-include-and-complie">Pre-Process for include and
+complie</h3>
+<blockquote>
+<p>Preprocess -&gt; Compile -&gt; Link<br />
+Simply paste them here</p>
+</blockquote>
+<blockquote>
+<p>Compile independently then link the needed function entities
+compiled. So you can compile successful only with function declaration
+but fails when linking if no implementation.</p>
+</blockquote>
+<h3 id="linking">Linking</h3>
+<blockquote>
+<p>static(outsides of class) keyword denotea only visable inside its own
+file when linking.</p>
+</blockquote>
+<blockquote>
+<p>Link every necessay(used) unit COMPILED</p>
+</blockquote>
+<blockquote>
+<p>Standard develop flowsheet: Write declaration in head file then
+including them in main.cpp. The implementations can be anywhere.</p>
+</blockquote>
+<pre class="mermaid"><code>flowchart LR
+   A(Source Code) --&gt;|Preprocess| B(Code with Pasted contents)
+   B --&gt;|Compile| C(Machine code unit)
+   C --&gt;|Link| D(Executable file or library)</code></pre>
+<h3 id="variable-in-cpp">Variable in CPP</h3>
+<blockquote>
+<p>For bool 0 is false and !0 is true, occupys a byte.</p>
+</blockquote>
+<div class="sourceCode" id="cb4"><pre
+class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="dt">unsigned</span> <span class="dt">int</span> a <span class="op">=</span> <span class="dv">99</span><span class="op">;</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="co">//print byte number  </span></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="bu">std::</span>cout <span class="op">&lt;&lt;</span> <span class="kw">sizeof</span><span class="op">(</span><span class="dt">bool</span><span class="op">)</span> <span class="op">&lt;&lt;</span> <span class="bu">std::</span>endl<span class="op">;</span></span></code></pre></div>
+<h3 id="function">Function</h3>
+<blockquote>
+<p>Definition(in .cpp) and Declaration(in .h)</p>
+</blockquote>
+<div class="sourceCode" id="cb5"><pre
+class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="co">// Head file guard to prevent duplication contain, g++ also supports this feature</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="pp">#pragma once</span></span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a><span class="co">//function signature</span></span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a><span class="dt">void</span> a<span class="op">(</span><span class="dt">int</span><span class="op">,</span><span class="dt">int</span><span class="op">);</span></span></code></pre></div>
+<h3 id="condition-statement">Condition Statement</h3>
+<div class="sourceCode" id="cb6"><pre
+class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> <span class="op">(</span><span class="dt">bool</span><span class="op">)</span> <span class="op">{}</span> <span class="cf">else</span> <span class="op">{}</span></span></code></pre></div>
+<h3 id="loop">Loop</h3>
+<div class="sourceCode" id="cb7"><pre
+class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="co">// combine with break and contine  </span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span><span class="op">(</span>init<span class="op">;</span>test<span class="op">;</span>operation<span class="op">){}</span></span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a><span class="cf">while</span><span class="op">(</span><span class="dt">bool</span><span class="op">){}</span></span></code></pre></div>
+<h3 id="pointer">Pointer</h3>
+<div class="sourceCode" id="cb8"><pre
+class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="dt">void</span> <span class="op">*</span>ptr <span class="op">=</span> <span class="kw">nullptr</span><span class="op">;</span></span></code></pre></div>
+<h3 id="reference">Reference</h3>
+<blockquote>
+<p>It is a const pointer</p>
+</blockquote>
+<div class="sourceCode" id="cb9"><pre
+class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="dt">int</span> a <span class="op">=</span> <span class="dv">5</span><span class="op">;</span></span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a><span class="dt">int</span><span class="op">&amp;</span> b <span class="op">=</span> a<span class="op">;</span></span></code></pre></div>
+<h3 id="class">Class</h3>
+<blockquote>
+<p>Default private</p>
+</blockquote>
+<blockquote>
+<p>static: shared by instance</p>
+</blockquote>
+<div class="sourceCode" id="cb10"><pre
+class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> Player</span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a><span class="op">{</span></span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>    <span class="dt">int</span> x<span class="op">,</span>y<span class="op">;</span></span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>    <span class="co">//declaration</span></span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">static</span> <span class="dt">int</span> speed<span class="op">;</span></span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a>    <span class="dt">void</span> move<span class="op">()</span> <span class="op">{</span></span>
+<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a>        <span class="co">//this can be omitted</span></span>
+<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a>        <span class="kw">this</span><span class="op">.</span>x<span class="op">++;</span></span>
+<span id="cb10-9"><a href="#cb10-9" aria-hidden="true" tabindex="-1"></a>        <span class="kw">this</span><span class="op">.</span>y<span class="op">++;</span></span>
+<span id="cb10-10"><a href="#cb10-10" aria-hidden="true" tabindex="-1"></a>    <span class="op">}</span></span>
+<span id="cb10-11"><a href="#cb10-11" aria-hidden="true" tabindex="-1"></a>    <span class="at">static</span> <span class="dt">void</span> Move<span class="op">()</span> <span class="op">{</span></span>
+<span id="cb10-12"><a href="#cb10-12" aria-hidden="true" tabindex="-1"></a>        <span class="co">//only access static member</span></span>
+<span id="cb10-13"><a href="#cb10-13" aria-hidden="true" tabindex="-1"></a>    <span class="op">}</span></span>
+<span id="cb10-14"><a href="#cb10-14" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span>
+<span id="cb10-15"><a href="#cb10-15" aria-hidden="true" tabindex="-1"></a><span class="co">//definition outside class declaration  </span></span>
+<span id="cb10-16"><a href="#cb10-16" aria-hidden="true" tabindex="-1"></a><span class="dt">int</span> Player<span class="op">::</span>speed<span class="op">;</span></span></code></pre></div>
+<h4 id="constructor-destructor">Constructor &amp; Destructor</h4>
+<div class="sourceCode" id="cb11"><pre
+class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> Player</span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a><span class="op">{</span></span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a><span class="kw">public</span><span class="op">:</span></span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>    <span class="dt">int</span> x<span class="op">,</span>y<span class="op">;</span></span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a>    Player<span class="op">(){</span></span>
+<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a>        x<span class="op">=</span><span class="dv">0</span><span class="op">;</span></span>
+<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a>        y<span class="op">=</span><span class="dv">0</span><span class="op">;</span></span>
+<span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a>    <span class="op">}</span></span>
+<span id="cb11-9"><a href="#cb11-9" aria-hidden="true" tabindex="-1"></a>    Player<span class="op">(</span><span class="dt">int</span> x<span class="op">,</span><span class="dt">int</span> y<span class="op">){</span></span>
+<span id="cb11-10"><a href="#cb11-10" aria-hidden="true" tabindex="-1"></a>        <span class="kw">this</span><span class="op">.</span>x<span class="op">=</span>x<span class="op">;</span></span>
+<span id="cb11-11"><a href="#cb11-11" aria-hidden="true" tabindex="-1"></a>        <span class="kw">this</span><span class="op">.</span>y<span class="op">=</span>y<span class="op">;</span></span>
+<span id="cb11-12"><a href="#cb11-12" aria-hidden="true" tabindex="-1"></a>    <span class="op">}</span></span>
+<span id="cb11-13"><a href="#cb11-13" aria-hidden="true" tabindex="-1"></a>    <span class="op">~</span>Player<span class="op">(</span><span class="dt">int</span> x<span class="op">,</span><span class="dt">int</span> y<span class="op">){</span></span>
+<span id="cb11-14"><a href="#cb11-14" aria-hidden="true" tabindex="-1"></a>        <span class="co">//handle pointer here</span></span>
+<span id="cb11-15"><a href="#cb11-15" aria-hidden="true" tabindex="-1"></a>    <span class="op">}</span></span>
+<span id="cb11-16"><a href="#cb11-16" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span>
+<span id="cb11-17"><a href="#cb11-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-18"><a href="#cb11-18" aria-hidden="true" tabindex="-1"></a><span class="dt">int</span> main<span class="op">(){</span></span>
+<span id="cb11-19"><a href="#cb11-19" aria-hidden="true" tabindex="-1"></a>    Player a<span class="op">(</span><span class="dv">1</span><span class="op">,</span><span class="dv">2</span><span class="op">);</span></span>
+<span id="cb11-20"><a href="#cb11-20" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
+<h3 id="constructor-initializer-list">Constructor initializer list</h3>
+<blockquote>
+<p>Better performance.</p>
+</blockquote>
+<div class="sourceCode" id="cb12"><pre
+class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> Entity <span class="op">{</span></span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a><span class="kw">public</span><span class="op">:</span></span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>    <span class="bu">std::</span>string name<span class="op">;</span></span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a>    <span class="dt">int</span> score<span class="op">;</span></span>
+<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a><span class="co">//first list then funciton body initialization</span></span>
+<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a>    Entity<span class="op">()</span></span>
+<span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a>    <span class="op">:</span> name<span class="op">(</span><span class="st">&quot;unknown&quot;</span><span class="op">),</span>score<span class="op">(</span><span class="dv">12</span><span class="op">){}</span></span>
+<span id="cb12-8"><a href="#cb12-8" aria-hidden="true" tabindex="-1"></a>    Entity<span class="op">(</span><span class="at">const</span> <span class="bu">std::</span>string<span class="op">&amp;</span> <span class="va">name_</span><span class="op">):</span>name<span class="op">(</span><span class="va">name_</span><span class="op">)</span></span>
+<span id="cb12-9"><a href="#cb12-9" aria-hidden="true" tabindex="-1"></a>    <span class="op">{}</span></span>
+<span id="cb12-10"><a href="#cb12-10" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
+<h4 id="class-inheritence">Class inheritence</h4>
+<div class="sourceCode" id="cb13"><pre
+class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> Gamer <span class="op">:</span> <span class="kw">public</span> Player</span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a><span class="op">{</span></span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>    <span class="co">//add new features</span></span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
+<h4 id="virtual-function">Virtual function</h4>
+<blockquote>
+<p>To support polymorphism<br />
+Additional overhead</p>
+</blockquote>
+<div class="sourceCode" id="cb14"><pre
+class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> Base <span class="op">{</span></span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a><span class="kw">public</span><span class="op">:</span> </span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>    <span class="kw">virtual</span> string GetName<span class="op">()</span> <span class="op">{</span><span class="cf">return</span> <span class="st">&quot;BASE&quot;</span><span class="op">;}</span></span>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span>
+<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> Derive<span class="op">{</span></span>
+<span id="cb14-7"><a href="#cb14-7" aria-hidden="true" tabindex="-1"></a><span class="kw">public</span><span class="op">:</span> </span>
+<span id="cb14-8"><a href="#cb14-8" aria-hidden="true" tabindex="-1"></a>    string GetName<span class="op">()</span> <span class="kw">override</span> <span class="op">{</span><span class="cf">return</span> <span class="st">&quot;Derive&quot;</span><span class="op">;}</span></span>
+<span id="cb14-9"><a href="#cb14-9" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span>
+<span id="cb14-10"><a href="#cb14-10" aria-hidden="true" tabindex="-1"></a><span class="dt">int</span> main<span class="op">()</span> <span class="op">{</span></span>
+<span id="cb14-11"><a href="#cb14-11" aria-hidden="true" tabindex="-1"></a>    Base a<span class="op">;</span></span>
+<span id="cb14-12"><a href="#cb14-12" aria-hidden="true" tabindex="-1"></a>    Base<span class="op">*</span> ptr_a <span class="op">=</span> <span class="op">&amp;</span>a<span class="op">;</span></span>
+<span id="cb14-13"><a href="#cb14-13" aria-hidden="true" tabindex="-1"></a>    Derive b<span class="op">;</span></span>
+<span id="cb14-14"><a href="#cb14-14" aria-hidden="true" tabindex="-1"></a>    Base<span class="op">*</span> ptr_b <span class="op">=</span> <span class="op">&amp;</span>b<span class="op">;</span></span>
+<span id="cb14-15"><a href="#cb14-15" aria-hidden="true" tabindex="-1"></a>    <span class="co">//if no virtual, all print &quot;BASE&quot;</span></span>
+<span id="cb14-16"><a href="#cb14-16" aria-hidden="true" tabindex="-1"></a>    ptr_a<span class="op">-&gt;</span>GetName<span class="op">();</span></span>
+<span id="cb14-17"><a href="#cb14-17" aria-hidden="true" tabindex="-1"></a>    ptr_b<span class="op">-&gt;</span>GetName<span class="op">();</span></span>
+<span id="cb14-18"><a href="#cb14-18" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
+<h4 id="pure-virtual-function">Pure Virtual Function</h4>
+<blockquote>
+<p>Like a Interface, force to override</p>
+</blockquote>
+<div class="sourceCode" id="cb15"><pre
+class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> Interface <span class="op">{</span></span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>    <span class="kw">virtual</span> <span class="bu">std::</span>string GetName<span class="op">()</span> <span class="op">=</span> <span class="dv">0</span><span class="op">;</span></span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span>
+<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> Entity<span class="op">:</span> <span class="kw">public</span> Base<span class="op">,</span> Interface<span class="op">{</span></span>
+<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a>    <span class="co">//...</span></span>
+<span id="cb15-6"><a href="#cb15-6" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span>
+<span id="cb15-7"><a href="#cb15-7" aria-hidden="true" tabindex="-1"></a><span class="dt">void</span> PrintName<span class="op">(</span>Interface<span class="op">*</span> a<span class="op">){</span></span>
+<span id="cb15-8"><a href="#cb15-8" aria-hidden="true" tabindex="-1"></a>    a<span class="op">-&gt;</span>GetName<span class="op">();</span></span>
+<span id="cb15-9"><a href="#cb15-9" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
+<h4 id="visiability">Visiability</h4>
+<div class="sourceCode" id="cb16"><pre
+class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> Base</span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a><span class="kw">public</span><span class="op">:</span></span>
+<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a>    <span class="co">//visiable to all</span></span>
+<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a><span class="kw">protected</span><span class="op">:</span></span>
+<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a>    <span class="co">//only visiable to class and subclass</span></span>
+<span id="cb16-6"><a href="#cb16-6" aria-hidden="true" tabindex="-1"></a><span class="kw">private</span><span class="op">:</span></span>
+<span id="cb16-7"><a href="#cb16-7" aria-hidden="true" tabindex="-1"></a>    <span class="co">//only visiable inside. </span></span>
+<span id="cb16-8"><a href="#cb16-8" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
+<h3 id="local-static-variable">Local static variable</h3>
+<div class="sourceCode" id="cb17"><pre
+class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="dt">void</span> Funciton<span class="op">()</span> <span class="op">{</span></span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>    <span class="co">//set 0 when first encouter this line, with a program life time  </span></span>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a>    <span class="at">static</span> <span class="dt">int</span> i <span class="op">=</span> <span class="dv">0</span><span class="op">;</span></span>
+<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
+<h3 id="enum">Enum</h3>
+<blockquote>
+<p>Represent a status with integer<br />
+Integer set</p>
+</blockquote>
+<div class="sourceCode" id="cb18"><pre
+class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="kw">enum</span> Status <span class="op">{</span> </span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a>    Good<span class="op">,</span></span>
+<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a>    Bad<span class="op">,</span></span>
+<span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a>    Mediocre</span>
+<span id="cb18-5"><a href="#cb18-5" aria-hidden="true" tabindex="-1"></a><span class="op">}</span> </span>
+<span id="cb18-6"><a href="#cb18-6" aria-hidden="true" tabindex="-1"></a><span class="co">//no namespace</span></span>
+<span id="cb18-7"><a href="#cb18-7" aria-hidden="true" tabindex="-1"></a>Status status <span class="op">=</span> Good<span class="op">;</span></span></code></pre></div>
+<h3 id="native-array">Native Array</h3>
+<div class="sourceCode" id="cb19"><pre
+class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="dt">int</span> example<span class="op">[</span><span class="dv">10</span><span class="op">];</span></span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>example<span class="op">[</span><span class="dv">3</span><span class="op">]</span> <span class="op">=</span> <span class="dv">5</span><span class="op">;</span></span>
+<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a><span class="dt">int</span> <span class="op">*</span>ptr <span class="op">=</span> example<span class="op">;</span></span>
+<span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a><span class="co">//equal to example[0]</span></span>
+<span id="cb19-5"><a href="#cb19-5" aria-hidden="true" tabindex="-1"></a><span class="op">*</span>example <span class="op">=</span> <span class="dv">10</span><span class="op">;</span> </span>
+<span id="cb19-6"><a href="#cb19-6" aria-hidden="true" tabindex="-1"></a><span class="co">//equal to example[9]</span></span>
+<span id="cb19-7"><a href="#cb19-7" aria-hidden="true" tabindex="-1"></a><span class="op">*(</span>ptr <span class="op">+</span> <span class="dv">9</span><span class="op">)</span> <span class="op">=</span> <span class="dv">10</span><span class="op">;</span></span>
+<span id="cb19-8"><a href="#cb19-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-9"><a href="#cb19-9" aria-hidden="true" tabindex="-1"></a><span class="co">// Trick play</span></span>
+<span id="cb19-10"><a href="#cb19-10" aria-hidden="true" tabindex="-1"></a>example<span class="op">[</span><span class="dv">2</span><span class="op">]</span> <span class="op">=</span> <span class="dv">5</span><span class="op">;</span></span>
+<span id="cb19-11"><a href="#cb19-11" aria-hidden="true" tabindex="-1"></a><span class="op">*(</span><span class="dt">int</span><span class="op">)((</span><span class="dt">char</span><span class="op">*)</span>ptr<span class="op">+</span><span class="dv">8</span><span class="op">)=</span><span class="dv">5</span><span class="op">;</span></span>
+<span id="cb19-12"><a href="#cb19-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-13"><a href="#cb19-13" aria-hidden="true" tabindex="-1"></a><span class="co">//Calculate Size, only works on stack</span></span>
+<span id="cb19-14"><a href="#cb19-14" aria-hidden="true" tabindex="-1"></a><span class="dt">int</span> a<span class="op">[</span><span class="dv">5</span><span class="op">];</span></span>
+<span id="cb19-15"><a href="#cb19-15" aria-hidden="true" tabindex="-1"></a><span class="dt">int</span> count <span class="op">=</span> <span class="kw">sizeof</span><span class="op">(</span>a<span class="op">)/</span><span class="kw">sizeof</span><span class="op">(</span><span class="dt">int</span><span class="op">);</span></span></code></pre></div>
+<h3 id="string-stdstring">string &amp; std::string</h3>
+<blockquote>
+<p>A char array with \0 tail</p>
+</blockquote>
+<div class="sourceCode" id="cb20"><pre
+class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="at">const</span> <span class="dt">char</span><span class="op">*</span> name <span class="op">=</span> <span class="st">&quot;Cherro&quot;</span><span class="op">;</span></span>
+<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a><span class="co">// size is n + 1, for \0</span></span>
+<span id="cb20-4"><a href="#cb20-4" aria-hidden="true" tabindex="-1"></a><span class="dt">char</span><span class="op">*</span> myname <span class="op">=</span> <span class="st">&quot;Cherro&quot;</span><span class="op">;</span></span>
+<span id="cb20-5"><a href="#cb20-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-6"><a href="#cb20-6" aria-hidden="true" tabindex="-1"></a><span class="co">//prohibit to modify literal,stored in readonly segment. </span></span>
+<span id="cb20-7"><a href="#cb20-7" aria-hidden="true" tabindex="-1"></a>myname<span class="op">[</span><span class="dv">2</span><span class="op">]</span> <span class="op">=</span> <span class="ch">&#39;J&#39;</span><span class="op">;</span>  </span>
+<span id="cb20-8"><a href="#cb20-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-9"><a href="#cb20-9" aria-hidden="true" tabindex="-1"></a><span class="co">// work the same, this can be modified  </span></span>
+<span id="cb20-10"><a href="#cb20-10" aria-hidden="true" tabindex="-1"></a><span class="dt">char</span> name_sqe<span class="op">[</span><span class="dv">7</span><span class="op">]={</span><span class="ch">&#39;C&#39;</span><span class="op">,</span><span class="ch">&#39;h&#39;</span><span class="op">,</span><span class="ch">&#39;e&#39;</span><span class="op">,</span><span class="ch">&#39;r&#39;</span><span class="op">,</span><span class="ch">&#39;r&#39;</span><span class="op">,</span><span class="ch">&#39;o&#39;</span><span class="op">,</span><span class="dv">0</span><span class="op">};</span></span>
+<span id="cb20-11"><a href="#cb20-11" aria-hidden="true" tabindex="-1"></a>name_seq<span class="op">[</span><span class="dv">2</span><span class="op">]</span> <span class="op">=</span> <span class="ch">&#39;J&#39;</span><span class="op">;</span>  </span>
+<span id="cb20-12"><a href="#cb20-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-13"><a href="#cb20-13" aria-hidden="true" tabindex="-1"></a><span class="bu">std::</span>string hatred <span class="op">=</span> <span class="st">&quot;java&quot;</span><span class="op">;</span></span></code></pre></div>
+<h3 id="const-mutable">const &amp; mutable</h3>
+<blockquote>
+<p><code>mutable</code> allows modification in a const method<br />
+<code>const</code> keyword before * is a constraint on the value.</p>
+</blockquote>
+<div class="sourceCode" id="cb21"><pre
+class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="co">//const the value</span></span>
+<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a>type <span class="at">const</span><span class="op">*</span> var<span class="op">;</span></span>
+<span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a><span class="at">const</span> type<span class="op">*</span> var<span class="op">;</span></span>
+<span id="cb21-4"><a href="#cb21-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-5"><a href="#cb21-5" aria-hidden="true" tabindex="-1"></a><span class="co">//const the pointer</span></span>
+<span id="cb21-6"><a href="#cb21-6" aria-hidden="true" tabindex="-1"></a>type<span class="op">*</span> <span class="at">const</span> var<span class="op">;</span></span>
+<span id="cb21-7"><a href="#cb21-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-8"><a href="#cb21-8" aria-hidden="true" tabindex="-1"></a><span class="co">//Promise not to modify class </span></span>
+<span id="cb21-9"><a href="#cb21-9" aria-hidden="true" tabindex="-1"></a><span class="co">//For const reference to call </span></span>
+<span id="cb21-10"><a href="#cb21-10" aria-hidden="true" tabindex="-1"></a><span class="dt">int</span> GetVal<span class="op">()</span> <span class="at">const</span><span class="op">{}</span></span></code></pre></div>
+<h3 id="tri-operator">Tri-operator</h3>
+<div class="sourceCode" id="cb22"><pre
+class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="dt">int</span> a <span class="op">=</span> <span class="dv">1</span><span class="op">?</span><span class="dv">1</span><span class="op">:</span><span class="dv">0</span><span class="op">;</span></span></code></pre></div>
+<h3 id="how-to-create-a-class">How to create a class</h3>
+<div class="sourceCode" id="cb23"><pre
+class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="co">// Call default constructor  </span></span>
+<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a>Entity entity<span class="op">;</span></span>
+<span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-4"><a href="#cb23-4" aria-hidden="true" tabindex="-1"></a><span class="co">// With parameters  </span></span>
+<span id="cb23-5"><a href="#cb23-5" aria-hidden="true" tabindex="-1"></a>Entity entity<span class="op">(</span>paras<span class="op">);</span></span>
+<span id="cb23-6"><a href="#cb23-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-7"><a href="#cb23-7" aria-hidden="true" tabindex="-1"></a><span class="co">// Create on heap  </span></span>
+<span id="cb23-8"><a href="#cb23-8" aria-hidden="true" tabindex="-1"></a>Entity <span class="op">*</span>e <span class="op">=</span> <span class="kw">new</span> Entity<span class="op">();</span></span>
+<span id="cb23-9"><a href="#cb23-9" aria-hidden="true" tabindex="-1"></a><span class="kw">delete</span> e<span class="op">;</span></span></code></pre></div>
+<h3 id="conversion-implicit-explicit">Conversion, Implicit &amp;
+Explicit</h3>
+<ol type="1">
+<li><p>(Bad Feature) Constructor receiving one parameter could implicit
+convert that to class using assignment operation</p></li>
+<li><p>Add <code>explicit</code> before the constructor to disable the
+feature.</p></li>
+</ol>
+<div class="sourceCode" id="cb24"><pre
+class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> Entity</span>
+<span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a><span class="op">{</span></span>
+<span id="cb24-3"><a href="#cb24-3" aria-hidden="true" tabindex="-1"></a>    <span class="kw">public</span><span class="op">:</span></span>
+<span id="cb24-4"><a href="#cb24-4" aria-hidden="true" tabindex="-1"></a>    <span class="dt">int</span> age<span class="op">;</span></span>
+<span id="cb24-5"><a href="#cb24-5" aria-hidden="true" tabindex="-1"></a>    <span class="kw">explicit</span> Entity<span class="op">(</span><span class="dt">int</span> _age<span class="op">):</span>age<span class="op">(</span>_age<span class="op">){}</span></span>
+<span id="cb24-6"><a href="#cb24-6" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
+<h3 id="operator-overloading">Operator Overloading</h3>
+<blockquote>
+<p>Only use this feature for being truly meaningful</p>
+</blockquote>
+<div class="sourceCode" id="cb25"><pre
+class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a><span class="co">// This function should be a friend </span></span>
+<span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a><span class="co">// allow it to access private field  </span></span>
+<span id="cb25-3"><a href="#cb25-3" aria-hidden="true" tabindex="-1"></a><span class="bu">std::</span>ostream<span class="op">&amp;</span> <span class="kw">operator</span><span class="op">&lt;&lt;(</span><span class="bu">std::</span>ostream<span class="op">&amp;</span> stream<span class="op">,</span> <span class="at">const</span> Entity<span class="op">&amp;</span> other<span class="op">){}</span></span></code></pre></div>
+<h3 id="smart-pointer">Smart Pointer</h3>
+<blockquote>
+<p>Automatically new and delete, preventing us from memery leakage</p>
+</blockquote>
+<div class="sourceCode" id="cb26"><pre
+class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a><span class="pp">#include </span><span class="im">&lt;iostream&gt;</span></span>
+<span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a><span class="pp">#include </span><span class="im">&lt;memory&gt;</span></span>
+<span id="cb26-3"><a href="#cb26-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb26-4"><a href="#cb26-4" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> MyClass <span class="op">{</span></span>
+<span id="cb26-5"><a href="#cb26-5" aria-hidden="true" tabindex="-1"></a><span class="kw">public</span><span class="op">:</span></span>
+<span id="cb26-6"><a href="#cb26-6" aria-hidden="true" tabindex="-1"></a>    MyClass<span class="op">()</span> <span class="op">{</span> <span class="bu">std::</span>cout <span class="op">&lt;&lt;</span> <span class="st">&quot;MyClass constructed!&quot;</span> <span class="op">&lt;&lt;</span> <span class="bu">std::</span>endl<span class="op">;</span> <span class="op">}</span></span>
+<span id="cb26-7"><a href="#cb26-7" aria-hidden="true" tabindex="-1"></a>    <span class="op">~</span>MyClass<span class="op">()</span> <span class="op">{</span> <span class="bu">std::</span>cout <span class="op">&lt;&lt;</span> <span class="st">&quot;MyClass destroyed!&quot;</span> <span class="op">&lt;&lt;</span> <span class="bu">std::</span>endl<span class="op">;</span> <span class="op">}</span></span>
+<span id="cb26-8"><a href="#cb26-8" aria-hidden="true" tabindex="-1"></a>    <span class="dt">void</span> greet<span class="op">()</span> <span class="op">{</span> <span class="bu">std::</span>cout <span class="op">&lt;&lt;</span> <span class="st">&quot;Hello from MyClass!&quot;</span> <span class="op">&lt;&lt;</span> <span class="bu">std::</span>endl<span class="op">;</span> <span class="op">}</span></span>
+<span id="cb26-9"><a href="#cb26-9" aria-hidden="true" tabindex="-1"></a><span class="op">};</span></span>
+<span id="cb26-10"><a href="#cb26-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb26-11"><a href="#cb26-11" aria-hidden="true" tabindex="-1"></a><span class="dt">int</span> main<span class="op">()</span> <span class="op">{</span></span>
+<span id="cb26-12"><a href="#cb26-12" aria-hidden="true" tabindex="-1"></a>    <span class="co">// Create a unique_ptr to manage a MyClass instance</span></span>
+<span id="cb26-13"><a href="#cb26-13" aria-hidden="true" tabindex="-1"></a>    <span class="bu">std::</span>unique_ptr<span class="op">&lt;</span>MyClass<span class="op">&gt;</span> ptr1 <span class="op">=</span> <span class="bu">std::</span>make_unique<span class="op">&lt;</span>MyClass<span class="op">&gt;();</span></span>
+<span id="cb26-14"><a href="#cb26-14" aria-hidden="true" tabindex="-1"></a>    ptr1<span class="op">-&gt;</span>greet<span class="op">();</span></span>
+<span id="cb26-15"><a href="#cb26-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb26-16"><a href="#cb26-16" aria-hidden="true" tabindex="-1"></a>    <span class="co">// Transfer ownership to another unique_ptr</span></span>
+<span id="cb26-17"><a href="#cb26-17" aria-hidden="true" tabindex="-1"></a>    <span class="bu">std::</span>unique_ptr<span class="op">&lt;</span>MyClass<span class="op">&gt;</span> ptr2 <span class="op">=</span> <span class="bu">std::</span>move<span class="op">(</span>ptr1<span class="op">);</span></span>
+<span id="cb26-18"><a href="#cb26-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb26-19"><a href="#cb26-19" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> <span class="op">(!</span>ptr1<span class="op">)</span> <span class="op">{</span></span>
+<span id="cb26-20"><a href="#cb26-20" aria-hidden="true" tabindex="-1"></a>        <span class="bu">std::</span>cout <span class="op">&lt;&lt;</span> <span class="st">&quot;ptr1 is now null after ownership transfer.&quot;</span> <span class="op">&lt;&lt;</span> <span class="bu">std::</span>endl<span class="op">;</span></span>
+<span id="cb26-21"><a href="#cb26-21" aria-hidden="true" tabindex="-1"></a>    <span class="op">}</span></span>
+<span id="cb26-22"><a href="#cb26-22" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb26-23"><a href="#cb26-23" aria-hidden="true" tabindex="-1"></a>    <span class="co">// Use ptr2 to access MyClass</span></span>
+<span id="cb26-24"><a href="#cb26-24" aria-hidden="true" tabindex="-1"></a>    ptr2<span class="op">-&gt;</span>greet<span class="op">();</span></span>
+<span id="cb26-25"><a href="#cb26-25" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb26-26"><a href="#cb26-26" aria-hidden="true" tabindex="-1"></a>    <span class="co">// Resetting ptr2 (deletes the managed object)</span></span>
+<span id="cb26-27"><a href="#cb26-27" aria-hidden="true" tabindex="-1"></a>    ptr2<span class="op">.</span>reset<span class="op">();</span></span>
+<span id="cb26-28"><a href="#cb26-28" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb26-29"><a href="#cb26-29" aria-hidden="true" tabindex="-1"></a>    <span class="co">// At this point, MyClass has been destroyed, and ptr2 is now null</span></span>
+<span id="cb26-30"><a href="#cb26-30" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> <span class="op">(!</span>ptr2<span class="op">)</span> <span class="op">{</span></span>
+<span id="cb26-31"><a href="#cb26-31" aria-hidden="true" tabindex="-1"></a>        <span class="bu">std::</span>cout <span class="op">&lt;&lt;</span> <span class="st">&quot;ptr2 is now null after reset.&quot;</span> <span class="op">&lt;&lt;</span> <span class="bu">std::</span>endl<span class="op">;</span></span>
+<span id="cb26-32"><a href="#cb26-32" aria-hidden="true" tabindex="-1"></a>    <span class="op">}</span></span>
+<span id="cb26-33"><a href="#cb26-33" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb26-34"><a href="#cb26-34" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> <span class="dv">0</span><span class="op">;</span></span>
+<span id="cb26-35"><a href="#cb26-35" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
+<h3 id="copy-constructor">Copy Constructor</h3>
+<blockquote>
+<p>A constructor receiving <code>const type&amp;</code></p>
+</blockquote>
+<blockquote>
+<p>Default copy member(shallow copy)</p>
+</blockquote>
+<div class="sourceCode" id="cb27"><pre
+class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a><span class="co">// Define your copy constructor for deep copy  </span></span></code></pre></div>
+<h3 id="arrow-operator">Arrow operator</h3>
+<blockquote>
+<p>Can be overloaded</p>
+</blockquote>
+<div class="sourceCode" id="cb28"><pre
+class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a><span class="co">// Get memory offset  </span></span>
+<span id="cb28-2"><a href="#cb28-2" aria-hidden="true" tabindex="-1"></a><span class="kw">struct</span> vectors<span class="op">{</span></span>
+<span id="cb28-3"><a href="#cb28-3" aria-hidden="true" tabindex="-1"></a>    <span class="dt">float</span> x<span class="op">,</span>y<span class="op">,</span>z<span class="op">;</span></span>
+<span id="cb28-4"><a href="#cb28-4" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span>
+<span id="cb28-5"><a href="#cb28-5" aria-hidden="true" tabindex="-1"></a><span class="dt">int</span> main<span class="op">()</span> </span>
+<span id="cb28-6"><a href="#cb28-6" aria-hidden="true" tabindex="-1"></a><span class="op">{</span></span>
+<span id="cb28-7"><a href="#cb28-7" aria-hidden="true" tabindex="-1"></a>    <span class="co">// Get z offset  </span></span>
+<span id="cb28-8"><a href="#cb28-8" aria-hidden="true" tabindex="-1"></a>    <span class="dt">int</span> offset <span class="op">=</span> <span class="op">(</span><span class="dt">int</span><span class="op">)&amp;((</span>vectors<span class="op">*)</span><span class="kw">nullptr</span><span class="op">)-&gt;</span>z<span class="op">;</span></span>
+<span id="cb28-9"><a href="#cb28-9" aria-hidden="true" tabindex="-1"></a>    <span class="bu">std::</span>cout<span class="op">&lt;&lt;</span>offset<span class="op">&lt;&lt;</span><span class="bu">std::</span>endl<span class="op">;</span></span>
+<span id="cb28-10"><a href="#cb28-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-11"><a href="#cb28-11" aria-hidden="true" tabindex="-1"></a>    <span class="co">// Better Solution  </span></span>
+<span id="cb28-12"><a href="#cb28-12" aria-hidden="true" tabindex="-1"></a>    <span class="pp">#include </span><span class="im">&lt;cstddef&gt;</span></span>
+<span id="cb28-13"><a href="#cb28-13" aria-hidden="true" tabindex="-1"></a>    <span class="bu">std::</span>cout <span class="op">&lt;&lt;</span> <span class="st">&quot;Offset of a: &quot;</span> <span class="op">&lt;&lt;</span> offsetof<span class="op">(</span>Matrix<span class="op">,</span> row<span class="op">)</span> <span class="op">&lt;&lt;</span> <span class="st">&quot; bytes&quot;</span> <span class="op">&lt;&lt;</span> <span class="bu">std::</span>endl<span class="op">;</span></span>
+<span id="cb28-14"><a href="#cb28-14" aria-hidden="true" tabindex="-1"></a>    <span class="bu">std::</span>cout <span class="op">&lt;&lt;</span> <span class="st">&quot;Offset of b: &quot;</span> <span class="op">&lt;&lt;</span> offsetof<span class="op">(</span>Matrix<span class="op">,</span>col<span class="op">)</span> <span class="op">&lt;&lt;</span> <span class="st">&quot; bytes&quot;</span> <span class="op">&lt;&lt;</span> <span class="bu">std::</span>endl<span class="op">;</span></span>
+<span id="cb28-15"><a href="#cb28-15" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
+<h3 id="template">Template</h3>
+<blockquote>
+<p>Templates are instantiated lazily</p>
+</blockquote>
+<h3 id="macro">Macro</h3>
+<pre><code>#ifdef DEBUG
+#define LOG(x) std::cout&lt;&lt; x &lt;&lt;std::endl;
+#else
+#define LOG(x)
+#endif</code></pre>
+<h3 id="function-pointer">Function Pointer</h3>
+<div class="sourceCode" id="cb30"><pre
+class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a><span class="dt">void</span> helloworld<span class="op">()</span> </span>
+<span id="cb30-2"><a href="#cb30-2" aria-hidden="true" tabindex="-1"></a><span class="op">{</span></span>
+<span id="cb30-3"><a href="#cb30-3" aria-hidden="true" tabindex="-1"></a>    <span class="bu">std::</span>cout<span class="op">&lt;&lt;</span><span class="st">&quot;hello world&quot;</span><span class="op">&lt;&lt;</span><span class="bu">std::</span>endl<span class="op">;</span></span>
+<span id="cb30-4"><a href="#cb30-4" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span>
+<span id="cb30-5"><a href="#cb30-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb30-6"><a href="#cb30-6" aria-hidden="true" tabindex="-1"></a><span class="dt">int</span> main<span class="op">()</span></span>
+<span id="cb30-7"><a href="#cb30-7" aria-hidden="true" tabindex="-1"></a><span class="op">{</span></span>
+<span id="cb30-8"><a href="#cb30-8" aria-hidden="true" tabindex="-1"></a>    <span class="kw">typedef</span> <span class="dt">void</span><span class="op">(*</span>ILOVERUST<span class="op">)();</span></span>
+<span id="cb30-9"><a href="#cb30-9" aria-hidden="true" tabindex="-1"></a>    ILOVERUST fn <span class="op">=</span> helloworld<span class="op">;</span></span>
+<span id="cb30-10"><a href="#cb30-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb30-11"><a href="#cb30-11" aria-hidden="true" tabindex="-1"></a>    <span class="dt">void</span> <span class="op">(*</span>cherro<span class="op">)()</span> <span class="op">=</span> helloworld<span class="op">;</span></span>
+<span id="cb30-12"><a href="#cb30-12" aria-hidden="true" tabindex="-1"></a>    <span class="co">// Function pointer;</span></span>
+<span id="cb30-13"><a href="#cb30-13" aria-hidden="true" tabindex="-1"></a>    <span class="co">// auto fn = &amp;helloworld;</span></span>
+<span id="cb30-14"><a href="#cb30-14" aria-hidden="true" tabindex="-1"></a>    <span class="kw">auto</span> fn <span class="op">=</span> helloworld<span class="op">;</span></span>
+<span id="cb30-15"><a href="#cb30-15" aria-hidden="true" tabindex="-1"></a>    fn<span class="op">();</span></span>
+<span id="cb30-16"><a href="#cb30-16" aria-hidden="true" tabindex="-1"></a>    cherro<span class="op">();</span></span>
+<span id="cb30-17"><a href="#cb30-17" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
+<h3 id="lambda">Lambda</h3>
+<blockquote>
+<p>Can be converted into fn pointer<br />
+<code>[capture mode](paras)-&gt;ret{body}</code></p>
+</blockquote>
+<h3 id="thread">Thread</h3>
+<h3 id="chrono">Chrono</h3>
+<div class="sourceCode" id="cb31"><pre
+class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a><span class="pp">#include </span><span class="im">&lt;iostream&gt;</span></span>
+<span id="cb31-2"><a href="#cb31-2" aria-hidden="true" tabindex="-1"></a><span class="pp">#include </span><span class="im">&lt;chrono&gt;</span></span>
+<span id="cb31-3"><a href="#cb31-3" aria-hidden="true" tabindex="-1"></a><span class="pp">#include </span><span class="im">&lt;thread&gt;</span></span>
+<span id="cb31-4"><a href="#cb31-4" aria-hidden="true" tabindex="-1"></a><span class="dt">int</span> main<span class="op">()</span> </span>
+<span id="cb31-5"><a href="#cb31-5" aria-hidden="true" tabindex="-1"></a><span class="op">{</span></span>
+<span id="cb31-6"><a href="#cb31-6" aria-hidden="true" tabindex="-1"></a>    <span class="kw">using</span> <span class="kw">namespace</span> <span class="bu">std::</span>literals::chrono_literals<span class="op">;</span></span>
+<span id="cb31-7"><a href="#cb31-7" aria-hidden="true" tabindex="-1"></a>    <span class="kw">auto</span> start <span class="op">=</span> <span class="bu">std::</span>chrono::high_resolution_clock::now<span class="op">();</span></span>
+<span id="cb31-8"><a href="#cb31-8" aria-hidden="true" tabindex="-1"></a>    <span class="bu">std::</span>this_thread::sleep_for<span class="op">(</span><span class="dv">1</span><span class="bu">s</span><span class="op">);</span></span>
+<span id="cb31-9"><a href="#cb31-9" aria-hidden="true" tabindex="-1"></a>    <span class="kw">auto</span> end <span class="op">=</span> <span class="bu">std::</span>chrono::high_resolution_clock::now<span class="op">();</span></span>
+<span id="cb31-10"><a href="#cb31-10" aria-hidden="true" tabindex="-1"></a>    <span class="bu">std::</span>chrono::duration<span class="op">&lt;</span><span class="dt">float</span><span class="op">&gt;</span> duration <span class="op">=</span> end <span class="op">-</span> start<span class="op">;</span></span>
+<span id="cb31-11"><a href="#cb31-11" aria-hidden="true" tabindex="-1"></a>    <span class="bu">std::</span>cout<span class="op">&lt;&lt;</span> duration<span class="op">.</span>count <span class="op">&lt;&lt;</span> <span class="bu">std::</span>endl<span class="op">;</span></span>
+<span id="cb31-12"><a href="#cb31-12" aria-hidden="true" tabindex="-1"></a>    <span class="bu">std::</span>cin<span class="op">.</span>get<span class="op">();</span></span>
+<span id="cb31-13"><a href="#cb31-13" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
+<h3 id="multi-dimension-array">Multi-Dimension Array</h3>
+<div class="sourceCode" id="cb32"><pre
+class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a><span class="dt">int</span> <span class="op">**</span> a2d <span class="op">=</span> <span class="kw">new</span> <span class="dt">int</span><span class="op">*[</span><span class="dv">5</span><span class="op">];</span></span>
+<span id="cb32-2"><a href="#cb32-2" aria-hidden="true" tabindex="-1"></a><span class="dt">int</span> <span class="op">***</span> a3d <span class="op">=</span> <span class="kw">new</span> <span class="dt">int</span><span class="op">**[</span><span class="dv">5</span><span class="op">];</span></span></code></pre></div>
+<h3 id="virtual-destructor">Virtual Destructor</h3>
+<blockquote>
+<p>To handle inheritence</p>
+</blockquote>
+<pre><code>class Base
+{
+    Base(){}
+    virtual ~Base(){}
+};
+class Derived: public Base
+{
+    Derive() {}
+    ~Derive() {}
+}
+
+int main()
+{
+    Base* base = new Derived();
+    // only ~Base called without virtual destructor.
+    delete base;
+}</code></pre>
+<h3 id="access-control">Access Control</h3>
+<table>
+<colgroup>
+<col style="width: 25%" />
+<col style="width: 25%" />
+<col style="width: 25%" />
+<col style="width: 25%" />
+</colgroup>
+<thead>
+<tr>
+<th style="text-align: left;">Access Modifier in Base</th>
+<th style="text-align: left;">Public Inheritance</th>
+<th style="text-align: left;">Protected Inheritance</th>
+<th style="text-align: left;">Private Inheritance</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">Public</td>
+<td style="text-align: left;">Public</td>
+<td style="text-align: left;">Protected</td>
+<td style="text-align: left;">Private</td>
+</tr>
+<tr>
+<td style="text-align: left;">Protected</td>
+<td style="text-align: left;">Protected</td>
+<td style="text-align: left;">Protected</td>
+<td style="text-align: left;">Private</td>
+</tr>
+<tr>
+<td style="text-align: left;">Private</td>
+<td style="text-align: left;">Inaccessible</td>
+<td style="text-align: left;">Inaccessible</td>
+<td style="text-align: left;">Inaccessible</td>
+</tr>
+</tbody>
+</table>
+<h3 id="namespace">Namespace</h3>
+<blockquote>
+<p>Class is also a namspace</p>
+</blockquote>
+<div class="sourceCode" id="cb34"><pre
+class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a><span class="kw">namespace</span> a</span>
+<span id="cb34-2"><a href="#cb34-2" aria-hidden="true" tabindex="-1"></a><span class="op">{</span></span>
+<span id="cb34-3"><a href="#cb34-3" aria-hidden="true" tabindex="-1"></a>    <span class="dt">void</span> print<span class="op">();</span></span>
+<span id="cb34-4"><a href="#cb34-4" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span>
+<span id="cb34-5"><a href="#cb34-5" aria-hidden="true" tabindex="-1"></a><span class="dt">int</span> main<span class="op">()</span> </span>
+<span id="cb34-6"><a href="#cb34-6" aria-hidden="true" tabindex="-1"></a><span class="op">{</span></span>
+<span id="cb34-7"><a href="#cb34-7" aria-hidden="true" tabindex="-1"></a>    <span class="co">//locally works</span></span>
+<span id="cb34-8"><a href="#cb34-8" aria-hidden="true" tabindex="-1"></a>    <span class="kw">using</span> <span class="kw">namespace</span> a<span class="op">;</span></span>
+<span id="cb34-9"><a href="#cb34-9" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
+<h3 id="call-base-method">Call Base method</h3>
+<blockquote>
+<p>Also apply on virtual method.</p>
+</blockquote>
+<div class="sourceCode" id="cb35"><pre
+class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a><span class="pp">#include </span><span class="im">&lt;iostream&gt;</span></span>
+<span id="cb35-2"><a href="#cb35-2" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> Base <span class="op">{</span></span>
+<span id="cb35-3"><a href="#cb35-3" aria-hidden="true" tabindex="-1"></a>    <span class="kw">public</span><span class="op">:</span></span>
+<span id="cb35-4"><a href="#cb35-4" aria-hidden="true" tabindex="-1"></a>    <span class="dt">void</span> show<span class="op">()</span> <span class="at">const</span> <span class="op">{</span></span>
+<span id="cb35-5"><a href="#cb35-5" aria-hidden="true" tabindex="-1"></a>    <span class="bu">std::</span>cout <span class="op">&lt;&lt;</span> <span class="st">&quot;Base class method</span><span class="sc">\n</span><span class="st">&quot;</span><span class="op">;</span></span>
+<span id="cb35-6"><a href="#cb35-6" aria-hidden="true" tabindex="-1"></a>                        <span class="op">}</span></span>
+<span id="cb35-7"><a href="#cb35-7" aria-hidden="true" tabindex="-1"></a><span class="op">};</span></span>
+<span id="cb35-8"><a href="#cb35-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb35-9"><a href="#cb35-9" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> Derived <span class="op">:</span> <span class="kw">public</span> Base <span class="op">{</span></span>
+<span id="cb35-10"><a href="#cb35-10" aria-hidden="true" tabindex="-1"></a>    <span class="kw">public</span><span class="op">:</span></span>
+<span id="cb35-11"><a href="#cb35-11" aria-hidden="true" tabindex="-1"></a>    <span class="dt">void</span> show<span class="op">()</span> <span class="at">const</span> <span class="op">{</span></span>
+<span id="cb35-12"><a href="#cb35-12" aria-hidden="true" tabindex="-1"></a>        <span class="co">// Call the base class method</span></span>
+<span id="cb35-13"><a href="#cb35-13" aria-hidden="true" tabindex="-1"></a>        Base<span class="op">::</span>show<span class="op">();</span></span>
+<span id="cb35-14"><a href="#cb35-14" aria-hidden="true" tabindex="-1"></a>        <span class="bu">std::</span>cout <span class="op">&lt;&lt;</span> <span class="st">&quot;Derived class method</span><span class="sc">\n</span><span class="st">&quot;</span><span class="op">;</span></span>
+<span id="cb35-15"><a href="#cb35-15" aria-hidden="true" tabindex="-1"></a>    <span class="op">}</span></span>
+<span id="cb35-16"><a href="#cb35-16" aria-hidden="true" tabindex="-1"></a><span class="op">};</span></span>
+<span id="cb35-17"><a href="#cb35-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb35-18"><a href="#cb35-18" aria-hidden="true" tabindex="-1"></a><span class="dt">int</span> main<span class="op">()</span> <span class="op">{</span></span>
+<span id="cb35-19"><a href="#cb35-19" aria-hidden="true" tabindex="-1"></a>    Derived d<span class="op">;</span></span>
+<span id="cb35-20"><a href="#cb35-20" aria-hidden="true" tabindex="-1"></a>    d<span class="op">.</span>show<span class="op">();</span> <span class="co">// Calls both base and derived class methods</span></span>
+<span id="cb35-21"><a href="#cb35-21" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> <span class="dv">0</span><span class="op">;</span></span>
+<span id="cb35-22"><a href="#cb35-22" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
+<h3 id="c-17-new-features">C++ 17 New Features</h3>
+<h4 id="stdvariant">std::variant</h4>
+<h4 id="stdoptional">std::optional</h4>
+<blockquote>
+<p>Can be converted into bool.</p>
+</blockquote>
+<div class="sourceCode" id="cb36"><pre
+class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb36-1"><a href="#cb36-1" aria-hidden="true" tabindex="-1"></a><span class="pp">#include </span><span class="im">&lt;iostream&gt;</span></span>
+<span id="cb36-2"><a href="#cb36-2" aria-hidden="true" tabindex="-1"></a><span class="pp">#include </span><span class="im">&lt;optional&gt;</span></span>
+<span id="cb36-3"><a href="#cb36-3" aria-hidden="true" tabindex="-1"></a><span class="pp">#include </span><span class="im">&lt;string&gt;</span></span>
+<span id="cb36-4"><a href="#cb36-4" aria-hidden="true" tabindex="-1"></a> </span>
+<span id="cb36-5"><a href="#cb36-5" aria-hidden="true" tabindex="-1"></a> <span class="co">// optional can be used as the return type of a factory that may fail</span></span>
+<span id="cb36-6"><a href="#cb36-6" aria-hidden="true" tabindex="-1"></a> <span class="bu">std::</span>optional<span class="op">&lt;</span><span class="bu">std::</span>string<span class="op">&gt;</span> create<span class="op">(</span><span class="dt">bool</span> b<span class="op">)</span></span>
+<span id="cb36-7"><a href="#cb36-7" aria-hidden="true" tabindex="-1"></a> <span class="op">{</span></span>
+<span id="cb36-8"><a href="#cb36-8" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> <span class="op">(</span>b<span class="op">)</span> <span class="cf">return</span> <span class="st">&quot;Godzilla&quot;</span><span class="op">;</span></span>
+<span id="cb36-9"><a href="#cb36-9" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> <span class="op">{};</span></span>
+<span id="cb36-10"><a href="#cb36-10" aria-hidden="true" tabindex="-1"></a> <span class="op">}</span></span>
+<span id="cb36-11"><a href="#cb36-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb36-12"><a href="#cb36-12" aria-hidden="true" tabindex="-1"></a><span class="co">// std::nullopt can be used to create any (empty) std::optional</span></span>
+<span id="cb36-13"><a href="#cb36-13" aria-hidden="true" tabindex="-1"></a><span class="kw">auto</span> create2<span class="op">(</span><span class="dt">bool</span> b<span class="op">)</span></span>
+<span id="cb36-14"><a href="#cb36-14" aria-hidden="true" tabindex="-1"></a><span class="op">{</span></span>
+<span id="cb36-15"><a href="#cb36-15" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> b <span class="op">?</span> <span class="bu">std::</span>optional<span class="op">&lt;</span><span class="bu">std::</span>string<span class="op">&gt;{</span><span class="st">&quot;Godzilla&quot;</span><span class="op">}</span> <span class="op">:</span> <span class="bu">std::</span>nullopt<span class="op">;</span></span>
+<span id="cb36-16"><a href="#cb36-16" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span>
+<span id="cb36-17"><a href="#cb36-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb36-18"><a href="#cb36-18" aria-hidden="true" tabindex="-1"></a><span class="dt">int</span> main<span class="op">()</span></span>
+<span id="cb36-19"><a href="#cb36-19" aria-hidden="true" tabindex="-1"></a><span class="op">{</span></span>
+<span id="cb36-20"><a href="#cb36-20" aria-hidden="true" tabindex="-1"></a>    <span class="bu">std::</span>cout <span class="op">&lt;&lt;</span> <span class="st">&quot;create(false) returned &quot;</span> <span class="op">&lt;&lt;</span> create<span class="op">(</span><span class="kw">false</span><span class="op">).</span>value_or<span class="op">(</span><span class="st">&quot;empty&quot;</span><span class="op">)</span> <span class="op">&lt;&lt;</span> <span class="ch">&#39;</span><span class="sc">\n</span><span class="ch">&#39;</span><span class="op">;</span></span>
+<span id="cb36-21"><a href="#cb36-21" aria-hidden="true" tabindex="-1"></a>    <span class="co">// optional-returning factory functions are usable as conditions of while and if</span></span>
+<span id="cb36-22"><a href="#cb36-22" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> <span class="op">(</span><span class="kw">auto</span> str <span class="op">=</span> create2<span class="op">(</span><span class="kw">true</span><span class="op">))</span></span>
+<span id="cb36-23"><a href="#cb36-23" aria-hidden="true" tabindex="-1"></a>        <span class="bu">std::</span>cout <span class="op">&lt;&lt;</span> <span class="st">&quot;create2(true) returned &quot;</span> <span class="op">&lt;&lt;</span> <span class="op">*</span>str <span class="op">&lt;&lt;</span> <span class="ch">&#39;</span><span class="sc">\n</span><span class="ch">&#39;</span><span class="op">;</span></span>
+<span id="cb36-24"><a href="#cb36-24" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
+<h3 id="lvalue-rvalue">lvalue &amp; rvalue</h3>
+<pre><code>#include &lt;iostream&gt;
+#include &lt;string&gt;
+#define LOG(x) std::cout&lt;&lt;x
+using std::string;
+
+//Only receive lvalue
+void print(string&amp; v){
+        LOG(&quot;lvalue&quot;)&lt;&lt;v&lt;&lt;std::endl;
+}
+
+//Only receive rvalue
+void print(string&amp;&amp; v){
+        LOG(&quot;rvalue&quot;)&lt;&lt;v&lt;&lt;std::endl;
+}
+
+int main()
+{
+        string first = &quot;hello&quot;;
+        string last = &quot;world&quot;;
+        string full = first + last;
+        print(full);
+        print(first + last);
+}</code></pre>
+<h3 id="operator-new-delete">Operator new &amp; delete</h3>
+<blockquote>
+<p>To inspect the memory allocation</p>
+</blockquote>
+<div class="sourceCode" id="cb38"><pre
+class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb38-1"><a href="#cb38-1" aria-hidden="true" tabindex="-1"></a><span class="dt">void</span><span class="op">*</span> <span class="kw">operator</span> <span class="kw">new</span><span class="op">(</span><span class="dt">size_t</span> byte<span class="op">)</span></span>
+<span id="cb38-2"><a href="#cb38-2" aria-hidden="true" tabindex="-1"></a><span class="op">{</span></span>
+<span id="cb38-3"><a href="#cb38-3" aria-hidden="true" tabindex="-1"></a>    <span class="bu">std::</span>cout<span class="op">&lt;&lt;</span><span class="st">&quot;Allocation for &quot;</span><span class="op">&lt;&lt;</span>byte<span class="op">&lt;&lt;</span><span class="st">&quot; byte&quot;</span><span class="op">&lt;&lt;</span><span class="bu">std::</span>endl<span class="op">;</span></span>
+<span id="cb38-4"><a href="#cb38-4" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> malloc<span class="op">(</span>byte<span class="op">);</span></span>
+<span id="cb38-5"><a href="#cb38-5" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span>
+<span id="cb38-6"><a href="#cb38-6" aria-hidden="true" tabindex="-1"></a><span class="dt">void</span> <span class="kw">operator</span> <span class="kw">delete</span><span class="op">(</span><span class="dt">void</span><span class="op">*</span> ptr<span class="op">,</span><span class="dt">size_t</span> byte<span class="op">)</span></span>
+<span id="cb38-7"><a href="#cb38-7" aria-hidden="true" tabindex="-1"></a><span class="op">{</span></span>
+<span id="cb38-8"><a href="#cb38-8" aria-hidden="true" tabindex="-1"></a>    <span class="bu">std::</span>cout<span class="op">&lt;&lt;</span><span class="st">&quot;Delete for &quot;</span><span class="op">&lt;&lt;</span>byte<span class="op">&lt;&lt;</span><span class="st">&quot; byte&quot;</span><span class="op">&lt;&lt;</span><span class="bu">std::</span>endl<span class="op">;</span></span>
+<span id="cb38-9"><a href="#cb38-9" aria-hidden="true" tabindex="-1"></a>    free<span class="op">(</span>ptr<span class="op">);</span></span>
+<span id="cb38-10"><a href="#cb38-10" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
+<h3 id="algorithm-based-on-iterator">Algorithm based on Iterator</h3>
+<ol type="1">
+<li>copy</li>
+</ol>
+<div class="sourceCode" id="cb39"><pre
+class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb39-1"><a href="#cb39-1" aria-hidden="true" tabindex="-1"></a><span class="co">// Copies the elements in the range defined by [first, last), </span></span>
+<span id="cb39-2"><a href="#cb39-2" aria-hidden="true" tabindex="-1"></a><span class="co">// to another range beginning at d_first (copy destination range).</span></span>
+<span id="cb39-3"><a href="#cb39-3" aria-hidden="true" tabindex="-1"></a><span class="bu">std::</span>copy<span class="op">(</span>first<span class="op">,</span> last<span class="op">,</span> d_first<span class="op">);</span></span>
+<span id="cb39-4"><a href="#cb39-4" aria-hidden="true" tabindex="-1"></a><span class="bu">std::</span>copy_n<span class="op">(</span>first<span class="op">,</span> count<span class="op">,</span> d_fist<span class="op">);</span></span></code></pre></div>
+<ol start="2" type="1">
+<li>fill</li>
+</ol>
+<div class="sourceCode" id="cb40"><pre
+class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb40-1"><a href="#cb40-1" aria-hidden="true" tabindex="-1"></a><span class="co">// Assigns the given value to all elements in the range [first, last).</span></span>
+<span id="cb40-2"><a href="#cb40-2" aria-hidden="true" tabindex="-1"></a><span class="bu">std::</span>fill<span class="op">(</span>first<span class="op">,</span> last<span class="op">,</span> <span class="at">const</span> T<span class="op">&amp;</span> value<span class="op">)</span></span>
+<span id="cb40-3"><a href="#cb40-3" aria-hidden="true" tabindex="-1"></a><span class="bu">std::</span>fill_n<span class="op">(</span>first<span class="op">,</span> count<span class="op">,</span> <span class="at">const</span> T<span class="op">&amp;</span> value<span class="op">)</span></span></code></pre></div>
+<ol start="3" type="1">
+<li>transform<br />
+</li>
+</ol>
+<div class="sourceCode" id="cb41"><pre
+class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb41-1"><a href="#cb41-1" aria-hidden="true" tabindex="-1"></a><span class="co">// std::transform applies the given function to the elements of the given input range(s), </span></span>
+<span id="cb41-2"><a href="#cb41-2" aria-hidden="true" tabindex="-1"></a><span class="co">// and stores the result in an output range starting from d_first.</span></span>
+<span id="cb41-3"><a href="#cb41-3" aria-hidden="true" tabindex="-1"></a><span class="bu">std::</span>transform<span class="op">(</span>first<span class="op">,</span>last<span class="op">,</span>d_first<span class="op">,</span>UnaryOp<span class="op">);</span></span>
+<span id="cb41-4"><a href="#cb41-4" aria-hidden="true" tabindex="-1"></a><span class="bu">std::</span>transform<span class="op">(</span>first1<span class="op">,</span>last1<span class="op">,</span>first2<span class="op">,</span>last2<span class="op">,</span>d_first<span class="op">,</span>BinaryOp<span class="op">)</span></span></code></pre></div>
+<ol start="4" type="1">
+<li>find</li>
+</ol>
+<div class="sourceCode" id="cb42"><pre
+class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb42-1"><a href="#cb42-1" aria-hidden="true" tabindex="-1"></a><span class="co">// Returns an iterator to the first element in the range [first, last) </span></span>
+<span id="cb42-2"><a href="#cb42-2" aria-hidden="true" tabindex="-1"></a><span class="co">// that satisfies specific criteria (or last if there is no such iterator).</span></span>
+<span id="cb42-3"><a href="#cb42-3" aria-hidden="true" tabindex="-1"></a><span class="bu">std::</span>find<span class="op">(</span>first<span class="op">,</span>last<span class="op">,</span><span class="at">const</span> T<span class="op">&amp;</span> value<span class="op">)</span></span>
+<span id="cb42-4"><a href="#cb42-4" aria-hidden="true" tabindex="-1"></a><span class="bu">std::</span>find_if<span class="op">(</span>first<span class="op">,</span>last<span class="op">,</span>UnaryPred<span class="op">);</span></span></code></pre></div>
+<ol start="5" type="1">
+<li>replace<br />
+</li>
+<li>foreach<br />
+</li>
+</ol>
+<div class="sourceCode" id="cb43"><pre
+class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb43-1"><a href="#cb43-1" aria-hidden="true" tabindex="-1"></a><span class="co">// Applies the given function object f </span></span>
+<span id="cb43-2"><a href="#cb43-2" aria-hidden="true" tabindex="-1"></a><span class="co">// to the result of dereferencing every iterator </span></span>
+<span id="cb43-3"><a href="#cb43-3" aria-hidden="true" tabindex="-1"></a><span class="co">// in the range [first, last). If f returns a result, the result is ignored.</span></span>
+<span id="cb43-4"><a href="#cb43-4" aria-hidden="true" tabindex="-1"></a>for_each<span class="op">(</span>first<span class="op">,</span> last<span class="op">,</span> UnaryFunc<span class="op">);</span></span></code></pre></div>
+<h3 id="overload-in-inheritence">Overload in inheritence</h3>
+<ol type="1">
+<li>If a virtual method, no influence<br />
+</li>
+<li>If not a virtual method, one in the sub-class hides the all of the
+base.</li>
+</ol>
+<h3 id="initialize-class-members">Initialize class members</h3>
+<blockquote>
+<p>In C++, there are three common ways to initialize class members:</p>
+</blockquote>
+<ol type="1">
+<li>Initializer List (in the constructor).
+<ul>
+<li>Members are initialized directly, which is usually more efficient
+because it avoids a default initialization followed by assignment.<br />
+</li>
+<li>Certain types of members (like const, references, and members of
+classes without a default constructor) must be initialized in the
+initializer list.<br />
+</li>
+</ul></li>
+<li>Constructor Function Body.
+<ul>
+<li>Members are first default-initialized (or zero-initialized if they
+are fundamental types), then they are assigned new values in the
+constructor body.<br />
+</li>
+<li>This can lead to inefficient code because the member is initialized
+twice (first the default initialization, then the assignment).<br />
+</li>
+</ul></li>
+<li>In-line Initialization (in the declaration of the member variable).
+<ul>
+<li>This is useful when you want to provide a default value for a
+member, which is used unless the constructor provides an alternative
+initialization.</li>
+</ul></li>
+</ol>
+<table>
+<colgroup>
+<col style="width: 20%" />
+<col style="width: 20%" />
+<col style="width: 20%" />
+<col style="width: 20%" />
+<col style="width: 20%" />
+</colgroup>
+<thead>
+<tr>
+<th style="text-align: center;">Method</th>
+<th style="text-align: center;">Description</th>
+<th style="text-align: center;">Use Case</th>
+<th style="text-align: center;">Performance</th>
+<th style="text-align: center;">Limitations</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: center;">Initializer List</td>
+<td style="text-align: center;">Initializes members directly in the
+initializer list.</td>
+<td style="text-align: center;">Best for efficiency, required for const
+and references, and base classes.</td>
+<td style="text-align: center;">Most efficient, avoids double
+initialization.</td>
+<td style="text-align: center;">Required for const and references.</td>
+</tr>
+<tr>
+<td style="text-align: center;">Constructor Body</td>
+<td style="text-align: center;">Initializes members after they are
+default-initialized.</td>
+<td style="text-align: center;">Use when initialization depends on
+complex logic.</td>
+<td style="text-align: center;">Can be less efficient (double
+initialization).</td>
+<td style="text-align: center;">Cannot be used for const and
+references.</td>
+</tr>
+<tr>
+<td style="text-align: center;">In-line Declaration</td>
+<td style="text-align: center;">Initializes members at their point of
+declaration.</td>
+<td style="text-align: center;">Good for default values that don’t
+change often.</td>
+<td style="text-align: center;">Efficient like initializer list for
+default values.</td>
+<td style="text-align: center;">Overridden by constructor
+initialization.</td>
+</tr>
+</tbody>
+</table>
+<h3 id="move-constructor-move-operator">move constructor &amp; move
+operator=</h3>
+<blockquote>
+<p>A shallow copy; constructor but take care of memory leakage.<br />
+<code>std::move</code> converts a lvalue to rvalue, to call move
+method.</p>
+</blockquote>
+<pre><code>#include &lt;iostream&gt;
+#include &lt;memory&gt;
+#include &lt;cstring&gt;
+
+class String 
+{
+public:
+    ~String(){
+        std::cout&lt;&lt;&quot;destroyed&quot;&lt;&lt;std::endl;
+        delete ptr;
+    }
+    String() = delete;
+    String(const char* s){
+        std::cout&lt;&lt;&quot;constructed&quot;&lt;&lt;std::endl;
+        size = strlen(s) + 1;
+        ptr = new char[size];
+        memcpy(ptr,s,size);
+    };
+    String(const String&amp; s){
+        std::cout&lt;&lt;&quot;Copyed&quot;&lt;&lt;std::endl;
+        this-&gt;size = s.size;
+        this-&gt;ptr = new char[size];
+        memcpy(ptr,s.ptr,size);
+    };
+    String(String&amp;&amp; s){
+        std::cout&lt;&lt;&quot;Moved&quot;&lt;&lt;std::endl;
+        this-&gt;size = s.size;
+        this-&gt;ptr = s.ptr;
+        s.size = 0;
+        s.ptr = nullptr;
+    }
+    String&amp; operator=(const String&amp; s){
+        if(&amp;s == this){
+            return *this;
+        }
+        std::cout&lt;&lt;&quot;Assign&quot;&lt;&lt;std::endl;
+        delete this-&gt;ptr;
+        this-&gt;size = s.size;
+        this-&gt;ptr = new char[s.size];
+        memcpy(ptr,s.ptr,size);
+        return *this;
+    }
+    String&amp; operator=(String&amp;&amp; s){
+        if(&amp;s == this){
+            return *this;
+        }
+        std::cout&lt;&lt;&quot;Moved Assign&quot;&lt;&lt;std::endl;
+        delete this-&gt;ptr;
+        this-&gt;ptr = s.ptr;
+        this-&gt;size = s.size;
+        s.ptr = nullptr;
+        s.size = 0;
+        return *this;
+    }
+private:
+    size_t size;
+    char *ptr;
+};
+
+int main()
+{
+//constructor
+String a(&quot;java&quot;);
+//copy constructor
+String b = a;
+//move constructor
+String c = std::move(a);
+//assgin
+c = b;
+//move assgin
+c = std::move(b);
+}</code></pre>
+<h3 id="async">Async</h3>

@@ -63,7 +63,7 @@ private:
     char *ptr;
 };
 
-int main()
+void test()
 {
     //constructor
     String a("java");

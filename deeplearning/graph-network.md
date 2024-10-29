@@ -36,5 +36,43 @@
 1. Using effective features over graphs is the key to achieving good model performance.  
 2. Traditional ML pipeline uses **hand-designed** features.  
 
+> Node features  
+1. Node degree(only care numbers)   
+    - Adjacant matrix x [1,1,1...,1] 
+2. Node centrality    
+    - Eigenverctor centrality  
+    - Betweenness centrality  
+    - Closeness centrality  
+3. cluster coefficient   
+4. graphylets  
+![graphlet](./img/graphlet.jpg)
 
+
+> Link features  
+1. **Katz index**: count the number of walks of all lengths between two nodes.  
+    - Use the power of adjacent matrix  
+
+> Graph-level Features  
+1. **Color Refinement** 
+2. Graph kernels: Measure similarity between two graphs.  
+
+
+
+### Node Embeddings  
+
+#### Graph representation learning  
+> Goal: Efficient task-independent feature learning for mahine learning with graphs.  
+```mermaid
+flowchart LR
+F(Feature Engineering) --x B
+A(Input Graph) --> B(Structured Features) --> Bh
+subgraph Bh[Downstream task]
+    direction LR
+    C(Learning Algorithm) --> D(Prediction)  
+end
+E(Representation Learning) --> B
+```
+
+> Encoder: nodes to vectors  
+> Decoder: similarity of two vectors
 

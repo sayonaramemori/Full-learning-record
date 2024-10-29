@@ -390,6 +390,11 @@ int main()
     // Get z offset  
     int offset = (int)&((vectors*)nullptr)->z;
     std::cout<<offset<<std::endl;
+
+    // Better Solution  
+    #include <cstddef>
+    std::cout << "Offset of a: " << offsetof(Matrix, row) << " bytes" << std::endl;
+    std::cout << "Offset of b: " << offsetof(Matrix,col) << " bytes" << std::endl;
 }
 ```
 
@@ -585,6 +590,61 @@ int main()
         print(full);
         print(first + last);
 }
+```
+
+### Operator new & delete  
+> To inspect the memory allocation  
+```cpp
+void* operator new(size_t byte)
+{
+    std::cout<<"Allocation for "<<byte<<" byte"<<std::endl;
+    return malloc(byte);
+}
+void operator delete(void* ptr,size_t byte)
+{
+    std::cout<<"Delete for "<<byte<<" byte"<<std::endl;
+    free(ptr);
+}
+```
+
+### Algorithm based on Iterator  
+1. copy 
+```cpp
+// Copies the elements in the range defined by [first, last), 
+// to another range beginning at d_first (copy destination range).
+std::copy(first, last, d_first);
+std::copy_n(first, count, d_fist);
+```
+2. fill
+```cpp
+// Assigns the given value to all elements in the range [first, last).
+std::fill(first, last, const T& value)
+std::fill_n(first, count, const T& value)
+```
+
+3. transform  
+```cpp
+// std::transform applies the given function to the elements of the given input range(s), 
+// and stores the result in an output range starting from d_first.
+std::transform(first,last,d_first,UnaryOp);
+std::transform(first1,last1,first2,last2,d_first,BinaryOp)
+```
+
+4. find
+```cpp
+// Returns an iterator to the first element in the range [first, last) 
+// that satisfies specific criteria (or last if there is no such iterator).
+std::find(first,last,const T& value)
+std::find_if(first,last,UnaryPred);
+```
+
+5. replace  
+6. foreach  
+```cpp
+// Applies the given function object f 
+// to the result of dereferencing every iterator 
+// in the range [first, last). If f returns a result, the result is ignored.
+for_each(first, last, UnaryFunc);
 ```
 
 ### Overload in inheritence  
