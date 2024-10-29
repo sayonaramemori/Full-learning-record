@@ -13,6 +13,13 @@
     - $g=\nabla L(w_0)$
     - $w_1 = w_0 - \eta\times g$
 - Regularization: Make function smoother  
+- Momentum  
+- Error computing  
+    - Mean Square Error  
+        - $e = \sum_{i=0}(\hat{y_i}-y_{i})^2$
+    - Cross-entropy  
+        - $e=-\sum_{i=0}\hat{y_i}lny_i$
+
 
 ### Activation Functions  
 > A function can be approximately expressed with a set of piecewise functions.  
@@ -36,7 +43,21 @@
 #### Sum of series of Sigmoid function to achieve the truth function    
 ![neural](./img/neural.jpg)
 
+### Hyperparameters  
 
+## Problems  
+
+### Module bias  
+
+### Optimization issues  
+
+#### Learning Rate  
+
+##### Root Mean Square  
+
+##### RMSProp
+
+##### Learining Rate Decay and Warm up  
 
 ### Gradient Descent
 

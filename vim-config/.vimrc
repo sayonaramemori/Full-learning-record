@@ -6,7 +6,7 @@ set nohls
 set encoding=UTF-8
 set history=50
 
-""set expandtab
+set expandtab
 set tabstop=4
 set smarttab
 set shiftwidth=4
@@ -26,8 +26,8 @@ set wildmenu
 set autoindent
 set smartindent
 
-"set list 
-"set listchars=tab:▸\ ,trail:▫
+set list 
+set listchars=tab:▸\ ,trail:▫
 set scrolloff=5
 set timeout timeoutlen=300 ttimeoutlen=100
 
@@ -86,7 +86,7 @@ nnoremap <backspace> db
 
 "nnoremap <space> zA
 "set fdm=indent
-
+"
 call plug#begin()
 Plug 'preservim/nerdcommenter'
 Plug 'octol/vim-cpp-enhanced-highlight'
