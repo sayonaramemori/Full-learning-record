@@ -9,4 +9,5 @@ struct Mnist : torch::nn::Module {
 };
 
 int train_mnist();
+int test_mnist();
 

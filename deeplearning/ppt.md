@@ -3,17 +3,16 @@
 
 ### Types of Functions  
 1. Regression: The function outputs a scalar.  
-2. Classification: Given options, the function outputs the correct one.  
+2. Classification: one-hot vector + softmax + cross-entropy  
 3. Structure Learning(creative)  
 
 ### Loss function(Gradient descend)  
-- MAE, MSE, 
+- MAE, MSE  
 - To minimize the Loss  
 - $L=\frac{1}{N} \sum_{i=0}^nE$
     - $g=\nabla L(w_0)$
     - $w_1 = w_0 - \eta\times g$
 - Regularization: Make function smoother  
-- Momentum  
 - Error computing  
     - Mean Square Error  
         - $e = \sum_{i=0}(\hat{y_i}-y_{i})^2$
@@ -25,7 +24,6 @@
 > A function can be approximately expressed with a set of piecewise functions.  
 
 > Piecewise function can be approximately simulated with sigmoid functions.  
-
 
 #### Sigmoid Function  
 - $y = b + \sum_{i}c_isigmoid(b_i+\sum_jw_{ij}x_j)$
@@ -43,41 +41,21 @@
 #### Sum of series of Sigmoid function to achieve the truth function    
 ![neural](./img/neural.jpg)
 
-### Hyperparameters  
+#### Softmax  
+![softmax](./img/softmax.jpg)
 
-## Problems  
-
-### Module bias  
-
-### Optimization issues  
-
-#### Learning Rate  
-
-##### Root Mean Square  
-
-##### RMSProp
-
-##### Learining Rate Decay and Warm up  
 
 ### Gradient Descent
 
 #### True Power -- Chain Rule  
 ![backpropagation](./img/backpropagation.jpg)
 
-### Softmax  
-![softmax](./img/softmax.jpg)
-
-### Train hyper-parameters  
-
-#### Batch Size  
-> For an iteration, the train data set with specific size is considered for parameter updating.  
-$\theta = \theta - \eta\times\frac{1}{N}\sum_{i}^N$
 
 
-### General Guide  
+## General Guide  
 ![guide](./img/guide.jpg)
 
-#### Overfitting  
+### Overfitting  
 > Solutions  
 
 - less parameters, sharing parameters  
@@ -86,6 +64,54 @@ $\theta = \theta - \eta\times\frac{1}{N}\sum_{i}^N$
 - regularization  
 - dropout  
 
-#### Optimization  
+### Optimization  
+> Find a theta to get the lowest Loss  
+> SGD: Stochastic gradient descent & SGDM: SGD with Momentum  
+> Issues: Critical point makes gradient zero: local minima, local maximum and saddle point.  
+
+#### Batch Size  
+> For an iteration, the train data set with specific size is considered for parameter updating.  
+$\theta = \theta - \eta\times\frac{1}{N}\sum_{i}^N$
+
+> For batch size=1, the update is too noisy.  
+
+> Relatively, Small batch size performs better than large batch size.  
+
+
+#### Momentum  
+![momentum](./img/momentum.jpg)
+
+#### Adaptive learning rate  
+1. Adagrad: Root Mean Square  
+    ![adagrad](./img/adagrad.jpg)  
+2. RMSProp:  
+    ![rmsprop](./img/rmsprop.jpg)  
+3. Adam: RMSProp + Momentum  
+4. Learning Rate Decay & Warm up(up then down)  
+    ![rate_decay](./img/rate_decay.jpg)  
+5. AdamW  
+
+
+## Network architectures  
+
+### CNN  
+1. Set a kernel for receptive field.  
+2. Parameter Sharing  
+    ![cnn](./img/cnn.jpg)  
+
+### Spatial Transformer Layer  
+> CNN is not invariant to scaling and rotation  
+
+
+### Self-attention  
+1. To learn $W_k , W_q ,  W_v$  
+2. Multi-head self-attention is widely used  
+3. Truncated self-attention  
+4. CNN: self-attention that can only attends in a receptive field.  
+
+
+### Graph Network work  
+
+
 
 
