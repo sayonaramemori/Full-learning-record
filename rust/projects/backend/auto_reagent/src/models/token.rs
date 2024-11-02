@@ -2,7 +2,7 @@ use actix_web::web;
 use redis::RedisError;
 use crate::middleware::redis_data::RedisState;
 
-pub async fn del_token(token_key:&str,redis_data: &web::Data<RedisState>,)->Result<(),RedisError> {
+pub async fn del_token(token_key:&str,redis_data: &web::Data<RedisState>,)->Result<bool,RedisError> {
     redis_data.del(token_key).await
 }
 

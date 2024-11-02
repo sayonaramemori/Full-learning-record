@@ -7,8 +7,8 @@ use std::str::FromStr;
 
 /// Return the datas in the image
 #[get("/state")]
-async fn turbine_state(req: HttpRequest, redis_data: web::Data<RedisState>,pool: web::Data<SqlxManager>) -> HttpResponse {
-    let res = verify(&req, &redis_data,&pool).await;
+async fn turbine_state(req: HttpRequest, redis_data: web::Data<RedisState>) -> HttpResponse {
+    let res = verify(&req, &redis_data).await;
     if res.is_some() {
         match redis_data.hgetall::<HashMap<String,String>>(vec!["turbineState:001","turbineState:002"]).await {
             Ok(res) => {
@@ -29,19 +29,19 @@ async fn turbine_state(req: HttpRequest, redis_data: web::Data<RedisState>,pool:
 /// Return the newest data with the specific number
 #[get("/findlastVice/{num}")]
 pub async fn findlast_vice(req: HttpRequest,num: web::Path<f64>,redis_data:web::Data<RedisState>,pool:web::Data<SqlxManager>) -> impl Responder {
-    return findlast_record(req, num, redis_data, pool, "fluxVice").await;
+    return findlast_record(req, num, redis_data,  "fluxVice").await;
 }
 
 /// Return the newest data with the specific number
 #[get("/findlast/{num}")]
 pub async fn findlast(req: HttpRequest,num: web::Path<f64>,redis_data:web::Data<RedisState>,pool:web::Data<SqlxManager>) -> impl Responder {
-    return findlast_record(req, num, redis_data, pool, "flux").await;
+    return findlast_record(req, num, redis_data,  "flux").await;
 }
 
 /// Return the newest status of the specific target
 #[get("/pumpStatus/{num}")]
-pub async fn pump_status(num:web::Path<u32>,req:HttpRequest,redis_data:web::Data<RedisState>,pool:web::Data<SqlxManager>) -> HttpResponse {
-    let res = verify(&req, &redis_data, &pool).await;
+pub async fn pump_status(num:web::Path<u32>,req:HttpRequest,redis_data:web::Data<RedisState>) -> HttpResponse {
+    let res = verify(&req, &redis_data).await;
     if res.is_some() {
         let number = num.into_inner();
         let obj = match number {
@@ -59,8 +59,8 @@ pub async fn pump_status(num:web::Path<u32>,req:HttpRequest,redis_data:web::Data
     HttpResponse::Unauthorized().json("Bad Token")
 }
 
-async fn findlast_record(req: HttpRequest,num: web::Path<f64>,redis_data:web::Data<RedisState>,pool:web::Data<SqlxManager>,target:&'static str) -> impl Responder {
-    let res = verify(&req, &redis_data,&pool).await;
+async fn findlast_record(req: HttpRequest,num: web::Path<f64>,redis_data:web::Data<RedisState>,target:&'static str) -> impl Responder {
+    let res = verify(&req, &redis_data).await;
     if res.is_some() {
         let num = num.into_inner() as i64;
         match redis_data.lrange(target, num as usize).await {

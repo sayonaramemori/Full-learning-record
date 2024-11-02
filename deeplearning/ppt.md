@@ -91,6 +91,10 @@ $\theta = \theta - \eta\times\frac{1}{N}\sum_{i}^N$
     ![rate_decay](./img/rate_decay.jpg)  
 5. AdamW  
 
+#### Feature Normalization  
+> BatchNorm  
+
+
 
 ## Network architectures  
 
@@ -109,9 +113,62 @@ $\theta = \theta - \eta\times\frac{1}{N}\sum_{i}^N$
 3. Truncated self-attention  
 4. CNN: self-attention that can only attends in a receptive field.  
 
-
 ### Graph Network work  
 
+
+### Unsupervised Learning -- word embedding  
+
+
+### Transformer  
+> Seq2seq  
+
+1. Encoder  
+![encoder](./img/encoder.jpg)
+
+2. Decoder -- Autoregressive  
+![decoder](./img/decoder.jpg)
+
+
+### Generative Adversarial Network  
+
+
+### Self-supervised Learning  
+
+> A contextualized word embedding.    
+
+1. Bert -- A pre-trained model 
+
+
+### Auto-Encoder  
+> Feature disentangle  
+
+
+### Anomaly Detection  
+> Detect the input with different distribution from training dataset.      
+
+
+### Unsupervised Learning  
+
+
+### Explainable Machine Learning  
+1. Local explaination
+    1. Saliency Map   
+    2. Smooth Gradient  
+2. Global explaination  
+
+
+### Aversarial Attack  
+
+### Domain Adaptation  
+
+### Reinforcement Learning 
+1. Policy Gradient  
+
+![reward](./img/reward.jpg)
+
+![rewardd](./img/rewardd.jpg)
+
+### Compression for network  
 
 
 

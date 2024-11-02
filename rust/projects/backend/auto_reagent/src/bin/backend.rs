@@ -8,6 +8,8 @@ use actix::prelude::Addr;
 use std::sync::{RwLock,Arc};
 
 
+const SECRETE: &[u8] = b"sbjavawocnm";
+
 #[actix_web::main] // or #[tokio::main]
 async fn main() -> std::io::Result<()> {
     dotenvy::dotenv().unwrap();
@@ -53,8 +55,8 @@ async fn main() -> std::io::Result<()> {
             // .service(send_instruction)
             // .default_service(web::to(|| HttpResponse::Ok()))
     })
-    .bind("0.0.0.0:8080")?
-    //.bind("localhost:8080")?
+    // .bind("0.0.0.0:8080")?
+    .bind("localhost:8080")?
     .run()
     .await
 }

@@ -52,7 +52,7 @@ fn analysis_history_data(data: Vec<TempRecord<DateTime<Utc>>>, output_number: us
 }
 
 async fn history(req: HttpRequest, redis_data: web::Data<RedisState>,pool: web::Data<SqlxManager>,data:web::Json<StringDateTimeRng>,db_name:&'static str) -> HttpResponse {
-    let res = verify(&req, &redis_data,&pool).await;
+    let res = verify(&req, &redis_data).await;
     if res.is_some() {
         if let (Ok(start),Ok(end)) = (data.start.parse::<DateTime<Utc>>(),data.end.parse::<DateTime<Utc>>()) {
             let start = with_timezone(start).naive_local();
