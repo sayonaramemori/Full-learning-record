@@ -10,13 +10,13 @@ use crate::utility::time::with_timezone;
 use chrono::Datelike;
 
 #[post("/historyMain")]
-async fn main_history(req: HttpRequest, redis_data: web::Data<RedisState>,pool: web::Data<SqlxManager>,data:web::Json<StringDateTimeRng>) -> HttpResponse {
-    return history(req,redis_data,pool,data,"flux").await;
+async fn main_history(req: HttpRequest, pool: web::Data<SqlxManager>,data:web::Json<StringDateTimeRng>) -> HttpResponse {
+    return history(req,pool,data,"flux").await;
 }
 
 #[post("/historyVice")]
-async fn vice_history(req: HttpRequest, redis_data: web::Data<RedisState>,pool: web::Data<SqlxManager>,data:web::Json<StringDateTimeRng>) -> HttpResponse {
-    return history(req,redis_data,pool,data,"fluxVice").await;
+async fn vice_history(req: HttpRequest, pool: web::Data<SqlxManager>,data:web::Json<StringDateTimeRng>) -> HttpResponse {
+    return history(req,pool,data,"fluxVice").await;
 }
 
 /// To provide the table name -- named with ymd
@@ -51,8 +51,8 @@ fn analysis_history_data(data: Vec<TempRecord<DateTime<Utc>>>, output_number: us
     }
 }
 
-async fn history(req: HttpRequest, redis_data: web::Data<RedisState>,pool: web::Data<SqlxManager>,data:web::Json<StringDateTimeRng>,db_name:&'static str) -> HttpResponse {
-    let res = verify(&req, &redis_data).await;
+async fn history(req: HttpRequest, pool: web::Data<SqlxManager>,data:web::Json<StringDateTimeRng>,db_name:&'static str) -> HttpResponse {
+    let res = verify(&req).await;
     if res.is_some() {
         if let (Ok(start),Ok(end)) = (data.start.parse::<DateTime<Utc>>(),data.end.parse::<DateTime<Utc>>()) {
             let start = with_timezone(start).naive_local();

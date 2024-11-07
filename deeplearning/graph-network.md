@@ -76,3 +76,18 @@ E(Representation Learning) --> B
 > Encoder: nodes to vectors  
 > Decoder: similarity of two vectors
 
+
+### Permutation Invariance  
+> Key idea: Generate node embeddings based on **local network neighborhoods**  
+
+> Receptive field: the set of nodes that determine the embedding of a node of interest.  
+
+![gnn](./img/gnn.jpg)  
+
+
+### GCN  
+
+
+
+ 
+

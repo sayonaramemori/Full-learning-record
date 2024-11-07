@@ -6,8 +6,8 @@ use actix::prelude::*;
 use std::sync::{RwLock,Arc};
 
 #[get("/startMain")]
-pub async fn start_main(data: web::Data<Arc<RwLock<Vec<Addr<MyWs>>>>>,req:HttpRequest,redis_data:web::Data<RedisState>) -> HttpResponse {
-    let res = verify(&req, &redis_data).await;
+pub async fn start_main(data: web::Data<Arc<RwLock<Vec<Addr<MyWs>>>>>,req:HttpRequest) -> HttpResponse {
+    let res = verify(&req).await;
     if res.is_some() {
         let target = "switch";
         return start(target.to_string(),data).await;
@@ -16,8 +16,8 @@ pub async fn start_main(data: web::Data<Arc<RwLock<Vec<Addr<MyWs>>>>>,req:HttpRe
 }
 
 #[get("/startVice")]
-pub async fn start_vice(data: web::Data<Arc<RwLock<Vec<Addr<MyWs>>>>>,req:HttpRequest,redis_data:web::Data<RedisState>) -> HttpResponse {
-    let res = verify(&req, &redis_data).await;
+pub async fn start_vice(data: web::Data<Arc<RwLock<Vec<Addr<MyWs>>>>>,req:HttpRequest) -> HttpResponse {
+    let res = verify(&req).await;
     if res.is_some() {
         let target = "switchVice";
         return start(target.to_string(),data).await;
@@ -26,8 +26,8 @@ pub async fn start_vice(data: web::Data<Arc<RwLock<Vec<Addr<MyWs>>>>>,req:HttpRe
 }
 
 #[get("/stopMain")]
-pub async fn stop_main(data: web::Data<Arc<RwLock<Vec<Addr<MyWs>>>>>,req:HttpRequest,redis_data:web::Data<RedisState>) -> HttpResponse {
-    let res = verify(&req, &redis_data).await;
+pub async fn stop_main(data: web::Data<Arc<RwLock<Vec<Addr<MyWs>>>>>,req:HttpRequest) -> HttpResponse {
+    let res = verify(&req).await;
     if res.is_some() {
         let target = "switch";
         return stop(target.to_string(),data).await;
@@ -36,8 +36,8 @@ pub async fn stop_main(data: web::Data<Arc<RwLock<Vec<Addr<MyWs>>>>>,req:HttpReq
 }
 
 #[get("/stopVice")]
-pub async fn stop_vice(data: web::Data<Arc<RwLock<Vec<Addr<MyWs>>>>>,req:HttpRequest,redis_data:web::Data<RedisState>) -> HttpResponse {
-    let res = verify(&req, &redis_data).await;
+pub async fn stop_vice(data: web::Data<Arc<RwLock<Vec<Addr<MyWs>>>>>,req:HttpRequest) -> HttpResponse {
+    let res = verify(&req).await;
     if res.is_some() {
         let target = "switchVice";
         return stop(target.to_string(),data).await;
@@ -47,8 +47,8 @@ pub async fn stop_vice(data: web::Data<Arc<RwLock<Vec<Addr<MyWs>>>>>,req:HttpReq
 
 
 #[get("/setpoint/{num}/{sp}")]
-pub async fn set_point(data: web::Data<Arc<RwLock<Vec<Addr<MyWs>>>>>,nums:web::Path<(u32,f64)>,req:HttpRequest,redis_data:web::Data<RedisState>) -> HttpResponse{
-    let res = verify(&req, &redis_data).await;
+pub async fn set_point(data: web::Data<Arc<RwLock<Vec<Addr<MyWs>>>>>,nums:web::Path<(u32,f64)>,req:HttpRequest) -> HttpResponse{
+    let res = verify(&req).await;
     if res.is_some() {
         let (num,sp) = nums.into_inner();
         let obj = match num {

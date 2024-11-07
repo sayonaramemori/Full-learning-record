@@ -1,6 +1,7 @@
 -- Line numbers
 vim.opt.relativenumber = true
 vim.opt.number = true
+
 -- vim.opt.cursorline = true  -- Uncomment if you want to enable cursorline
 vim.opt.hlsearch = false
 
@@ -17,7 +18,7 @@ vim.opt.softtabstop = 4
 
 -- Command Bar
 -- vim.opt.laststatus = 2  -- Uncomment if you want a constant status line
-vim.opt.cmdheight = 2
+-- vim.opt.cmdheight = 2
 vim.opt.autochdir = true
 vim.opt.showcmd = true
 vim.opt.showmode = true
@@ -80,7 +81,6 @@ vim.keymap.set("n", "a", "A")
 
 -- Plugin and utility commands
 vim.keymap.set("n", "<leader>ta", ":TagbarToggle<CR>")
-vim.keymap.set("n", "<leader><leader>", ":source ~/.vimrc<CR>")
 vim.keymap.set("i", "{", "{<CR><CR>}<ESC>kcc")
 vim.keymap.set("i", "[", "[]<ESC>i")
 
@@ -88,7 +88,6 @@ vim.keymap.set("i", "[", "[]<ESC>i")
 vim.keymap.set("n", "-", "0")
 vim.keymap.set("n", "=", "$")
 vim.keymap.set("n", "<backspace>", "db")
-
 
 -- Bootstrap lazy.nvim
 local lazypath = vim.fn.stdpath("data") .. "/lazy/lazy.nvim"
@@ -114,35 +113,47 @@ vim.opt.rtp:prepend(lazypath)
 vim.g.maplocalleader = "\\"
 
 -- Setup lazy.nvim
+
 require("lazy").setup({
   spec = {
     -- add your plugins here
     {
-        "iamcco/markdown-preview.nvim",
-        cmd = { "MarkdownPreviewToggle", "MarkdownPreview", "MarkdownPreviewStop" },
-        ft = { "markdown" },
-        build = function() vim.fn["mkdp#util#install"]() end,
+          "iamcco/markdown-preview.nvim",
+          cmd = { "MarkdownPreviewToggle", "MarkdownPreview", "MarkdownPreviewStop" },
+          build = "cd app && npm install",
+          init = function()
+            vim.g.mkdp_filetypes = { "markdown" }
+          end,
+          ft = { "markdown" },
     },
     {
-        "vim-airline/vim-airline"
-    },
-    {
-        "rafi/awesome-vim-colorschemes"
-    },
-    {
-        'connorholyday/vim-snazzy'
-    },
-    {
-        "rebelot/kanagawa.nvim"
-    },
-    {
-        "scottmckendry/cyberdream.nvim",
-        lazy = false,
-        priority = 1000,
+        "nvim-tree/nvim-tree.lua",
+         version = "*",
+         lazy = false,
+         dependencies = {
+           "nvim-tree/nvim-web-devicons",
+         },
+         config = function()
+            require("nvim-tree").setup {}
+         end,
     },
     {
         "octol/vim-cpp-enhanced-highlight"
-    }
+    },
+    {
+        "nvim-lualine/lualine.nvim",
+         dependencies = { 'nvim-tree/nvim-web-devicons' }
+    },
+    {
+         "scottmckendry/cyberdream.nvim",
+         lazy = false,
+         priority = 1000,
+         config = function()
+            require("cyberdream").setup({
+                transparent = true,
+            })
+         end,
+    },
   },
   -- Configure any other settings here. See the documentation for more details.
   -- colorscheme that will be used when installing plugins.
@@ -151,66 +162,31 @@ require("lazy").setup({
   checker = { enabled = true },
 })
 
-require("cyberdream").setup({
-    -- Enable transparent background
-    transparent = true,
 
-    -- Enable italics comments
-    italic_comments = false,
-
-    -- Replace all fillchars with ' ' for the ultimate clean look
-    hide_fillchars = false,
-
-    -- Modern borderless telescope theme - also applies to fzf-lua
-    borderless_telescope = true,
-
-    -- Set terminal colors used in `:terminal`
-    terminal_colors = true,
-
-    -- Improve start up time by caching highlights. Generate cache with :CyberdreamBuildCache and clear with :CyberdreamClearCache
-    cache = false,
-
-    theme = {
-        variant = "default", -- use "light" for the light variant. Also accepts "auto" to set dark or light colors based on the current value of `vim.o.background`
-        saturation = 1, -- accepts a value between 0 and 1. 0 will be fully desaturated (greyscale) and 1 will be the full color (default)
-        highlights = {
-            -- Highlight groups to override, adding new groups is also possible
-            -- See `:h highlight-groups` for a list of highlight groups or run `:hi` to see all groups and their current values
-
-            -- Example:
-            Comment = { fg = "#696969", bg = "NONE", italic = true },
-
-            -- Complete list can be found in `lua/cyberdream/theme.lua`
-        },
-
-        -- Override a highlight group entirely using the color palette
-        overrides = function(colors) -- NOTE: This function nullifies the `highlights` option
-            -- Example:
-            return {
-                Comment = { fg = colors.green, bg = "NONE", italic = true },
-                ["@property"] = { fg = colors.magenta, bold = true },
-            }
-        end,
-
-        -- Override a color entirely
-        colors = {
-            -- For a list of colors see `lua/cyberdream/colours.lua`
-            -- Example:
-            bg = "#000000",
-            green = "#00ff00",
-            magenta = "#ff00ff",
-        },
-    },
-
-    -- Disable or enable colorscheme extensions
-    extensions = {
-        telescope = true,
-        notify = true,
-        mini = true,
-        ...
-    },
+-- Auto close NvimTree
+vim.api.nvim_create_autocmd({"QuitPre"}, {
+    callback = function() vim.cmd("NvimTreeClose") end,
 })
+
+require('lualine').setup()
 
 vim.cmd("colorscheme cyberdream")
 
 vim.g.cpp_class_scope_highlight = true
+
+-- global
+vim.api.nvim_set_keymap("n", "<leader>n", ":NvimTreeToggle<cr>", {silent = true, noremap = true})
+
+local function on_attach(bufnr)
+    local api = require('nvim-tree.api')
+    local function opts(desc)
+        return { desc = 'nvim-tree: ' .. desc, buffer = bufnr, noremap = true, silent = true, nowait = true }
+    end
+	vim.keymap.set('n', 's', api.node.open.vertical,                opts('Open: Vertical Split'))
+    vim.keymap.set('n', '<CR>',  api.node.open.edit,                    opts('Open'))
+end
+
+
+require("nvim-tree").setup({
+  on_attach = on_attach,
+})

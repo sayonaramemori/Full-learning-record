@@ -2,13 +2,9 @@ use actix_web::{get, guard, web, App, Error, HttpRequest, HttpResponse, HttpServ
 use actix_cors::Cors;
 extern crate AutoReagent;
 use AutoReagent::handlers::{login::*,monitor::*,machine_panel::*,history_data::*,};
-use AutoReagent::middleware::redis_data;
 use AutoReagent::middleware::{myws::{MyWs,websocket_index},redis_data::RedisState,sqlx_manager::SqlxManager};
 use actix::prelude::Addr;
 use std::sync::{RwLock,Arc};
-
-
-const SECRETE: &[u8] = b"sbjavawocnm";
 
 #[actix_web::main] // or #[tokio::main]
 async fn main() -> std::io::Result<()> {
@@ -40,7 +36,6 @@ async fn main() -> std::io::Result<()> {
             .service(findlast)
             .service(findlast_vice)
             .service(login)
-            .service(logout)
             .service(turbine_state)
             .service(check_privilege)
             .service(main_history)
