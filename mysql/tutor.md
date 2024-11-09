@@ -297,18 +297,3 @@ unlock tables;
 ```
 mysql --help | grep my.cnf
 ```
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

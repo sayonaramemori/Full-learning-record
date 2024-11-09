@@ -76,9 +76,14 @@ impl RedisState {
         redis::cmd("EXPIRE").arg(key).arg(sec).query_async::<_,()>(&mut conn).await
     }
 
-    pub async fn get(&self,key:&str) ->RedisResult<String>{
+    pub async fn get<T: FromRedisValue>(&self,key:&str) ->RedisResult<T>{
         let mut conn = self.get_auth_connection().await?;
-        redis::cmd("GET").arg(key).query_async::<_,String>(&mut conn).await
+        redis::cmd("GET").arg(key).query_async::<_,T>(&mut conn).await
+    }
+
+    pub async fn incr(&self,key:&str) ->RedisResult<()>{
+        let mut conn = self.get_auth_connection().await?;
+        redis::cmd("INCR").arg(key).query_async::<_,()>(&mut conn).await
     }
 
     pub async fn del(&self,key:&str) ->RedisResult<bool>{

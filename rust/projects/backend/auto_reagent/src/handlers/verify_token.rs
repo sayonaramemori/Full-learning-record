@@ -9,6 +9,9 @@ pub fn generate_token(info: &LoginInfo,expire_time: chrono::TimeDelta) -> String
 }
 
 pub async fn verify(req: &HttpRequest) -> Option<LoginInfo>{ 
+    let cinfo = req.connection_info();
+    let ip = cinfo.realip_remote_addr().unwrap_or("unknown");
+    println!("{ip}");
     let token = match req.headers().get("token") {
         Some(header_value) => header_value.to_str().unwrap_or(""),
         _ => "",

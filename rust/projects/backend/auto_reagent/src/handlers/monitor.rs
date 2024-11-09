@@ -51,7 +51,7 @@ pub async fn pump_status(num:web::Path<u32>,req:HttpRequest,redis_data:web::Data
             3 => "setpointViceStatus",
             _ => return HttpResponse::BadRequest().json("Bad params"),
         };
-        match redis_data.get(obj).await {
+        match redis_data.get::<String>(obj).await {
             Ok(res) => return HttpResponse::Ok().json(res),
             Err(e) => return HttpResponse::InternalServerError().json(e.to_string() + " leading Operation failed"),
         }

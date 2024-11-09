@@ -5,9 +5,13 @@ use super::verify_token::{verify,generate_token};
 use crate::middleware::{redis_data::RedisState,sqlx_manager::SqlxManager};
 use crate::models::user::exist_user;
 use crate::models::token::{del_token,add_token};
+use crate::middleware::limiter;
 
 #[post("/login")]
-async fn login(info: web::Json<LoginInfo>, pool:web::Data<SqlxManager>) -> HttpResponse {
+async fn login(req: HttpRequest,info: web::Json<LoginInfo>, pool:web::Data<SqlxManager>, redis_conn: web::Data<RedisState>) -> HttpResponse {
+    if !limiter::rate_limit_check(&req, &redis_conn).await {
+        return HttpResponse::Unauthorized().body("Too many requests");
+    }
     let res = exist_user(&info, &pool).await;
     if res.is_ok() {
         let verify_interval = Duration::hours(24);

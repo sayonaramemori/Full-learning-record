@@ -40,7 +40,7 @@ edge_labels = nx.get_edge_attributes(G, "relation")
 nx.draw_networkx_edge_labels(G, pos, edge_labels)
 nx.draw(G,pos=pos,with_labels=True)
 
-# plt.show()
+plt.show()
 # print(G)
 # G.nodes(data=True)
 
