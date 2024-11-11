@@ -1,4 +1,4 @@
-local cmp_status_ok,cmp = pcall(require,"cmp")
+local cmp = require'cmp'
 local snip_status_ok,luasnip pcall(require,"luasnip")
 
 require("luasnip/loaders/from_vscode").lazy_load()
@@ -6,7 +6,7 @@ require("luasnip/loaders/from_vscode").lazy_load()
 cmp.setup({
     snippet = {
       expand = function(args)
-        luasnip.lsp_expand(args.body)
+        require('luasnip').lsp_expand(args.body)
       end,
     },
     mapping = cmp.mapping.preset.insert({
@@ -19,10 +19,9 @@ cmp.setup({
       ['<CR>'] = cmp.mapping.confirm({ select = true }), 
     }),
     sources = cmp.config.sources({
-      { name = 'luasnip' }, -- For luasnip users.
-      { name = 'buffer' },
       { name = 'nvim_lsp' },
-      { name = 'vsnip' }, -- For vsnip users.
+      { name = 'luasnip' }, 
+      { name = 'buffer' },
     }, {
       { name = 'buffer' },
     })
