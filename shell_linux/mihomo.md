@@ -3,13 +3,12 @@
 - [Release Page](https://github.com/MetaCubeX/mihomo/releases/tag/v1.18.10)  
 - [Wiki Page](https://wiki.metacubex.one/startup/service/)  
 
-> For Windows, file.exe is recommended and file.deb for Linux  
 
-
-### Configuration  
-1. Install the installer, with github speed up, eg.
+### Configuration in Ubuntu  
+1. Download the installer, with github proxy.  
 ```shell
 # Using Github proxy ,here https://ghp.ci
+# My cpu architecture is x86_64. Choose your version.
 
 curl -L https://ghp.ci/https://github.com/MetaCubeX/mihomo/releases/download/v1.18.10/mihomo-linux-amd64-compatible-go120-v1.18.10.deb -o mihomo.deb
 ```
@@ -43,8 +42,8 @@ curl -i google.com --proxy http://127.0.0.1:[YOUR_HTTP(S)_PORT]
 # It should return some information with status code 301 if it works well.
 ```
 
-### Configure for WebUI  
-> To select node freely with GUI.  
+### Configure for Dashboard  
+> To select node freely with web-GUI.  
 ```shell
 # Caution: Github proxy also used here
 # Insert the three lines into config.yaml
@@ -61,8 +60,8 @@ sudo mv /etc/mihomo/temp.yaml /etc/mihomo/config.yaml
 sudo systemctl restart mihomo
 
 # Access via http://{{external-controller}}/ui in browser
-# The ip of your host is needed for accessing.
-# Do remember set secret for login for security.
+# The IP of your host is needed for accessment.
+# Do remember set secret for security.
 ```
 
 > Test whether GUI works well  
@@ -81,7 +80,7 @@ EOF
 cd /etc/mihomo
 sudo chmod o+x test.sh  
 
-# You should see the node you just have selected
+# You should see some information of the node you just have selected
 ./test.sh
 ```
 

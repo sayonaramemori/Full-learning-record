@@ -6,4 +6,6 @@ set(CMAKE_CXX_STANDARD 17)
 
 file(GLOB SRC ${PROJECT_SOURCE_DIR}/*.cpp)
 
+add_definitions(-DCMAKE_EXPORT_COMPILE_COMMANDS=ON)
+
 add_executable(app ${SRC})

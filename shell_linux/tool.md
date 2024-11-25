@@ -32,3 +32,4 @@ nmap -v -sn 192.168.xx.0/20
 4. tldr  
 5. neofetch  
 6. btop  
+7. fzf  

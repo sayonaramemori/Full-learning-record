@@ -13,7 +13,6 @@ databases [Number of Database]
 ```
 
 ### Start with Docker  
-- ``
 
 ### Connect to redis  
 - `redis-cli -a PASSWD -p 6379`

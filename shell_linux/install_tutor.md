@@ -56,7 +56,7 @@ sudo passwd root
 ### Remove Ubuntu  
 1. Enter Windows  
 2. Find disk manager, delete the volumn of Ubutun  
-3. Open terminal with adminstrator permission(To show Boot)  
+3. Open terminal with adminstrator permission(To show Boot, diskpart if no such cmd found)  
     1. list disk  
     2. select disk [num of UEFI]
     3. list partition  
@@ -67,7 +67,20 @@ sudo passwd root
     8. back to terminal: remove letter=G
 
 
+### Install Nvidia Driver  
+- You can install it when installing via the installation wizard.  
+- You can install it from nvidia website, just follow its wizards. Some operations maybe happen:  
+    1. Reboot for driver overwritten.  
+    2. Set CC for the version the same as kernal version.  
+- Change Cable to DP or HDMI after installation and reboot.  
+
+### Install cuda-toolkit  
+- Use Runfile to install. (Caution: No driver selection for installation)  
+- You can remove it via `/usr/local/cuda/bin/cuda-uninstall`  
 
 
+### Install cudnn  
+
+### Install libtorch  
 
 

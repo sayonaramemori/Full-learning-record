@@ -40,6 +40,43 @@
 
 
 
+## Chapter 9 --- Classification  
+
+### Free Settling  
+- For well-dispersed pulps, free settling dominates when the percentage by weight of solids is less than about 15%.  
+- To calculate the *terminal velocity* with Stokes' law and Newton's law.  
+$V_t \propto d\times(\rho_s-\rho_f)$
+
+### Hindered Settling  
+- As the proportion of solids in the pulp increase above 15%, turbulence resistance dominates.
+
+### Effect of Density on Separation Efficiency  
+- Based on the terminal velocity formula, it can be concluded that:
+    1. If two particles have the same density, then the particle with the large diameter has the higher terminal velocity.  
+    2. If two particles have the same diameter, then the heavier particles have the higher terminal velocity.  teeter
 
 
+## Chapter 11 --- Dense Medium Separation  
+- It has the ability to offer sharp separations at any required density, with a high degree of efficiency.  
+- The process is most widely applied when the density difference occurs at a coarse particle size.  
 
+### DMS circuits  
+- The feed to a dense medium circuit must be screened to remove fines, and slimes should be removed by washing, thus alleviating any tendency that such slime content may have for creating sharp increases in medium viscosity.  
+
+
+### word
+#### Ore
+|granite|platinum|silver|copper|mercury|sulfide|carbonate|
+|:--|:--|:--|:--|:--|:--|:--|
+|chloride|silicate|aluminum|beryllium|galena|cassiterite|tin|
+|metalliferous|ferrosilicon|
+
+alteration
+igneous
+molten
+magma
+feldspar
+quartz
+mica
+
+silt

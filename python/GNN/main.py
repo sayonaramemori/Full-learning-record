@@ -1,4 +1,4 @@
-import networkx as nx
+import networkx as nx 
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
@@ -15,6 +15,7 @@ from utils import sort_utils
 # Set Font for chinese display
 plt.rcParams['font.sans-serif']=['SimHei']
 plt.rcParams['axes.unicode_minus']=False
+
 
 G = nx.DiGraph()
 
@@ -40,7 +41,7 @@ edge_labels = nx.get_edge_attributes(G, "relation")
 nx.draw_networkx_edge_labels(G, pos, edge_labels)
 nx.draw(G,pos=pos,with_labels=True)
 
-# plt.show()
+plt.show()
 # print(G)
 # G.nodes(data=True)
 

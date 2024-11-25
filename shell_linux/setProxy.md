@@ -19,8 +19,8 @@ sudo vim /etc/systemd/system/docker.service.d/http-proxy.conf
 
 ### Add these 
 [Service]
-Environment="HTTP_PROXY=http://127.0.0.1:10809/"
-Environment="HTTPS_PROXY=http://127.0.0.1:10809/"
+Environment="HTTP_PROXY=http://127.0.0.1:7899/"
+Environment="HTTPS_PROXY=http://127.0.0.1:7899/"
 Environment="NO_PROXY=localhost,127.0.0.1"
 
 sudo systemctl daemon-reload

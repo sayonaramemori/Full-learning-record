@@ -4,7 +4,7 @@
 sudo apt install zsh
 
 # 将 Zsh 设置为默认 Shell
-chsh -s /bin/zsh
+# chsh -s /bin/zsh
 ```
 
 ### Install Oh My Zsh  
@@ -15,13 +15,12 @@ sudo bash install.sh
 
 ### Config  
 ```shell
-git clone https://github.com/bhilburn/powerlevel9k.git ~/.oh-my-zsh/custom/themes/powerlevel9k
 git clone https://github.com/zsh-users/zsh-autosuggestions ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-autosuggestions
 git clone https://github.com/zsh-users/zsh-syntax-highlighting.git ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-syntax-highlighting
+git clone --depth=1 https://github.com/romkatv/powerlevel10k.git ${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}/themes/powerlevel10k
 
-# Final in zshrc
-ZSH_THEME="powerlevel9k/powerlevel9k"
 plugins=(
-  git zsh-autosuggestions zsh-syntax-highlighting
+  git zsh-autosuggestions zsh-syntax-highlighting copypath
 )
+ZSH_THEME="powerlevel10k/powerlevel10k"
 ```
