@@ -1,6 +1,7 @@
 #include <iostream>
 #include <memory>
 #include <cstring>
+#include "header.hpp"
 
 class String 
 {

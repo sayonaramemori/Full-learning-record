@@ -3,8 +3,11 @@
 
 namespace string_allocation{
     void java();
-	void test();
+    void test();
     void hello();
 }
 
+namespace lrvalue {
+  void test();
+}
 

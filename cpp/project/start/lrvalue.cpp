@@ -2,13 +2,12 @@
 #include <string>
 using std::string;
 #define LOG(x) std::cout<<x
-#include <>
 
 namespace lrvalue {
   void print(string& v){
     LOG("lvalue")<<v<<std::endl;
-
   }
+
   void print(string&& v){
     LOG("rvalue")<<v<<std::endl;
   }
@@ -21,4 +20,5 @@ namespace lrvalue {
     print(full);
     print(first + last);
   }
+
 }
