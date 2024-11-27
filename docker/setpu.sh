@@ -36,13 +36,13 @@ echo \
 
       # Step 6: Reload systemd and restart Docker
       echo "Reloading systemd and restarting Docker..."
-      sudo systemctl daemon-reload
+      sudo systemctl daemon-reload &&
       sudo systemctl restart docker
 
       # Step 7: Test Docker installation by pulling an image
       echo "Testing Docker installation by pulling the hello-world image..."
       docker pull hello-world
-	  docker pull teddysun/v2ray
+      # docker pull teddysun/v2ray
 
       # Step 8: Clear apt proxy configuration
       echo "Clearing apt proxy configuration..."
@@ -51,10 +51,9 @@ echo \
       # Step 9: Clear Docker proxy configuration
       echo "Clearing Docker proxy configuration..."
       sudo rm /etc/systemd/system/docker.service.d/http-proxy.conf
-      sudo systemctl daemon-reload
+      sudo systemctl daemon-reload &&
       sudo systemctl restart docker
 
       echo "Script completed successfully."
 
-	  sudo docker run --name ciallo hello-world
-	  sudo docker stop ciallo
+	  sudo docker run --rm --name ciallo hello-world

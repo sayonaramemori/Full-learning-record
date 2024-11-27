@@ -1,21 +1,13 @@
 -- Be careful about the order of loading
+--
+-- disable netrw at the very start of your init.lua
+vim.g.loaded_netrw = 1
+vim.g.loaded_netrwPlugin = 1
+
+-- optionally enable 24-bit colour
+vim.opt.termguicolors = true
+
 require("core.keymappings")
-require("plugins.lazymanager")
-require("plugins.nvimtreesettings")
-require("plugins.commenter")
+require("core.lazy")
 
--- Set Neovim theme
-require("plugins.mycyberdream")
--- vim.cmd[[colorscheme tokyonight-storm]]
-
-require("plugins.mybufferline")
-require("plugins.mytreesitter")
-require("plugins.gitsigns")
-require("plugins.toggleterm")
-require('lualine').setup()
-
-require("plugins.cmp")
-require("plugins.lsp")
-
-
-
+vim.keymap.set("n","g<leader>","viw:Translate ZH<CR>")
