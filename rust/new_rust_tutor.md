@@ -44,7 +44,6 @@
 2. You can view String as Vec<u8> and &str as &[u8]. But only u8 can be converted to char.  
 
 
-
 ### Ownship  
 1. Variable owns its value, being destoryed when out of its scope.  
 2. Moving the ownship leads the original variable uninitialized.  
@@ -54,9 +53,9 @@
 > Copy trait including integer, float, char, bool, and tuple and array in which the data implementes the copy trait.  
 
 #### Reference  
-> Multiple readers and single writer.  
-
-1. Deep Reference is allowed in Rust.  
+- Multiple readers and single writer.  
+- Deep Reference is allowed in Rust.  
+- Deref will be automatically called.  
 
 ### Life Span  
 ```rust
@@ -819,6 +818,28 @@ The type supported by `macro_rules!`
 
 
 ### Unsafe Code  
+- Create an immutable and a mutable raw pointer from references.  
+- We can create raw pointers in safe code, but we can’t dereference raw pointers and read the data being pointed to.  
+- With raw pointers, we can create a mutable pointer and an immutable pointer to the same location and change data through the mutable pointer, potentially creating a data race. Be careful!  
+- When we know code is okay, but Rust doesn’t, it’s time to reach for unsafe code.  
+```rust
+let mut num = 5;
+let r1 = &num as *const i32;
+let r2 = &mut num as *mut i32;
+unsafe {
+    println!("r1 is: {}", *r1);
+    println!("r2 is: {}", *r2);
+}
+```
+
+#### Calling an Unsafe Block  
+```rust
+    unsafe fn dangerous() {}
+
+    unsafe {
+        dangerous();
+    }
+```
 
 
 
