@@ -80,9 +80,10 @@ git commit --amend
 //Only one commit happens, the second commit amends the first commit.
 ```
 
-## Unstage
+## Unstage and untrack  
 ```
 git reset HEAD FILES
+git rm --cached FILE
 ```
 
 ## Discard modify  

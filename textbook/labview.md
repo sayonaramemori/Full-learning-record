@@ -103,9 +103,14 @@
     - Special Attributes  
 
 #### 调用节点(member function)  
+- Call a function directly  
 - Method of VI  
 
 ### 子VI  
+
+#### Son VI Running Mode  
+- Default `One Instance Exists`  
+- Use `Multi Instance without sharing`  
 
 
 ### Multiple Thread  
