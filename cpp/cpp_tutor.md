@@ -751,3 +751,6 @@ c = std::move(b);
 
 ### Async  
 
+### Difference of Static and Shared Lib  
+
+### 

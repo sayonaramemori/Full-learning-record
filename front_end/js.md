@@ -96,7 +96,8 @@ console.log(NaN === NaN);
 |!== | not equal value or type|
 
 #### Logic Operator
-> The && and || only return the value when true, not transfering the return value to boolean
+1. The logical OR operator evaluates each operand from left to right and returns the value of the first operand that is truthy. If all operands are falsy, it returns the value of the last operand.  
+2. The logical AND operator evaluates each operand from left to right and returns the value of the first operand that is falsy. If all operands are truthy, it returns the value of the last operand.  
 ```java
 // Return undefined
 console.log(10 && undefined);

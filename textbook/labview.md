@@ -1,3 +1,4 @@
+## Basic  
 ### Features  
 - If a stream has a metric, then the displayer should have the same metric as well.  
 
@@ -76,7 +77,7 @@
 
 
 ### 事件结构 Event Struct
-- Block for event.  
+- Block for event, denoting on input received until the event is over.  
 - Different IO is accepted  
 
 #### 过滤事件结构  
@@ -124,6 +125,66 @@
 - Share datas between threads and VI.  
 
 
+
+
+## With C and Cpp  
+
+### Add decoration On declaration  
+> Caution for different toolchain for compiling.  
+```c
+#ifndef LABVIEW_H
+
+#define LABVIEW_H
+
+#ifdef DLL_EXPORTS
+  // When building the DLL
+  #define DLL __declspec(dllexport)
+#else
+  #define DLL __declspec(dllimport)
+  // When using the DLL
+#endif
+
+#define CALL __stdcall
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+#ifndef LABVIEW_H
+
+#define LABVIEW_H
+
+#ifdef DLL_EXPORTS
+  // When building the DLL
+  #define DLL __declspec(dllexport)
+#else
+  #define DLL __declspec(dllimport)
+  // When using the DLL
+#endif
+
+#define CALL __stdcall
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+// Declare you functions here
+DLL void* CALL createControllerInstance();
+DLL void CALL deleteControllerInstance(void*);
+
+#ifdef __cplusplus
+}
+#endif
+#endif
+```
+
+### Import dll to Labview  
+1. Prepare your dll and its header file.  
+2. Update the imported lib is support.  
+3. Put the dll under the executable file's path or add to PATH.  
+
+
+### Dependency Walker  
 
 
 

@@ -1,10 +1,33 @@
 #include "header.hpp"
 #include <iostream>
-#include <ostream>
+
+class vbase{
+    public:
+    void info(){
+        std::cout<<"Vbase"<<std::endl;
+    }
+    vbase(const vbase& v){
+        std::cout<<"Copy Constructor"<<std::endl;
+    }
+    vbase(){
+        std::cout<<"Constructor"<<std::endl;
+    }
+    virtual ~vbase(){
+        std::cout<<"VBase des"<<std::endl;
+    }
+};
+
+class derived: public vbase {
+    public:
+    virtual ~derived(){
+        std::cout<<"Derive des"<<std::endl;
+    }
+};
+
 int main()
 {
-    std::cout<< "SB pz" <<std::endl;
-    string_allocation::test();
-    string_allocation::hello();
-    lrvalue::test();
+    vbase a;
+    auto b = new vbase(a);
+    delete b;
+    return 0;
 }

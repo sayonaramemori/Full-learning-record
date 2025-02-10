@@ -5,8 +5,7 @@
 Timer::Timer()
 {
     this->start = std::chrono::high_resolution_clock::now();
-    std::cout<<"Start counting Time"<<std::endl;
-
+    std::cout<<"Start Time Record"<<std::endl;
 }
 
 Timer::~Timer()
