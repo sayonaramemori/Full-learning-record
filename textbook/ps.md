@@ -1,8 +1,13 @@
 ### Shortcuts   
-- `Ctrl + K` to open pre-settings  
+- `Ctrl + K` to open pre-settings(Set cache disk to :D)  
 - `Ctrl + Alt + Shift + K` to open shortcut panel.  
 - Press `shift` with a mode key to switch within the specific mode  
 
+#### Useful  
+|cmd|Explain|  
+|:--:|:--:|  
+|`C-A-i`| Set image size|  
+|`Shift+F5`| Fill|
 
 |Mode|Explain|
 |:--|:--|
@@ -12,19 +17,26 @@
 
 
 ### View  
-- Press `space`  
+- Press `space` to drag viewer  
 - `Alt + scroller` to change the scaler  
 
 
 ### Picture layer  
 - `Ctrl + Alt + Shift + E` to quickly preview the converge of the visible pictures.  
+- `C-S-N` to create a new pic-layer.  
 
-#### Quick Layer Copy  
-- In `v` mode, drag a layer with `Alt`.  
+#### Copy  
+- In pic-layer panel, drag a layer with `Alt`.  
 - `Ctrl + J`  
+- `Ctrl + Shift + J` to cut  
 
-#### Show/Hide layers
-1. `Alt + <LC>` on the *eye* to hide other layers , also on mask
+#### Show/Hide  
+- `Alt + <LC>` on the *eye* to hide other layers , also on mask
+
+#### Move(V mode)  
+- Select a pic-layer, then drag to move(Default auto selection, use `ctrl` to toggle auto-selection)
+- `Shift` to move vertically or horizentally.  
+- Use direction key to move slightly.  
 
 #### Mask on a layer  
 1. `Alt + <LC>` on the mask to edit visually  
@@ -40,18 +52,39 @@
 - `Ctrl + G` to create a group  
 - `Ctrl + Shift + G` to cancel.  
 
-
-
 #### Adjustment layer  
 
 
 ### Select Area  
-- `m` to enable rectangular select.  
-- `l` to enable string select.  
-- `w` to enable quick select.  
 
-1. `Ctrl + Shift + J` to cut a select area.(without shift recommended)    
-2. `Ctrl` + `<LC>` to generate a select area, clicking on the micro-pic on a layer  
+#### Create an select area
+- `M` to enable rectangular select, `shift` for cube.  
+- `L` to enable string select.  
+- `W` to enable quick select.  
+- `Ctrl-D` to cancel a select area.  
+- `Ctrl-Shift-D` to restore the canceled area.  
+- `Ctrl` + `<LC>` to generate a select area, clicking on the micro-pic on a layer  
+
+#### Four Mode for craft select area
+1. New area(Default).  
+2. Add  
+3. Subtract  
+4. Difference  
+
+#### Operation on select area  
+- `Right-Click` on a select area:  
+    1. click `transform area`
+    2. click `reverse selection`
+- In top bar, click `selection` then `modify` --> `border`.  
+- 羽化  
+
+### Brush  
+#### Size  
+- `Alt` + `Right-Click` + `horizental move`
+
+#### hardness  
+- `Alt` + `Right-Click` + `vertically move`
+
 
 ### Color   
 

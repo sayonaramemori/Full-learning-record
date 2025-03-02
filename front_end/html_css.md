@@ -19,23 +19,49 @@
 
 ### Image element  
 > Modify width or height then the other set with the same proportion.  
-```
+```html
 <img src='' width='' alt=''>
 ```
 
+### Table element  
+```html  
+<table>
+    <thead>
+        <tr> <th>0</th> <th>0</th> <th>0</th> </tr>
+    </thead>
+    <tbody>
+        <tr v-for="n in 3"> <td v-for="n in 3">{{ n }}</td> </tr>
+    </tbody>
+</table>
+```
 
-### Raise application  
-```
-<a href="tel:10086">Telephone</a>
-<a href="mailto:jkk@qq.com">Mail</a>
-<a href="sms:10086">sms to</a>
+### List element  
+
+#### Unordered List  
+```html  
+<ul>
+    <li>
+        <!-- Anything can be here -->
+    </li>
+</ul>
 ```
 
-### Global attribute  
+#### Ordered List  
+```html  
+<ol>
+    <li>
+        <!-- Anything can be here -->
+    </li>
+</ol>
 ```
-<img id='' class='' style='color: green;' title='' dir='' lang=''>
-//title is a hint when hold on this elements
-//dir default 'ltr', diplay from l to r, you can set it 'rtl'
+
+#### Self-Defined List  
+```html  
+<dl>
+    <dt>Attention</dt>
+    <dd>QQ</dd>
+    <dd>WeChat</dd>
+</dl>
 ```
 
 ### meta  
@@ -245,9 +271,20 @@ span {
 ### Box Model  
 > margin -- border -- padding -- content(width,height)  
 
-> Box size = border + padding + content  
-
 > margin influence the position of the box  
+
+```css
+<!--default
+width = content  
+-->
+box-sizing: content-box
+
+<!--
+width = border + padding + content  
+-->
+box-sizing: border-box
+
+```
 
 
 #### Content  
@@ -360,10 +397,8 @@ body {
 
 
 ### Relative position  
-> For slight adjustment.  
+> Still in document stream, relative to the original place.  
 ```
-//Not out of document stream
-//relative to the original place
 div {
     position: relative;
     left: 200px;
@@ -371,9 +406,8 @@ div {
 ```
 
 ### Absolute position  
+> Out of document stream, relative to the first father set postion: relative;
 ```
-//out of document stream  
-//relative to the first father set postion: relative;
 div {
     position: absolute;
     top: 20px;
@@ -545,6 +579,7 @@ div {
 }
 ```
 
+#### flexible box  
 
 
 
