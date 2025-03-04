@@ -1,3 +1,5 @@
+## Cpp Basic  
+
 ### Install by MSYS2 project  
 1. [Click me to go](https://www.msys2.org/)  
 2. Download it the and just follow its wizards  
@@ -767,6 +769,17 @@ int main()
 }
 ```
 
+## Others  
+
 ### Difference of Static and Shared Lib  
+- The dynamic library should be placed in the PATH directory or the same directory where executable file locates.
 
 ### CMake  
+
+#### Usage  
+```bash
+# Specify your build target and some options
+cmake [-S [DIR_OF_CMAKELISTS]] -B [YOUR_BUILD_DIR] -G "Ninja" -DCMAKE_BUILD_TYPE=Release -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
+# Trigger building
+cmake --build [YOUR_BUILD_DIR] --config Release
+```
