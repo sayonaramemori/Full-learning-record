@@ -1,3 +1,41 @@
+## Shell Script  
+
+
+## Others
+
+### iptables  
+
+#### Basic  
+![iptables](./img/iptables.jpg)
+```shell  
+iptables [-t filter] -L
+iptables -t nat -L
+
+iptables -t filter -I INPUT -s IP -p tcp -dport 3306 -j DROP
+iptables -t filter -D INPUT index
+
+#prevent docker
+iptables -t filter -I DOCKER -s IP -p tcp -dport [container-port] -j DROP
+```
+
+#### Architecture  
+1. Four tables with five chains  
+2. Table order: raw --> mangle --> nat --> filter  
+```mermaid
+---
+    title: Top -> Bottom Traffic road map
+---
+flowchart TB
+    A{Network} -->|IN| B[Table: nat <br> Chain: PREROUTING]
+    B -->|TO ME| D[Table: filter <br> Chain: INPUT]
+    B -->|NOT TO ME| E[Table: filter <br> Chain: FORWARD]
+    D --> G[Local Process]
+    G --> H[Table: nat <br> Chain: OUTPUT]
+    H --> I[Table: filter <br> Chain: OUTPUT]
+    I & E --> K[Routing decision]
+    K -->|OUT| L{NetWork}
+```
+
 ### Scan ip
 ```shell
 //umask is 255.255.255.0 8*3 = 24
@@ -10,17 +48,17 @@ nmap -sP IP-Range
 nmap -v -sn 192.168.xx.0/20
 ```
 
-### Scan Port
+#### Scan Port
 - `nmap -sT IP -p-`  
 - `nmap -sS IP -p-`  
 
-### Finding plc
+#### Finding plc
 > `nmap -sn 192.168.31.0/24 | grep for | cut -d ' ' -f5,6`
 
-### Trace Route  
+#### Trace Route  
 > `traceroute IP`
 
-### Rename host
+#### Rename host
 > `hostnamectl set-hostname [name]`
 
 ### Awesome tools
@@ -173,11 +211,6 @@ g++ --version
 ### Detect gcc version of kernel  
 ```shell
 cat /proc/version
-```
-
-### tldr  
-```shell
-tldr --update
 ```
 
 ### watch gpu status  

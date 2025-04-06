@@ -1,3 +1,5 @@
+## Cpp Basic  
+
 ### Install by MSYS2 project  
 1. [Click me to go](https://www.msys2.org/)  
 2. Download it the and just follow its wizards  
@@ -876,10 +878,19 @@ int main()
 }
 ```
 
+## Others  
+
 ### Difference of Static and Shared Lib  
-1. In windows, if you build a dll, three files will be generated, including, file.dll, file.lib and file.exp. The file.lib should be used for a new combination in another project. And the file.dll should be put in the PATH.  
+<<<<<<< HEAD
+1. In windows, if you build a dll, three files will be generated, including, file.dll, file.lib and file.exp. The file.lib should be used for a new combination in another project.  The dynamic library should be placed in the PATH directory or the same directory where executable file locates.
 2. Static library is also ended with lib. But it's larger and contains all the codes needed for being executable.
 
 ### CMake  
 
-
+#### Usage  
+```bash
+# Specify your build target and some options
+cmake [-S [DIR_OF_CMAKELISTS]] -B [YOUR_BUILD_DIR] -G "Ninja" -DCMAKE_BUILD_TYPE=Release -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
+# Trigger building
+cmake --build [YOUR_BUILD_DIR] --config Release
+```
