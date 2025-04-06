@@ -22,9 +22,9 @@ cmake -G "MinGW Makefiles" ..
 "C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Auxiliary\Build\vcvarsall.bat" x86
 
 :: Build scripts
-rm ./build -rf
+rm .\build -rf
 cmake -B build -G "Ninja" -DCMAKE_BUILD_TYPE=Release -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
-cp ./build/compile_commands.json .
+copy .\build\compile_commands.json .
 cmake --build build --config Release
 ```
 
@@ -75,7 +75,8 @@ unsigned int d[99]={0};
 ```
 
 ### Function  
-> Definition(in .cpp) and Declaration(in .h)  
+> Definition(in .cpp) and Declaration(in .hpp)  
+> Inline Function and Template function should be placed at hpp.  
 ```c++
 // Head file guard to prevent duplication contain, g++ also supports this feature
 #pragma once
@@ -117,7 +118,18 @@ for(init;test;operation){}
 while(bool){}
 ```
 
+### Code Block  
+> Good practice with lock
+```cpp 
+{
+    std::lock<mutex> a;
+    //do something here
+}
+// Automatically unlock
+```
+
 ### Pointer  
+> Always using Smart pointer  
 ```cpp
 void *ptr = nullptr;
 ```
@@ -547,6 +559,8 @@ int GetVal() const{}
 
 ### Smart Pointer  
 > Automatically new and delete, preventing us from memery leakage  
+
+#### unique_ptr  
 ```cpp
 #include <iostream>
 #include <memory>
@@ -585,6 +599,9 @@ int main() {
 }
 ```
 
+#### shared_ptr  
+
+
 
 ### Lambda  
 > `[capture mode](paras)->ret{body}`
@@ -592,9 +609,17 @@ int main() {
 > In nature, Lambda is a class implementing the operator(), and the captured parameters are stored as member.  
 ```cpp 
 // Lambda without Capture could be converted into fn pointer  
-void (*a)() = [](){printf("hello");}
-auto b = [](){printf("hello");}
+void (*a)() = [](){printf("hello");};
+auto b = [](){printf("hello");};
+// Default const, use mutable to remove const
+int gg = 9.81;
+MovableClass mc;
+auto c = [gg]()mutable{gg=88;};
+// Move capture
+auto d = [mc = std::move(mc)](){};
 ```
+
+
 ### Namespace  
 > Class is also a namspace  
 ```cpp
@@ -750,6 +775,90 @@ std::find_if(first,last,UnaryPred);
 for_each(first, last, UnaryFunc);
 ```
 
+### Thread  
+> Threads begin execution immediately upon construction of the associated thread object.  
+
+### Safety in Concurrent  
+
+#### std::atomic  
+```cpp  
+// atomical operation  
+atomic<bool> flag{false};
+flag.store(true);
+flag.load();
+bool previous_val = flag.exchange(false);
+
+// non-atomical operation  
+operator=();
+```
+
+#### std::unique_lock  
+> Using with condition variables.  
+> When calling cv.wait(lock), this thread will be managed by the queue inside the condition_variable.(Ensure the mutex is the same otherwise undefined)
+```cpp
+#include <iostream>
+#include <vector>
+#include <thread>
+#include <queue>
+#include <mutex>
+#include <condition_variable>
+#include <atomic>
+
+class ImageStorageThreadPool {
+public:
+    ImageStorageThreadPool(size_t numThreads):stopFlag(false) 
+    {
+        for (size_t i = 0; i < numThreads; ++i) {
+            workers.emplace_back([this] {
+                while (true) {
+                    std::function<void()> task;
+                    {
+                        std::unique_lock<std::mutex> lock(queueMutex);
+                        condition.wait(lock, [this] { 
+                            return stopFlag || !tasks.empty(); 
+                        });
+                        
+                        if (stopFlag && tasks.empty()) return;
+                        task = std::move(tasks.front());
+                        tasks.pop();
+                    }
+                    task();
+                }
+            });
+        }
+    }
+
+    ~ImageStorageThreadPool() { shutdown(); }
+
+    void enqueue(const std::function<void()>& task) {
+        {
+            std::unique_lock<std::mutex> lock(queueMutex);
+            tasks.push(task);
+        }
+        condition.notify_one();
+    }
+
+    void shutdown() {
+        if (stopFlag.exchange(true)) return;
+        
+        condition.notify_all();
+        for (auto& worker : workers) {
+            if (worker.joinable()) worker.join();
+        }
+    }
+
+private:
+    std::vector<std::thread> workers;
+    std::queue<std::function<void()>> tasks;
+    std::mutex queueMutex;
+    std::condition_variable condition;
+    std::atomic<bool> stopFlag;
+};
+
+```
+
+
+
 ### Chrono  
 ```cpp
 #include <iostream>
@@ -768,5 +877,9 @@ int main()
 ```
 
 ### Difference of Static and Shared Lib  
+1. In windows, if you build a dll, three files will be generated, including, file.dll, file.lib and file.exp. The file.lib should be used for a new combination in another project. And the file.dll should be put in the PATH.  
+2. Static library is also ended with lib. But it's larger and contains all the codes needed for being executable.
 
 ### CMake  
+
+
