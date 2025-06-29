@@ -272,7 +272,6 @@ let timer = setInterval(fn,1000);
 clearInterval(timer);
 //可以不清除
 let timeout = setTimeout(fn,1000);
-
 ```
 
 ### EventListener
@@ -499,6 +498,7 @@ Pig.eye = 2;
 //static method
 Pig.sayHi = ()=>console.log('hi');
 ```
+
 
 ### Object static method
 ```javascript
