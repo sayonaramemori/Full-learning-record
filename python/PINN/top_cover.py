@@ -140,4 +140,6 @@ model.restore("./model/top_cover_model.ckpt-59000.pt")
 checkpointer = dde.callbacks.ModelCheckpoint( "./model/top_cover_model.ckpt", verbose=1, save_better_only=True)
 pde_resampler = dde.callbacks.PDEPointResampler(period=100)
 losshistory, train_state = model.train(callbacks=[checkpointer,pde_resampler])
+from mailmsg import send_over_msg
+send_over_msg()
 dde.saveplot(losshistory, train_state, issave=True, isplot=True)
